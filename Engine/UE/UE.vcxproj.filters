@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="Delegate.h">
+      <Filter>Source Files\Runtime\Core\Delegate</Filter>
+    </ClInclude>
+    <ClInclude Include="MulticastDelegate.h">
+      <Filter>Source Files\Runtime\Core\Delegate</Filter>
+    </ClInclude>
+    <ClInclude Include="DelegatesMacros.h">
+      <Filter>Source Files\Runtime\Core\Delegate</Filter>
+    </ClInclude>
+    <ClInclude Include="InputTypes.h">
+      <Filter>Source Files\Runtime\Engine\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="InputSubsystem.h">
+      <Filter>Source Files\Subsystem</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowsInputApplication.h">
+      <Filter>Source Files\Runtime\ApplicationCore\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerController.h">
+      <Filter>Source Files\Entity\Object\Controller\PlayerController</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerInput.h">
+      <Filter>Source Files\Runtime\Engine\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="AppTimeSubsystem.h">
+      <Filter>Source Files\Subsystem</Filter>
+    </ClInclude>
+    <ClInclude Include="AppTimeRenderProxy.h">
+      <Filter>Source Files\Entity\World\Scene\SceneProxy</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneViewExtension.h">
+      <Filter>Source Files\Entity\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="FAppTimeSubsystem.h">
+      <Filter>Source Files\Subsystem</Filter>
+    </ClInclude>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{3644268a-8df1-4195-95c7-0ea2045959e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{fdd55b52-0fc9-4ba9-b117-1054c4274c0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime">
+      <UniqueIdentifier>{86115586-1e91-4b47-b5c6-a1e7361dfe73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Engine">
+      <UniqueIdentifier>{c31203d0-da68-4f77-9521-c2b2cc057541}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Engine\Viewport">
+      <UniqueIdentifier>{D8A993E0-1D1A-4D6A-B688-96DD2F322444}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Launch">
+      <UniqueIdentifier>{05e89f18-dd72-45b9-921c-d95d876913f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Subsystem">
+      <UniqueIdentifier>{41b95dea-1de5-4aa0-b71a-5d483b19e197}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RHI">
+      <UniqueIdentifier>{78d09466-498e-489e-9e97-06ae2efb162a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RHI\Windows">
+      <UniqueIdentifier>{d854ba73-e932-4ab7-87e8-f6b7b37cb7ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{76c3123e-0226-4c82-a536-f60885157240}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity">
+      <UniqueIdentifier>{b32a4a02-5131-4152-b895-eb20e42681be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Engine">
+      <UniqueIdentifier>{6bd4b8e0-31a4-4b8d-8047-55a6b24b0c9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Component">
+      <UniqueIdentifier>{1d20a7ad-c038-4312-91a1-b37987337f50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\World">
+      <UniqueIdentifier>{8250d4dd-ba0f-4c33-8a22-6ce610fed0ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Interface">
+      <UniqueIdentifier>{5eff22d8-039a-4a3c-ab86-e7be873b8461}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Object">
+      <UniqueIdentifier>{3cb577c0-94bc-4a67-a8c2-13ad3096d66f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Object\Actor">
+      <UniqueIdentifier>{43235b26-bc0b-4481-9926-d7ba302b5ebd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Object\Actor\Pawn">
+      <UniqueIdentifier>{3c0898f4-ad01-48a8-8dc5-b516ba944782}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Object\Actor\Pawn\Character">
+      <UniqueIdentifier>{d30fb062-e807-4b99-9bd8-ca8fa11b0e25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Math">
+      <UniqueIdentifier>{8ee487a9-085e-43dd-bae5-e693ca21ca64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Component\ActorComponent">
+      <UniqueIdentifier>{f0cf8d03-d44b-47f8-8d73-f77aa5f74139}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Object\Controller">
+      <UniqueIdentifier>{69629040-2c45-42eb-8939-761e1dac0390}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Object\Controller\PlayerController">
+      <UniqueIdentifier>{5198d885-5166-40a5-b4e7-cb07c8794769}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Object\Controller\AIController">
+      <UniqueIdentifier>{4dfc8c42-1895-4100-b9c9-8cb7b180379c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Core">
+      <UniqueIdentifier>{10961331-6cf1-4f30-a683-28f021008746}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\UnrealStringTypes">
+      <UniqueIdentifier>{48bb3ea8-5195-4e41-91b7-02092993a19a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\UnrealStringTypes\String">
+      <UniqueIdentifier>{e284518a-f2a5-4b59-8fb8-27e47122ad20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\UnrealStringTypes\Name">
+      <UniqueIdentifier>{607e0d1f-f965-446b-8f5a-d4e0a5b30c77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\UnrealStringTypes\Text">
+      <UniqueIdentifier>{7ce6f98c-b0ca-4f37-a0ac-c7c89dbc8980}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Core\Delegate">
+      <UniqueIdentifier>{cbd1a3a0-a330-4825-bba8-58234238c6a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Engine\Input">
+      <UniqueIdentifier>{A5364D8F-6400-49DE-B28D-E214B060FD57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\ApplicationCore">
+      <UniqueIdentifier>{A9E57F15-8AF0-4DA0-8130-90CD09867022}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\ApplicationCore\Windows">
+      <UniqueIdentifier>{97657FC7-110D-4D2A-9497-359DB120D2F5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Template">
+      <UniqueIdentifier>{426237a7-b8ff-4c0c-95ef-68c1592991e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SystemManager">
+      <UniqueIdentifier>{6408643f-1f46-48b9-bf74-92f612d6bb6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\World\Level">
+      <UniqueIdentifier>{cd4f2db7-a8b7-47d1-8800-1126dfecc1d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\World\Scene">
+      <UniqueIdentifier>{ECC22B0C-6EC9-4FD7-9784-FB9EB076A27E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\World\Scene\SceneProxy">
+      <UniqueIdentifier>{42CC1E2D-401C-48A6-992D-A984411510F8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Component\ActorComponent\SceneComponent">
+      <UniqueIdentifier>{BA1EC85B-E0D6-414C-B232-241D2030FB72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Component\ActorComponent\SceneComponent\PrimitiveComponent">
+      <UniqueIdentifier>{71A97A82-D565-40D4-B374-12BB8654082E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Component\ActorComponent\SceneComponent\PrimitiveComponent\StaticMeshComponent">
+      <UniqueIdentifier>{F37E0F1D-6BC1-4850-B176-4D4910981EAA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Object\Mesh">
+      <UniqueIdentifier>{df5532d7-2356-49ad-afaf-512fcd7d2790}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="InputComponent.h">
+      <Filter>Source Files\Entity\Component\ActorComponent\InputComponent</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="InputSubsystem.cpp">
+      <Filter>Source Files\Subsystem</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsInputApplication.cpp">
+      <Filter>Source Files\Runtime\ApplicationCore\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerController.cpp">
+      <Filter>Source Files\Entity\Object\Controller\PlayerController</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerInput.cpp">
+      <Filter>Source Files\Runtime\Engine\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="AppTimeSubsystem.cpp">
+      <Filter>Source Files\Subsystem</Filter>
+    </ClCompile>
+    <ClCompile Include="AppTimeRenderProxy.cpp">
+      <Filter>Source Files\Entity\World\Scene\SceneProxy</Filter>
+    </ClCompile>
+    <ClCompile Include="FAppTimeSubsystem.cpp">
+      <Filter>Source Files\Subsystem</Filter>
+    </ClCompile>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LaunchEngineLoop.h">
+      <Filter>Source Files\Runtime\Launch</Filter>
+    </ClInclude>
+    <ClInclude Include="define.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSystem.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="CoreTypes.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="NameTypes.h">
+      <Filter>Source Files\Runtime\UnrealStringTypes\Name</Filter>
+    </ClInclude>
+    <ClInclude Include="UnrealString.h">
+      <Filter>Source Files\Runtime\UnrealStringTypes\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>Source Files\Runtime\UnrealStringTypes\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="StringUtility.h">
+      <Filter>Source Files\Runtime\UnrealStringTypes\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Tickable.h">
+      <Filter>Source Files\Entity\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Source Files\Entity\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>Source Files\Entity\Object\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.inl">
+      <Filter>Source Files\Entity\Object\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Source Files\Entity\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Pawn.h">
+      <Filter>Source Files\Entity\Object\Actor\Pawn</Filter>
+    </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>Source Files\Entity\Object\Actor\Pawn\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Axis.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Box.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Color.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\InterpCurve.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\InterpCurvePoint.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Interval.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\IntPoint.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\IntRect.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\MathFwd.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Matrix.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Plane.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\PolynomialRootSolver.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Quat.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\QuatRotationTranslationMatrix.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\RandomStream.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\RotationMatrix.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\RotationTranslationMatrix.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Rotator.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\ScalarRegister.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Sphere.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Transform.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\TransformNonVectorized.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\TransformVectorized.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\TwoVectors.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\UnrealMath.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\UnrealMathFPU.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\UnrealMathSSE.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\UnrealMathUtility.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\UnrealMemory.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector2D.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector4.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\VectorRegister.h">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="ActorComponent.h">
+      <Filter>Source Files\Entity\Component\ActorComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller.h">
+      <Filter>Source Files\Entity\Object\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineBaseTypes.h">
+      <Filter>Source Files\Runtime\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Template.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineLoop.h">
+      <Filter>Source Files\Entity\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="T_Singleton.h">
+      <Filter>System\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="Subsystem.h">
+      <Filter>Source Files\Entity\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSubsystem.h">
+      <Filter>Source Files\Subsystem</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicRHI.h">
+      <Filter>Source Files\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowsGDIRHI.h">
+      <Filter>Source Files\RHI\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Viewport.h">
+      <Filter>Source Files\Runtime\Engine\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="GameViewportClient.h">
+      <Filter>Source Files\Runtime\Engine\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="T_RAIIPattern_ThreadGuard.h">
+      <Filter>System\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="World.h">
+      <Filter>Source Files\Entity\World</Filter>
+    </ClInclude>
+    <ClInclude Include="World.inl">
+      <Filter>Source Files\Entity\World</Filter>
+    </ClInclude>
+    <ClInclude Include="TickTaskManager.h">
+      <Filter>Source Files\SystemManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>Source Files\Entity\World\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.inl">
+      <Filter>Source Files\Entity\World\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneComponent.h">
+      <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="PrimitiveComponent.h">
+      <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent\PrimitiveComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="PrimitiveSceneProxy.h">
+      <Filter>Source Files\Entity\World\Scene\SceneProxy</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Source Files\Entity\World\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticMeshComponent.h">
+      <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent\PrimitiveComponent\StaticMeshComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticMeshSceneProxy.h">
+      <Filter>Source Files\Entity\World\Scene\SceneProxy</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticMesh.h">
+      <Filter>Source Files\Entity\Object\Mesh</Filter>
+    </ClInclude>
+    <ClCompile Include="InputComponent.cpp">
+      <Filter>Source Files\Entity\Component\ActorComponent\InputComponent</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LaunchEngineLoop.cpp">
+      <Filter>Source Files\Runtime\Launch</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Source Files\Entity\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="NameTypes.cpp">
+      <Filter>Source Files\Runtime\UnrealStringTypes\Name</Filter>
+    </ClCompile>
+    <ClCompile Include="UnrealString.cpp">
+      <Filter>Source Files\Runtime\UnrealStringTypes\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Text.cpp">
+      <Filter>Source Files\Runtime\UnrealStringTypes\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
+      <Filter>Source Files\Entity\Object\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Pawn.cpp">
+      <Filter>Source Files\Entity\Object\Actor\Pawn</Filter>
+    </ClCompile>
+    <ClCompile Include="Character.cpp">
+      <Filter>Source Files\Entity\Object\Actor\Pawn\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Source Files\Entity\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="ActorComponent.cpp">
+      <Filter>Source Files\Entity\Component\ActorComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller.cpp">
+      <Filter>Source Files\Entity\Object\Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSubsystem.cpp">
+      <Filter>Source Files\Subsystem</Filter>
+    </ClCompile>
+    <ClCompile Include="DynamicRHI.cpp">
+      <Filter>Source Files\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsGDIRHI.cpp">
+      <Filter>Source Files\RHI\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewport.cpp">
+      <Filter>Source Files\Runtime\Engine\Viewport</Filter>
+    </ClCompile>
+    <ClCompile Include="GameViewportClient.cpp">
+      <Filter>Source Files\Runtime\Engine\Viewport</Filter>
+    </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>Source Files\Entity\World</Filter>
+    </ClCompile>
+    <ClCompile Include="TickTaskManager.cpp">
+      <Filter>Source Files\SystemManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Level.cpp">
+      <Filter>Source Files\Entity\World\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneComponent.cpp">
+      <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="PrimitiveComponent.cpp">
+      <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent\PrimitiveComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files\Entity\World\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticMeshComponent.cpp">
+      <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent\PrimitiveComponent\StaticMeshComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticMeshSceneProxy.cpp">
+      <Filter>Source Files\Entity\World\Scene\SceneProxy</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\UnrealMath.cpp">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Delegate.inl">
+      <Filter>Source Files\Runtime\Core\Delegate</Filter>
+    </None>
+    <None Include="MulticastDelegate.inl">
+      <Filter>Source Files\Runtime\Core\Delegate</Filter>
+    </None>
+    <None Include="T_Singleton.inl">
+      <Filter>System\Template</Filter>
+    </None>
+    <None Include="T_RAIIPattern_ThreadGuard.inl">
+      <Filter>System\Template</Filter>
+    </None>
+    <None Include="Engine.inl">
+      <Filter>Source Files\Entity\Engine</Filter>
+    </None>
+    <None Include="UnrealString.inl">
+      <Filter>Source Files\Runtime\UnrealStringTypes\String</Filter>
+    </None>
+    <None Include="Math\Matrix.inl">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </None>
+    <None Include="Math\UnrealMathVectorCommon.h.inl">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </None>
+    <None Include="Math\UnrealMathVectorConstants.h.inl">
+      <Filter>Source Files\Runtime\Math</Filter>
+    </None>
+    <None Include="InputComponent.inl">
+      <Filter>Source Files\Entity\Component\ActorComponent\InputComponent</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\Entity\Component\ActorComponent\InputComponent">
+      <UniqueIdentifier>{ec8064fe-4378-4d40-86a4-7c593a6d6326}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

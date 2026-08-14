@@ -1,0 +1,26 @@
+# Visual Studio user state and caches
+.vs/
+*.suo
+*.user
+*.VC.db
+*.opendb
+ipch/
+
+# Build outputs
+x64/
+Debug/
+Release/
+*.obj
+*.pch
+*.pdb
+*.idb
+*.ilk
+*.lib
+*.exe
+*.tlog
+*.lastbuildstate
+*.recipe
+
+# OS files
+Thumbs.db
+.DS_Store
