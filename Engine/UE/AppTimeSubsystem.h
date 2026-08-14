@@ -29,6 +29,8 @@ private:
 
 	void PublishRenderData() const;
 
+	void PublishEngineLoopData() const;
+
 private:
 	LARGE_INTEGER __Frequency = {};
 

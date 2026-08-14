@@ -148,15 +148,13 @@ HRESULT FEngineLoop::SubsystemBootstrapper()
 	if (nullptr == GEngine)
 		return E_POINTER;
 
-
 	if (nullptr == GEngine->CreateSubsystem<RenderSubsystem>())
 		return E_FAIL;
 
 	if (nullptr == GEngine->CreateSubsystem<AppTimeSubsystem>())
 		return E_FAIL;
 
-	InputSubsystem* Input = GEngine->CreateSubsystem<InputSubsystem>();
-	if (nullptr == Input || false == Input->InitializePlatformApplication(__Hwnd))
+	if (nullptr == GEngine->CreateSubsystem<InputSubsystem>())
 		return E_FAIL;
 
 	return S_OK;

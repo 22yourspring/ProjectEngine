@@ -172,7 +172,6 @@
     <ClInclude Include="AppTimeSubsystem.h" />
     <ClInclude Include="AppTimeRenderProxy.h" />
     <ClInclude Include="SceneViewExtension.h" />
-    <ClInclude Include="FAppTimeSubsystem.h" />
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Actor.inl" />
     <ClInclude Include="Level.h" />
@@ -257,7 +256,6 @@
     <ClCompile Include="PlayerInput.cpp" />
     <ClCompile Include="AppTimeSubsystem.cpp" />
     <ClCompile Include="AppTimeRenderProxy.cpp" />
-    <ClCompile Include="FAppTimeSubsystem.cpp" />
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="TickTaskManager.cpp" />

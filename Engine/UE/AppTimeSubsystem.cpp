@@ -53,10 +53,9 @@ void AppTimeSubsystem::Tick(float _DeltaTime)
 	constexpr double MaxDeltaTime = 0.1;
 	__DeltaTime = std::clamp(__RawDeltaTime, 0.0, MaxDeltaTime);
 
-	FEngineLoop::GetInstance()->SetDeltaTime(static_cast<float>(__DeltaTime));
-
 	UpdateFramesPerSecond();
 	PublishRenderData();
+	PublishEngineLoopData();
 }
 
 double AppTimeSubsystem::MeasureDeltaTime()
@@ -99,4 +98,11 @@ void AppTimeSubsystem::PublishRenderData() const
 		return;
 
 	__RenderProxy->Submit("QPC", __FramesPerSecond, __CurrentTime);
+}
+
+void AppTimeSubsystem::PublishEngineLoopData() const
+{
+	static double __PrevDeltaTime = 0.f;
+	FEngineLoop::GetInstance()->SetDeltaTime(static_cast<float>(__DeltaTime));
+	__PrevDeltaTime = __DeltaTime;
 }

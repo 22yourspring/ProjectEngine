@@ -34,9 +34,6 @@
     <ClInclude Include="SceneViewExtension.h">
       <Filter>Source Files\Entity\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="FAppTimeSubsystem.h">
-      <Filter>Source Files\Subsystem</Filter>
-    </ClInclude>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -189,9 +186,6 @@
     </ClCompile>
     <ClCompile Include="AppTimeRenderProxy.cpp">
       <Filter>Source Files\Entity\World\Scene\SceneProxy</Filter>
-    </ClCompile>
-    <ClCompile Include="FAppTimeSubsystem.cpp">
-      <Filter>Source Files\Subsystem</Filter>
     </ClCompile>
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "InputSubsystem.h"
 
+#include "LaunchEngineLoop.h"
 #include "PlayerController.h"
 #include "WindowsInputApplication.h"
 
@@ -120,20 +121,12 @@ HRESULT InputSubsystem::Initialize()
 	for (const FPolledKey& PolledKey : PolledKeys)
 		__KeyStates.emplace(PolledKey.__Key, false);
 
-	return S_OK;
-}
-
-bool InputSubsystem::InitializePlatformApplication(HWND _WindowHandle)
-{
-	if (__PlatformApplication)
-		return true;
-
 	__PlatformApplication = std::make_unique<FWindowsInputApplication>();
-	if (__PlatformApplication->Initialize(_WindowHandle))
-		return true;
+	if (__PlatformApplication->Initialize(FEngineLoop::GetInstance()->GetHandle()))
+		return S_OK;
 
 	__PlatformApplication.reset();
-	return false;
+	return E_FAIL;
 }
 
 void InputSubsystem::Deinitialize()

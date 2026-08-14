@@ -23,7 +23,6 @@ public:
 	virtual void Tick(float _DeltaTime) override;
 	virtual bool IsTickable() const override { return false; }
 
-	bool InitializePlatformApplication(HWND _WindowHandle);
 	void TickInput(float _DeltaTime);
 
 	void SetPlayerController(APlayerController* _PlayerController);
