@@ -1,6 +1,6 @@
-//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by Editor.rc
+
+
+
 
 #define IDS_APP_TITLE			103
 
@@ -13,11 +13,25 @@
 #define IDI_SMALL				108
 #define IDC_EDITOR			109
 #define IDC_MYICON				2
+#define IDM_KEY_MAPPING             112
+#define IDD_KEY_MAPPING             113
+#define IDM_DEFAULTPAWN_MANNEQUIN   114
+#define IDM_DEFAULTPAWN_PROJECTPLAYER 115
+#define IDM_PLAY                    116
+#define IDM_STOP                    117
+#define IDM_PAUSE                   118
+#define IDC_MAPPING_TYPE            1001
+#define IDC_MAPPING_NAME            1002
+#define IDC_MAPPING_KEY             1003
+#define IDC_MAPPING_SCALE           1004
+#define IDC_MAPPING_LIST            1005
+#define IDC_MAPPING_ADD             1006
+#define IDC_MAPPING_REMOVE          1007
 #ifndef IDC_STATIC
 #define IDC_STATIC				-1
 #endif
-// Next default values for new objects
-//
+
+
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 

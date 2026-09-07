@@ -6,17 +6,17 @@
 #include <memory>
 #include <vector>
 
-class InputSubsystem;
+class InputEngineSystem;
 class UInputComponent;
 class UPlayerInput;
 
 
 UCLASS(MinimalAPI)
-class APlayerController : public AController
+class ENGINE_API APlayerController : public AController
 {
 	GENERATED_BODY()
 
-	friend class InputSubsystem;
+	friend class InputEngineSystem;
 
 public:
 	APlayerController();

@@ -1,11 +1,18 @@
 #pragma once
 
-#include <Windows.h>
+#include "pch.h"
+#include "Tickable.h"
 
-#include <memory>
-#include <string>
-#include <unordered_map>
-#include <utility>
-#include <vector>
+UCLASS(Abstract)
+class ENGINE_API IEngineSystem : public FTickableGameObject
+{
+	GENERATED_BODY()
 
-#include <cassert>
+public:
+	FEngineSystemTickFunction PrimaryEngineSystemTick;
+
+	virtual ~IEngineSystem() = default;
+	virtual HRESULT Initialize() = 0;
+	virtual void Deinitialize() = 0;
+	virtual bool UsesTickGroup() const { return false; }
+};

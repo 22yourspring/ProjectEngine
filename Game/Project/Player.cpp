@@ -5,6 +5,9 @@
 #include "UE/StaticMeshComponent.h"
 #include "UE/SceneComponent.h"
 #include "UE/InputComponent.h"
+#include "UE/GameplayStatics.h"
+#include "UE/World.h"
+#include "UE/Level.h"
 
 APlayer::APlayer()
 {
@@ -47,6 +50,18 @@ void APlayer::SetupPlayerInputComponent(UInputComponent* _InputComponent)
 
 	_InputComponent->BindAxis("MoveHorizontal", this, &APlayer::MoveHorizontal);
 	_InputComponent->BindAxis("MoveVertical", this, &APlayer::MoveVertical);
+	_InputComponent->BindAction("OpenNextLevel", EInputEvent::Pressed,
+		this, &APlayer::OpenNextLevel);
+}
+
+void APlayer::OpenNextLevel()
+{
+	UWorld* World = GetWorld();
+	if (nullptr == World || nullptr == World->GetPersistentLevel())
+		return;
+
+	UGameplayStatics::OpenLevel(this,
+		World->IsPersistentLevel(TEXT("Stage1")) ? TEXT("Stage2") : TEXT("Stage1"));
 }
 
 void APlayer::MoveHorizontal(float _Value)

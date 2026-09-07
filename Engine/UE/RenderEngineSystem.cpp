@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "RenderSubsystem.h"
+#include "RenderEngineSystem.h"
 #include "LaunchEngineLoop.h"
 #include "Engine.h"
 #include "World.h"
@@ -8,10 +8,10 @@
 #include "Viewport.h"
 #include "SceneViewExtension.h"
 
-RenderSubsystem::RenderSubsystem() = default;
-RenderSubsystem::~RenderSubsystem() = default;
+RenderEngineSystem::RenderEngineSystem() = default;
+RenderEngineSystem::~RenderEngineSystem() = default;
 
-HRESULT RenderSubsystem::Initialize()
+HRESULT RenderEngineSystem::Initialize()
 {
     __DynamicRHI = PlatformCreateDynamicRHI();
     if (nullptr == __DynamicRHI || false == __DynamicRHI->Init())
@@ -39,7 +39,7 @@ HRESULT RenderSubsystem::Initialize()
     return S_OK;
 }
 
-void RenderSubsystem::Deinitialize()
+void RenderEngineSystem::Deinitialize()
 {
 	{
 		std::lock_guard<std::mutex> Lock(__SceneViewExtensionMutex);
@@ -57,15 +57,31 @@ void RenderSubsystem::Deinitialize()
     }
 }
 
-void RenderSubsystem::Tick(float _DeltaTime)
+void RenderEngineSystem::Tick(float _DeltaTime)
 {
 }
 
-void RenderSubsystem::Render()
+void RenderEngineSystem::Render()
 {
     FSceneViewport* SceneViewport = nullptr != __GameViewportClient
         ? __GameViewportClient->GetGameViewport()
         : nullptr;
+
+	if (nullptr != SceneViewport && nullptr != __DynamicRHI)
+	{
+		HWND ViewportWindow = static_cast<HWND>(SceneViewport->GetWindowHandle());
+		RECT ClientRect = {};
+		if (nullptr != ViewportWindow && GetClientRect(ViewportWindow, &ClientRect))
+		{
+			const uint32 Width = static_cast<uint32>(ClientRect.right - ClientRect.left);
+			const uint32 Height = static_cast<uint32>(ClientRect.bottom - ClientRect.top);
+			if (Width > 0 && Height > 0 &&
+				(Width != SceneViewport->GetSizeX() || Height != SceneViewport->GetSizeY()))
+			{
+				SceneViewport->ResizeFrame(*__DynamicRHI, Width, Height);
+			}
+		}
+	}
 
     FRHIViewport* ViewportRHI = nullptr != SceneViewport
         ? SceneViewport->GetViewportRHI()
@@ -75,8 +91,8 @@ void RenderSubsystem::Render()
         false == __DynamicRHI->RHIBeginDrawingViewport(ViewportRHI, __ClearColor))
         return;
 
-    if (UWorld* World = GEngine->GetWorld())
-        World->GetScene()->Render(*__DynamicRHI);
+    if (GEngine)
+        GEngine->RenderWorld(*__DynamicRHI);
 
 	std::vector<std::shared_ptr<ISceneViewExtension>> SceneViewExtensions;
 	{
@@ -93,7 +109,7 @@ void RenderSubsystem::Render()
     __DynamicRHI->RHIEndDrawingViewport(ViewportRHI, true);
 }
 
-void RenderSubsystem::RegisterSceneViewExtension(
+void RenderEngineSystem::RegisterSceneViewExtension(
 	std::shared_ptr<ISceneViewExtension> _Extension)
 {
 	if (nullptr == _Extension)

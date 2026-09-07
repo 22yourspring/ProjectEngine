@@ -1,78 +1,78 @@
 #pragma once
 
 template<typename T>
-T* UEngine::CreateSubsystem()
+T* UEngine::CreateEngineSystem()
 {
-    static_assert(std::is_base_of<ISubsystem, T>::value, "T must derive from ISubsystem.");
+    static_assert(std::is_base_of<IEngineSystem, T>::value, "T must derive from IEngineSystem.");
 
     if (__bGameLoopStarted.load(std::memory_order_acquire))
         return nullptr;
 
-    return CreateSubsystemInternal<T>(ESubsystemInitializeReason::ExplicitPreload);
+    return CreateEngineSystemInternal<T>(EEngineSystemInitializeReason::ExplicitPreload);
 }
 
 template<typename T>
-T* UEngine::GetSubsystem()
+T* UEngine::GetEngineSystem()
 {
-    static_assert(std::is_base_of<ISubsystem, T>::value, "T must derive from ISubsystem.");
+    static_assert(std::is_base_of<IEngineSystem, T>::value, "T must derive from IEngineSystem.");
 
     const std::type_index TypeIndex(typeid(T));
-    T* Subsystem = nullptr;
+    T* EngineSystem = nullptr;
 
     {
-        std::lock_guard<std::mutex> Lock(__SubsystemMutex);
+        std::lock_guard<std::mutex> Lock(__EngineSystemMutex);
 
-        auto Iter = __Subsystems.find(TypeIndex);
+        auto Iter = __EngineSystems.find(TypeIndex);
 
-        if (__Subsystems.end() != Iter)
-            Subsystem = static_cast<T*>(Iter->second.Instance.get());
+        if (__EngineSystems.end() != Iter)
+            EngineSystem = static_cast<T*>(Iter->second.Instance.get());
     }
 
-    if (nullptr == Subsystem)
-        return CreateSubsystemInternal<T>(ESubsystemInitializeReason::RuntimeLazyAccess);
+    if (nullptr == EngineSystem)
+        return CreateEngineSystemInternal<T>(EEngineSystemInitializeReason::RuntimeLazyAccess);
 
-    if (false == InitializeSubsystem<T>(
-        Subsystem, ESubsystemInitializeReason::RuntimeLazyAccess))
+    if (false == InitializeEngineSystem<T>(
+        EngineSystem, EEngineSystemInitializeReason::RuntimeLazyAccess))
         return nullptr;
 
-    return Subsystem;
+    return EngineSystem;
 }
 
 template<typename T>
-T* UEngine::CreateSubsystemInternal(ESubsystemInitializeReason _Reason)
+T* UEngine::CreateEngineSystemInternal(EEngineSystemInitializeReason _Reason)
 {
-    static_assert(std::is_base_of<ISubsystem, T>::value, "T must derive from ISubsystem.");
+    static_assert(std::is_base_of<IEngineSystem, T>::value, "T must derive from IEngineSystem.");
 
     const std::type_index TypeIndex(typeid(T));
-    std::unique_ptr<T> NewSubsystem = std::make_unique<T>();
-    T* NewSubsystemPointer = NewSubsystem.get();
-    T* Subsystem = nullptr;
+    std::unique_ptr<T> NewEngineSystem = std::make_unique<T>();
+    T* NewEngineSystemPointer = NewEngineSystem.get();
+    T* EngineSystem = nullptr;
 
     {
-        std::lock_guard<std::mutex> Lock(__SubsystemMutex);
-        FSubsystemEntry& Entry = __Subsystems[TypeIndex];
+        std::lock_guard<std::mutex> Lock(__EngineSystemMutex);
+        FEngineSystemEntry& Entry = __EngineSystems[TypeIndex];
 
         if (nullptr == Entry.Instance)
         {
-            Entry.Instance = std::move(NewSubsystem);
-            Subsystem = NewSubsystemPointer;
+            Entry.Instance = std::move(NewEngineSystem);
+            EngineSystem = NewEngineSystemPointer;
         }
         else
         {
-            Subsystem = static_cast<T*>(Entry.Instance.get());
+            EngineSystem = static_cast<T*>(Entry.Instance.get());
         }
     }
 
-    if (false == InitializeSubsystem<T>(Subsystem, _Reason))
+    if (false == InitializeEngineSystem<T>(EngineSystem, _Reason))
         return nullptr;
 
-    return Subsystem;
+    return EngineSystem;
 }
 
 template<typename T>
-bool UEngine::InitializeSubsystem(T* _Subsystem, ESubsystemInitializeReason _Reason)
+bool UEngine::InitializeEngineSystem(T* _EngineSystem, EEngineSystemInitializeReason _Reason)
 {
-    static_assert(std::is_base_of<ISubsystem, T>::value, "T must derive from ISubsystem.");
+    static_assert(std::is_base_of<IEngineSystem, T>::value, "T must derive from IEngineSystem.");
 
-    return InitializeSubsystemEntry(std::type_index(typeid(T)), _Subsystem, typeid(T).name(), _Reason);
+    return InitializeEngineSystemEntry(std::type_index(typeid(T)), _EngineSystem, typeid(T).name(), _Reason);
 }

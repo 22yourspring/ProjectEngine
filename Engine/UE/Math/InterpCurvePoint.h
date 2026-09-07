@@ -1,4 +1,4 @@
-﻿// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -95,7 +95,7 @@ enum EInterpCurveMode : int
 	CIM_Unknown
 };
 
-#ifdef COREUOBJECT_API
+#if UE_WITH_COREUOBJECT
 template<> COREUOBJECT_API UEnum* StaticEnum<EInterpCurveMode>();
 #endif
 

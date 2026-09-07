@@ -1,10 +1,10 @@
 #pragma once
 
-#include "EngineSystem.h"
+#include "EngineMinimal.h"
 #include "CoreTypes.h"
 #include "Math/Color.h"
 
-class FRHIViewport
+class RHI_API FRHIViewport
 {
 public:
 	virtual ~FRHIViewport() = default;
@@ -18,6 +18,12 @@ enum class ERHIPresentMode
 	VSync
 };
 
+enum class ERHIInterfaceType
+{
+	GDI,
+	D3D11
+};
+
 struct FRHIViewportDesc
 {
 	void* WindowHandle = nullptr;
@@ -28,10 +34,12 @@ struct FRHIViewportDesc
 	ERHIPresentMode PresentMode = ERHIPresentMode::VSync;
 };
 
-class FDynamicRHI
+class RHI_API FDynamicRHI
 {
 public:
 	virtual ~FDynamicRHI() = default;
+	virtual const char* GetName() const = 0;
+	virtual ERHIInterfaceType GetInterfaceType() const = 0;
 
 	virtual bool Init() = 0;
 
@@ -58,4 +66,14 @@ public:
 	virtual void RHIEndDrawingViewport(FRHIViewport* _Viewport, bool _bPresent) = 0;
 };
 
+class RHI_API IDynamicRHIModule
+{
+public:
+	virtual ~IDynamicRHIModule() = default;
+	virtual const char* GetName() const = 0;
+	virtual bool IsSupported() const = 0;
+	virtual std::unique_ptr<FDynamicRHI> CreateRHI() = 0;
+};
+
+RHI_API void RHISetPreferredInterface(ERHIInterfaceType _InterfaceType);
 std::unique_ptr<FDynamicRHI> PlatformCreateDynamicRHI();

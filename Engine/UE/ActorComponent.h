@@ -3,14 +3,15 @@
 #include "Tickable.h"
 
 class UWorld;
+class AActor;
 
 UCLASS(BlueprintType, Abstract, MinimalAPI)
-class UActorComponent : public UObject
+class ENGINE_API UActorComponent : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	explicit UActorComponent() : __Owner(nullptr) {};
+	explicit UActorComponent() = default;
 	virtual ~UActorComponent() = default;
 
 public:
@@ -30,12 +31,14 @@ public:
 
 	void MarkPendingDestroy() { __bPendingDestroy = true; }
 
-	FORCEINLINE UObject* GetOwner() { return __Owner; }
-
-	FORCEINLINE void SetOwner(UObject* NewOwner) { __Owner = NewOwner; }
+	FORCEINLINE AActor* GetOwner() const { return __Owner; }
 
 private:
-	UObject* __Owner;
+	friend class AActor;
+
+	FORCEINLINE void SetOwner(AActor* _NewOwner) { __Owner = _NewOwner; }
+
+	AActor* __Owner = nullptr;
 	UWorld* __World = nullptr;
 	bool	__bPendingDestroy = false;
 };

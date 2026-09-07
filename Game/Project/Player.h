@@ -9,7 +9,7 @@ class USceneComponent;
 class UInputComponent;
 
 UCLASS()
-class PROJECT_API APlayer final : public ACharacter
+class APlayer final : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -24,16 +24,23 @@ protected:
 private:
 	UFUNCTION()
 	void MoveHorizontal(float _Value);
+
 	UFUNCTION()
 	void MoveVertical(float _Value);
+
+	UFUNCTION()
+	void OpenNextLevel();
 
 private:
 	UPROPERTY()
 	std::unique_ptr<UStaticMesh>	__PlayerMesh;
+
 	UPROPERTY()
 	USceneComponent*				__RootSceneComponent = nullptr;
+
 	UPROPERTY()
 	UStaticMeshComponent*			__MeshComponent = nullptr;
+
 	UPROPERTY()
 	float							__MoveSpeed = 300.0f;
 	float							__HorizontalInput = 0.0f;

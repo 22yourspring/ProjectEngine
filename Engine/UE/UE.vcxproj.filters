@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Filters for UE. -->
   <ItemGroup>
     <ClInclude Include="Delegate.h">
       <Filter>Source Files\Runtime\Core\Delegate</Filter>
@@ -13,8 +14,8 @@
     <ClInclude Include="InputTypes.h">
       <Filter>Source Files\Runtime\Engine\Input</Filter>
     </ClInclude>
-    <ClInclude Include="InputSubsystem.h">
-      <Filter>Source Files\Subsystem</Filter>
+    <ClInclude Include="InputEngineSystem.h">
+      <Filter>Source Files\System</Filter>
     </ClInclude>
     <ClInclude Include="WindowsInputApplication.h">
       <Filter>Source Files\Runtime\ApplicationCore\Windows</Filter>
@@ -25,8 +26,8 @@
     <ClInclude Include="PlayerInput.h">
       <Filter>Source Files\Runtime\Engine\Input</Filter>
     </ClInclude>
-    <ClInclude Include="AppTimeSubsystem.h">
-      <Filter>Source Files\Subsystem</Filter>
+    <ClInclude Include="AppTimeEngineSystem.h">
+      <Filter>Source Files\System</Filter>
     </ClInclude>
     <ClInclude Include="AppTimeRenderProxy.h">
       <Filter>Source Files\Entity\World\Scene\SceneProxy</Filter>
@@ -56,23 +57,23 @@
     <Filter Include="Source Files\Runtime\Launch">
       <UniqueIdentifier>{05e89f18-dd72-45b9-921c-d95d876913f5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Subsystem">
-      <UniqueIdentifier>{41b95dea-1de5-4aa0-b71a-5d483b19e197}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\RHI">
       <UniqueIdentifier>{78d09466-498e-489e-9e97-06ae2efb162a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\RHI\Windows">
       <UniqueIdentifier>{d854ba73-e932-4ab7-87e8-f6b7b37cb7ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="System">
-      <UniqueIdentifier>{76c3123e-0226-4c82-a536-f60885157240}</UniqueIdentifier>
+    <Filter Include="Source Files\RHI\Windows\D3D11RHI">
+      <UniqueIdentifier>{98B52912-1647-4D1A-845D-D6731312A6C2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Entity">
       <UniqueIdentifier>{b32a4a02-5131-4152-b895-eb20e42681be}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Entity\Engine">
       <UniqueIdentifier>{6bd4b8e0-31a4-4b8d-8047-55a6b24b0c9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\GameInstance">
+      <UniqueIdentifier>{a4f74f9a-5e0e-4aa0-9af4-6fb77bb7de1b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Entity\Component">
       <UniqueIdentifier>{1d20a7ad-c038-4312-91a1-b37987337f50}</UniqueIdentifier>
@@ -137,12 +138,6 @@
     <Filter Include="Source Files\Runtime\ApplicationCore\Windows">
       <UniqueIdentifier>{97657FC7-110D-4D2A-9497-359DB120D2F5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="System\Template">
-      <UniqueIdentifier>{426237a7-b8ff-4c0c-95ef-68c1592991e5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\SystemManager">
-      <UniqueIdentifier>{6408643f-1f46-48b9-bf74-92f612d6bb6e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Entity\World\Level">
       <UniqueIdentifier>{cd4f2db7-a8b7-47d1-8800-1126dfecc1d5}</UniqueIdentifier>
     </Filter>
@@ -167,10 +162,31 @@
     <ClInclude Include="InputComponent.h">
       <Filter>Source Files\Entity\Component\ActorComponent\InputComponent</Filter>
     </ClInclude>
+    <ClInclude Include="LevelStreaming.h">
+      <Filter>Source Files\Entity\World\Level\LevelStreaming</Filter>
+    </ClInclude>
+    <ClInclude Include="GameInstanceSubsystem.h">
+      <Filter>Source Files\Entity\GameInstance\GameInstanceSubsystem</Filter>
+    </ClInclude>
+    <ClInclude Include="GameplayStatics.h">
+      <Filter>Source Files\Entity\Engine\GameplayStatics</Filter>
+    </ClInclude>
+    <ClInclude Include="GameEngine.h">
+      <Filter>Source Files\Entity\Engine\GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="GameModeBase.h">
+      <Filter>Source Files\Entity\World\GameModeBase</Filter>
+    </ClInclude>
+    <ClInclude Include="Info.h">
+      <Filter>Source Files\Entity\Object\Actor\Info</Filter>
+    </ClInclude>
+    <ClInclude Include="MannequinPawn.h">
+      <Filter>Source Files\Entity\Object\Actor\Pawn\MannequinPawn</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="InputSubsystem.cpp">
-      <Filter>Source Files\Subsystem</Filter>
+    <ClCompile Include="InputEngineSystem.cpp">
+      <Filter>Source Files\System</Filter>
     </ClCompile>
     <ClCompile Include="WindowsInputApplication.cpp">
       <Filter>Source Files\Runtime\ApplicationCore\Windows</Filter>
@@ -181,8 +197,8 @@
     <ClCompile Include="PlayerInput.cpp">
       <Filter>Source Files\Runtime\Engine\Input</Filter>
     </ClCompile>
-    <ClCompile Include="AppTimeSubsystem.cpp">
-      <Filter>Source Files\Subsystem</Filter>
+    <ClCompile Include="AppTimeEngineSystem.cpp">
+      <Filter>Source Files\System</Filter>
     </ClCompile>
     <ClCompile Include="AppTimeRenderProxy.cpp">
       <Filter>Source Files\Entity\World\Scene\SceneProxy</Filter>
@@ -197,13 +213,16 @@
       <Filter>Source Files\Runtime\Launch</Filter>
     </ClInclude>
     <ClInclude Include="define.h">
-      <Filter>System</Filter>
+      <Filter>EngineTypes</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSystem.h">
-      <Filter>System</Filter>
+    <ClInclude Include="CoreMinimal.h">
+      <Filter>EngineTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineMinimal.h">
+      <Filter>EngineTypes</Filter>
     </ClInclude>
     <ClInclude Include="CoreTypes.h">
-      <Filter>System</Filter>
+      <Filter>EngineTypes</Filter>
     </ClInclude>
     <ClInclude Include="NameTypes.h">
       <Filter>Source Files\Runtime\UnrealStringTypes\Name</Filter>
@@ -347,25 +366,31 @@
       <Filter>Source Files\Runtime\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Template.h">
-      <Filter>System</Filter>
+      <Filter>EngineTypes</Filter>
     </ClInclude>
     <ClInclude Include="EngineLoop.h">
       <Filter>Source Files\Entity\Interface</Filter>
     </ClInclude>
     <ClInclude Include="T_Singleton.h">
-      <Filter>System\Template</Filter>
+      <Filter>EngineTypes\Template</Filter>
     </ClInclude>
-    <ClInclude Include="Subsystem.h">
+    <ClInclude Include="EngineSystem.h">
       <Filter>Source Files\Entity\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="RenderSubsystem.h">
-      <Filter>Source Files\Subsystem</Filter>
+    <ClInclude Include="RenderEngineSystem.h">
+      <Filter>Source Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceEngineSystem.h">
+      <Filter>Source Files\System</Filter>
     </ClInclude>
     <ClInclude Include="DynamicRHI.h">
       <Filter>Source Files\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="WindowsGDIRHI.h">
-      <Filter>Source Files\RHI\Windows</Filter>
+    <ClInclude Include="D3D11DynamicRHI.h">
+      <Filter>Source Files\RHI\Windows\D3D11RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\WindowsGDIRHI.h">
+      <Filter>Source Files\RHI\Windows\WindowsRHI</Filter>
     </ClInclude>
     <ClInclude Include="Viewport.h">
       <Filter>Source Files\Runtime\Engine\Viewport</Filter>
@@ -374,7 +399,7 @@
       <Filter>Source Files\Runtime\Engine\Viewport</Filter>
     </ClInclude>
     <ClInclude Include="T_RAIIPattern_ThreadGuard.h">
-      <Filter>System\Template</Filter>
+      <Filter>EngineTypes\Template</Filter>
     </ClInclude>
     <ClInclude Include="World.h">
       <Filter>Source Files\Entity\World</Filter>
@@ -383,13 +408,16 @@
       <Filter>Source Files\Entity\World</Filter>
     </ClInclude>
     <ClInclude Include="TickTaskManager.h">
-      <Filter>Source Files\SystemManager</Filter>
+      <Filter>Source Files\Entity\World\TickTaskManager</Filter>
     </ClInclude>
     <ClInclude Include="Level.h">
       <Filter>Source Files\Entity\World\Level</Filter>
     </ClInclude>
     <ClInclude Include="Level.inl">
       <Filter>Source Files\Entity\World\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="GameInstance.h">
+      <Filter>Source Files\Entity\GameInstance</Filter>
     </ClInclude>
     <ClInclude Include="SceneComponent.h">
       <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent</Filter>
@@ -415,9 +443,30 @@
     <ClCompile Include="InputComponent.cpp">
       <Filter>Source Files\Entity\Component\ActorComponent\InputComponent</Filter>
     </ClCompile>
+    <ClCompile Include="LevelStreaming.cpp">
+      <Filter>Source Files\Entity\World\Level\LevelStreaming</Filter>
+    </ClCompile>
+    <ClCompile Include="GameInstanceSubsystem.cpp">
+      <Filter>Source Files\Entity\GameInstance\GameInstanceSubsystem</Filter>
+    </ClCompile>
+    <ClCompile Include="GameplayStatics.cpp">
+      <Filter>Source Files\Entity\Engine\GameplayStatics</Filter>
+    </ClCompile>
+    <ClCompile Include="GameEngine.cpp">
+      <Filter>Source Files\Entity\Engine\GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="GameModeBase.cpp">
+      <Filter>Source Files\Entity\World\GameModeBase</Filter>
+    </ClCompile>
+    <ClCompile Include="Info.cpp">
+      <Filter>Source Files\Entity\Object\Actor\Info</Filter>
+    </ClCompile>
+    <ClCompile Include="MannequinPawn.cpp">
+      <Filter>Source Files\Entity\Object\Actor\Pawn\MannequinPawn</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
@@ -456,14 +505,20 @@
     <ClCompile Include="Controller.cpp">
       <Filter>Source Files\Entity\Object\Controller</Filter>
     </ClCompile>
-    <ClCompile Include="RenderSubsystem.cpp">
-      <Filter>Source Files\Subsystem</Filter>
+    <ClCompile Include="RenderEngineSystem.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceEngineSystem.cpp">
+      <Filter>Source Files\System</Filter>
     </ClCompile>
     <ClCompile Include="DynamicRHI.cpp">
       <Filter>Source Files\RHI</Filter>
     </ClCompile>
-    <ClCompile Include="WindowsGDIRHI.cpp">
-      <Filter>Source Files\RHI\Windows</Filter>
+    <ClCompile Include="D3D11DynamicRHI.cpp">
+      <Filter>Source Files\RHI\Windows\D3D11RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Windows\WindowsGDIRHI.cpp">
+      <Filter>Source Files\RHI\Windows\WindowsRHI</Filter>
     </ClCompile>
     <ClCompile Include="Viewport.cpp">
       <Filter>Source Files\Runtime\Engine\Viewport</Filter>
@@ -475,10 +530,13 @@
       <Filter>Source Files\Entity\World</Filter>
     </ClCompile>
     <ClCompile Include="TickTaskManager.cpp">
-      <Filter>Source Files\SystemManager</Filter>
+      <Filter>Source Files\Entity\World\TickTaskManager</Filter>
     </ClCompile>
     <ClCompile Include="Level.cpp">
       <Filter>Source Files\Entity\World\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="GameInstance.cpp">
+      <Filter>Source Files\Entity\GameInstance</Filter>
     </ClCompile>
     <ClCompile Include="SceneComponent.cpp">
       <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent</Filter>
@@ -507,10 +565,10 @@
       <Filter>Source Files\Runtime\Core\Delegate</Filter>
     </None>
     <None Include="T_Singleton.inl">
-      <Filter>System\Template</Filter>
+      <Filter>EngineTypes\Template</Filter>
     </None>
     <None Include="T_RAIIPattern_ThreadGuard.inl">
-      <Filter>System\Template</Filter>
+      <Filter>EngineTypes\Template</Filter>
     </None>
     <None Include="Engine.inl">
       <Filter>Source Files\Entity\Engine</Filter>
@@ -534,6 +592,42 @@
   <ItemGroup>
     <Filter Include="Source Files\Entity\Component\ActorComponent\InputComponent">
       <UniqueIdentifier>{ec8064fe-4378-4d40-86a4-7c593a6d6326}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\World\Level\LevelStreaming">
+      <UniqueIdentifier>{4edd0d5d-c9f3-4e09-a112-5d7db60ca679}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\GameInstance\GameInstanceSubsystem">
+      <UniqueIdentifier>{bbfcfb09-6d94-4e56-8f53-c33204298de7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Engine\GameplayStatics">
+      <UniqueIdentifier>{c96ea62a-39b8-4345-81bd-889d939cdfbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Engine\GameEngine">
+      <UniqueIdentifier>{d19bf742-ca18-4939-af99-d162ab830f5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\World\GameModeBase">
+      <UniqueIdentifier>{8f0e8872-8456-461b-8159-d71e30f11feb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\World\TickTaskManager">
+      <UniqueIdentifier>{6408643f-1f46-48b9-bf74-92f612d6bb6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineTypes">
+      <UniqueIdentifier>{76c3123e-0226-4c82-a536-f60885157240}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineTypes\Template">
+      <UniqueIdentifier>{426237a7-b8ff-4c0c-95ef-68c1592991e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\System">
+      <UniqueIdentifier>{41b95dea-1de5-4aa0-b71a-5d483b19e197}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Object\Actor\Pawn\MannequinPawn">
+      <UniqueIdentifier>{d6930be4-3786-4b1f-b9ac-f3f2ed7870fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Object\Actor\Info">
+      <UniqueIdentifier>{a69e4d25-abd7-4e47-9e61-e5dc7804f994}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RHI\Windows\WindowsRHI">
+      <UniqueIdentifier>{E6B342B1-8A68-4C14-AE44-2A4C7A4F3D8E}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

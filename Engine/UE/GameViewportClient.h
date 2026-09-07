@@ -11,8 +11,11 @@ public:
 	virtual ~FViewportClient() = default;
 };
 
-class UGameViewportClient final : public UObject, public FViewportClient
+UCLASS(Within=Engine, Transient, Config=Engine)
+class ENGINE_API UGameViewportClient final : public UObject, public FViewportClient
 {
+	GENERATED_BODY()
+
 public:
 	~UGameViewportClient();
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "EngineSystem.h"
+#include "EngineMinimal.h"
 
 UCLASS(Abstract, MinimalAPI)
-class UObject
+class COREUOBJECT_API UObject
 {
 	GENERATED_BODY()
 

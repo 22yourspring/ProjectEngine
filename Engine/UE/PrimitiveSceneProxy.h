@@ -15,3 +15,4 @@ public:
 protected:
 	FVector __WorldLocation = {};
 };
+

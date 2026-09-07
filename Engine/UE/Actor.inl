@@ -1,14 +1,42 @@
 #pragma once
 
 template <typename ComponentType, typename... Args>
-ComponentType* AActor::CreateDefaultSubobject(Args&&... args)
+ComponentType* AActor::CreateDefaultSubobject(Args&&... _Args)
 {
-	ComponentType* NewComp = new ComponentType(std::forward<Args>(args)...);
-	NewComp->SetOwner(this);
-	__Components.emplace_back(NewComp);
-	RegisterComponentTickFunction(NewComp);
-	if (UWorld* World = GetWorld())
-		NewComp->RegisterComponentWithWorld(World);
+	return CreateOwnedComponent<ComponentType>(
+		false,
+		std::forward<Args>(_Args)...);
+}
 
-	return NewComp;
+template <typename ComponentType, typename... Args>
+ComponentType* AActor::CreateInstanceComponent(Args&&... _Args)
+{
+	return CreateOwnedComponent<ComponentType>(
+		true,
+		std::forward<Args>(_Args)...);
+}
+
+template <typename ComponentType, typename... Args>
+ComponentType* AActor::CreateOwnedComponent(
+	bool _bInstanceComponent,
+	Args&&... _Args)
+{
+	static_assert(std::is_base_of_v<UActorComponent, ComponentType>);
+
+	auto Component = std::make_unique<ComponentType>(
+		std::forward<Args>(_Args)...);
+	ComponentType* NewComponent = Component.get();
+
+	NewComponent->SetOwner(this);
+	__ComponentStorage.push_back(std::move(Component));
+	AddOwnedComponent(NewComponent);
+
+	if (_bInstanceComponent)
+		AddInstanceComponent(NewComponent);
+
+	RegisterComponentTickFunction(NewComponent);
+	if (UWorld* World = GetWorld())
+		NewComponent->RegisterComponentWithWorld(World);
+
+	return NewComponent;
 }

@@ -83,9 +83,9 @@ Engine Loop, World, Actor/Component, Tick, Subsystem, Delegate, Input, Update/Re
 
 ```text
 ProjectEngine.sln
-├─ Engine/UE                     Engine Runtime Static Library
+├─ Engine/UE                     Engine Runtime DLL
 ├─ Engine/ThirdParty/WIL         Windows 리소스 RAII 지원 Header
-├─ Game/Project                  Gameplay Static Library와 사용 예시
+├─ Game/Project           Gameplay DLL와 사용 예시
 └─ Game/Programs
    ├─ Client                     핵심 실행 애플리케이션
    ├─ Editor                     Editor 확장을 위한 Win32 골격

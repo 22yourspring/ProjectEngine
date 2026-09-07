@@ -126,7 +126,12 @@ LRESULT FWindowsInputApplication::ProcessMessage(
 		break;
 	}
 
-	const LRESULT Result = CallWindowProcW(__OriginalWindowProc, _Hwnd, _Message, _WParam, _LParam);
+	
+	
+	const WNDPROC OriginalWindowProc = __OriginalWindowProc;
+	const LRESULT Result = OriginalWindowProc
+		? CallWindowProcW(OriginalWindowProc, _Hwnd, _Message, _WParam, _LParam)
+		: DefWindowProcW(_Hwnd, _Message, _WParam, _LParam);
 	if (WM_NCDESTROY == _Message)
 	{
 		RemovePropW(_Hwnd, InputApplicationProperty);

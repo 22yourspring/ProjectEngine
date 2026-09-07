@@ -2,7 +2,7 @@
 #include "Pawn.h"
 
 UCLASS(Blueprintable, MinimalAPI)
-class ACharacter : public APawn
+class ENGINE_API ACharacter : public APawn
 {
 	GENERATED_BODY()
 

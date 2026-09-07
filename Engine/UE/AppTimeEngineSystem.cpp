@@ -1,14 +1,16 @@
 #include "pch.h"
-#include "AppTimeSubsystem.h"
+#include "AppTimeEngineSystem.h"
 #include "Engine.h"
 #include "LaunchEngineLoop.h"
-#include "RenderSubsystem.h"
+#include "RenderEngineSystem.h"
 #include "AppTimeRenderProxy.h"
 
 #include <algorithm>
 
-HRESULT AppTimeSubsystem::Initialize()
+HRESULT AppTimeEngineSystem::Initialize()
 {
+	PrimaryEngineSystemTick.TickGroup = ETickingGroup::TG_PostUpdateWork;
+
 	if (!QueryPerformanceFrequency(&__Frequency))
 		return HRESULT_FROM_WIN32(GetLastError());
 
@@ -21,7 +23,7 @@ HRESULT AppTimeSubsystem::Initialize()
 	__AverageFrameTime = 0.0;
 	__FramesPerSecond = 0.0;
 
-	RenderSubsystem* Renderer = GEngine->GetSubsystem<RenderSubsystem>();
+	RenderEngineSystem* Renderer = GEngine->GetEngineSystem<RenderEngineSystem>();
 	if (nullptr == Renderer)
 		return E_FAIL;
 
@@ -31,7 +33,7 @@ HRESULT AppTimeSubsystem::Initialize()
 	return S_OK;
 }
 
-void AppTimeSubsystem::Deinitialize()
+void AppTimeEngineSystem::Deinitialize()
 {
 	__Frequency = {};
 	__PreviousCounter = {};
@@ -43,7 +45,7 @@ void AppTimeSubsystem::Deinitialize()
 	__RenderProxy.reset();
 }
 
-void AppTimeSubsystem::Tick(float _DeltaTime)
+void AppTimeEngineSystem::Tick(float _DeltaTime)
 {
 	UNREFERENCED_PARAMETER(_DeltaTime);
 
@@ -55,10 +57,11 @@ void AppTimeSubsystem::Tick(float _DeltaTime)
 
 	UpdateFramesPerSecond();
 	PublishRenderData();
-	PublishEngineLoopData();
+
+	FEngineLoop::GetInstance()->SetDeltaTime(static_cast<float>(__DeltaTime));
 }
 
-double AppTimeSubsystem::MeasureDeltaTime()
+double AppTimeEngineSystem::MeasureDeltaTime()
 {
 	LARGE_INTEGER CurrentCounter = {};
 
@@ -74,7 +77,7 @@ double AppTimeSubsystem::MeasureDeltaTime()
 	return DeltaTime;
 }
 
-void AppTimeSubsystem::UpdateFramesPerSecond()
+void AppTimeEngineSystem::UpdateFramesPerSecond()
 {
 	if (__RawDeltaTime <= 0.0)
 		return;
@@ -85,24 +88,16 @@ void AppTimeSubsystem::UpdateFramesPerSecond()
 	}
 	else
 	{
-		__AverageFrameTime =
-			__AverageFrameTime * 0.75 + __RawDeltaTime * 0.25;
+		__AverageFrameTime = __AverageFrameTime * 0.75 + __RawDeltaTime * 0.25;
 	}
 
 	__FramesPerSecond = 1.0 / __AverageFrameTime;
 }
 
-void AppTimeSubsystem::PublishRenderData() const
+void AppTimeEngineSystem::PublishRenderData() const
 {
 	if (nullptr == __RenderProxy)
 		return;
 
 	__RenderProxy->Submit("QPC", __FramesPerSecond, __CurrentTime);
-}
-
-void AppTimeSubsystem::PublishEngineLoopData() const
-{
-	static double __PrevDeltaTime = 0.f;
-	FEngineLoop::GetInstance()->SetDeltaTime(static_cast<float>(__DeltaTime));
-	__PrevDeltaTime = __DeltaTime;
 }

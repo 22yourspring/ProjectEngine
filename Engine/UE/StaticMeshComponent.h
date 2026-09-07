@@ -5,7 +5,7 @@
 class UStaticMesh;
 
 UCLASS(MinimalAPI)
-class UStaticMeshComponent : public UPrimitiveComponent
+class ENGINE_API UStaticMeshComponent : public UPrimitiveComponent
 {
 	GENERATED_BODY()
 

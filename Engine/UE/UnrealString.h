@@ -25,12 +25,12 @@ namespace ESearchDir
     };
 }
 
-/**
- * Lightweight Unreal-style owning string.
- *
- * FString keeps Unreal's common API surface while using std::wstring as its
- * storage. UTF-8 conversion is explicit at external-system boundaries.
- */
+
+
+
+
+
+
 class FString
 {
 public:
@@ -47,7 +47,7 @@ public:
     FString(std::wstring _Text);
     FString(std::wstring_view _Text);
 
-    // Compatibility constructors for UTF-8 sources used by this project.
+    
     FString(const char* _Utf8Text);
     FString(const std::string& _Utf8Text);
     FString(std::string_view _Utf8Text);

@@ -25,7 +25,7 @@ UWorld* AActor::GetWorld() const
 
 bool AActor::SetRootComponent(USceneComponent* _RootComponent)
 {
-	if (nullptr != _RootComponent && _RootComponent->GetOwner() != this)
+	if (nullptr != _RootComponent && !OwnsComponent(_RootComponent))
 		return false;
 
 	__RootComponent = _RootComponent;
@@ -76,27 +76,78 @@ void AActor::Destroy()
 
 bool AActor::DestroyComponent(UActorComponent* _Component)
 {
-	if (nullptr == _Component)
+	if (!OwnsComponent(_Component))
 		return false;
-
-	if (_Component == __RootComponent)
-		__RootComponent = nullptr;
 
 	UWorld* World = GetWorld();
 
 	if (World && World->IsTicking())
 	{
+		if (_Component->IsPendingDestroy())
+			return false;
+
 		_Component->MarkPendingDestroy();
 		World->QueueComponentDestroy(this, _Component);
 
 		return true;
 	}
 
+	_Component->MarkPendingDestroy();
+
+	if (_Component == __RootComponent)
+		__RootComponent = nullptr;
+
 	UnregisterComponentTickFunction(_Component);
 	_Component->UnregisterComponent();
 	RemoveComponent(_Component);
 
 	return true;
+}
+
+bool AActor::OwnsComponent(UActorComponent* _Component) const
+{
+	return nullptr != _Component &&
+		__OwnedComponents.contains(_Component);
+}
+
+bool AActor::AddOwnedComponent(UActorComponent* _Component)
+{
+	if (nullptr == _Component || _Component->GetOwner() != this)
+		return false;
+
+	return __OwnedComponents.insert(_Component).second;
+}
+
+bool AActor::AddInstanceComponent(UActorComponent* _Component)
+{
+	if (!OwnsComponent(_Component))
+		return false;
+
+	if (std::find(
+		__InstanceComponents.begin(),
+		__InstanceComponents.end(),
+		_Component) != __InstanceComponents.end())
+	{
+		return false;
+	}
+
+	__InstanceComponents.push_back(_Component);
+	return true;
+}
+
+void AActor::RemoveOwnedComponent(UActorComponent* _Component)
+{
+	__OwnedComponents.erase(_Component);
+}
+
+void AActor::RemoveInstanceComponent(UActorComponent* _Component)
+{
+	__InstanceComponents.erase(
+		std::remove(
+			__InstanceComponents.begin(),
+			__InstanceComponents.end(),
+			_Component),
+		__InstanceComponents.end());
 }
 
 void AActor::RegisterComponentTickFunction(UActorComponent* _Component)
@@ -113,17 +164,21 @@ void AActor::UnregisterComponentTickFunction(UActorComponent* _Component)
 
 void AActor::RemoveComponent(UActorComponent* _Component)
 {
+	RemoveInstanceComponent(_Component);
+	RemoveOwnedComponent(_Component);
+	_Component->SetOwner(nullptr);
+
 	auto Iter = std::remove_if
 	(
-		__Components.begin(),
-		__Components.end(),
+		__ComponentStorage.begin(),
+		__ComponentStorage.end(),
 		[_Component](const std::unique_ptr<UActorComponent>& Component)
 		{
 			return Component.get() == _Component;
 		}
 	);
 
-	__Components.erase(Iter, __Components.end());
+	__ComponentStorage.erase(Iter, __ComponentStorage.end());
 }
 
 void AActor::Destroyed()

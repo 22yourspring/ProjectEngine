@@ -4,12 +4,12 @@
 
 #include <string_view>
 
-/**
- * Lightweight Unreal-style display text.
- *
- * The class preserves the common FText API while storing an FString. It does
- * not yet include Unreal Engine's localization history or culture database.
- */
+
+
+
+
+
+
 class FText
 {
 public:

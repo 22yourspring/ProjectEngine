@@ -6,12 +6,12 @@
 #include <functional>
 #include <string_view>
 
-/**
- * Lightweight Unreal-style immutable name.
- *
- * This compatibility type keeps the FName API used by the imported math code.
- * Unlike Unreal Engine's global name table, it owns its text through FString.
- */
+
+
+
+
+
+
 class FName
 {
 public:

@@ -1,26 +1,50 @@
 #include "pch.h"
 #include "LaunchEngineLoop.h"
-#include "Engine.h"
-#include "RenderSubsystem.h"
-#include "AppTimeSubsystem.h"
-#include "InputSubsystem.h"
+#include "GameEngine.h"
+#include "RenderEngineSystem.h"
+#include "AppTimeEngineSystem.h"
+#include "InputEngineSystem.h"
+#include "ResourceEngineSystem.h"
 
 FEngineLoop::FEngineLoop() = default;
 FEngineLoop::~FEngineLoop() = default;
 
 HRESULT FEngineLoop::Initialize(POINT _Resolution)
 {
+	return InitializeWithWindow(GetActiveWindow(), _Resolution, false);
+}
+
+HRESULT FEngineLoop::InitializeForEmbeddedViewport(HWND _WindowHandle, POINT _Resolution)
+{
+	return InitializeWithWindow(_WindowHandle, _Resolution, true);
+}
+
+HRESULT FEngineLoop::InitializeWithWindow(
+	HWND _WindowHandle,
+	POINT _Resolution,
+	bool _IsEmbeddedViewport)
+{
 	if (__bInitialized.load(std::memory_order_acquire))
 		return S_FALSE;
 
-	__Hwnd = GetActiveWindow();
+	__Hwnd = _WindowHandle;
 	if (nullptr == __Hwnd)
 		return E_HANDLE;
 
-	if (FAILED(ResolutionInitialize(_Resolution)))
-		return E_FAIL;
+	if (_IsEmbeddedViewport)
+	{
+		if (_Resolution.x <= 0 || _Resolution.y <= 0)
+			return E_INVALIDARG;
 
-	__Engine = std::make_unique<UEngine>();
+		__Resolution = _Resolution;
+	}
+	else
+	{
+		if (FAILED(ResolutionInitialize(_Resolution)))
+			return E_FAIL;
+	}
+
+	__Engine = std::make_unique<UGameEngine>();
 	GEngine = __Engine.get();
 
 	auto CleanupFailedEngineInitialization = [this]()
@@ -36,7 +60,7 @@ HRESULT FEngineLoop::Initialize(POINT _Resolution)
 	{
 		GEngine->SetGameLoopStarted(false);
 
-		if (FAILED(SubsystemBootstrapper()))
+		if (FAILED(EngineSystemBootstrapper()))
 		{
 			CleanupFailedEngineInitialization();
 			return E_FAIL;
@@ -53,7 +77,6 @@ HRESULT FEngineLoop::Initialize(POINT _Resolution)
 	
 	{
 		__ThreadRunning = true;
-
 		__UpdateThread = std::thread(&FEngineLoop::Update, this);
 		__RenderThread = std::thread(&FEngineLoop::Render, this);
 	}
@@ -98,7 +121,7 @@ HRESULT FEngineLoop::ResolutionInitialize(POINT _Resolution)
 	}
 	else
 	{
-		constexpr DWORD WindowStyle = WS_OVERLAPPEDWINDOW;
+		constexpr DWORD WindowStyle = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN;
 		__Resolution = _Resolution;
 
 		SetWindowLongPtr(__Hwnd, GWL_STYLE, WindowStyle);
@@ -143,18 +166,21 @@ void FEngineLoop::Deinitialize()
 	__Resolution = {};
 }
 
-HRESULT FEngineLoop::SubsystemBootstrapper()
+HRESULT FEngineLoop::EngineSystemBootstrapper()
 {
 	if (nullptr == GEngine)
 		return E_POINTER;
 
-	if (nullptr == GEngine->CreateSubsystem<RenderSubsystem>())
+	if (nullptr == GEngine->CreateEngineSystem<AppTimeEngineSystem>())
 		return E_FAIL;
 
-	if (nullptr == GEngine->CreateSubsystem<AppTimeSubsystem>())
+	if (nullptr == GEngine->CreateEngineSystem<RenderEngineSystem>())
+		return E_FAIL;	
+
+	if (nullptr == GEngine->CreateEngineSystem<InputEngineSystem>())
 		return E_FAIL;
 
-	if (nullptr == GEngine->CreateSubsystem<InputSubsystem>())
+	if (nullptr == GEngine->CreateEngineSystem<ResourceEngineSystem>())
 		return E_FAIL;
 
 	return S_OK;
@@ -188,7 +214,7 @@ void FEngineLoop::Render()
 {
 	while (__ThreadRunning)
 	{
-		if (auto Renderer = __Engine.get()->GetSubsystem<RenderSubsystem>())
+		if (auto Renderer = __Engine.get()->GetEngineSystem<RenderEngineSystem>())
 			Renderer->Render();
 	}
 }

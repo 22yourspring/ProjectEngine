@@ -1,18 +1,121 @@
 #include "pch.h"
 #include "World.h"
 #include "Scene.h"
+#include "GameModeBase.h"
+#include "EngineSystem.h"
 #include <algorithm>
 
-UWorld::UWorld()
-	: __Scene(std::make_unique<FScene>()), __PersistentLevel(std::make_unique<ULevel>(this))
+UWorld::UWorld(const FName& _PersistentLevelName)
+	: __Scene(std::make_unique<FScene>()),
+	  __PersistentLevel(std::make_unique<ULevel>(this, _PersistentLevelName))
 {
 }
 
 UWorld::~UWorld() = default;
 
+bool UWorld::IsPersistentLevel(const TCHAR* _LevelName) const
+{
+	return nullptr != _LevelName && __PersistentLevel &&
+		__PersistentLevel->GetLevelName() == FName(_LevelName);
+}
+
+void UWorld::SetGameMode(std::unique_ptr<AGameModeBase> _GameMode)
+{
+	__GameMode = std::move(_GameMode);
+}
+
+bool UWorld::StartPlay()
+{
+	return nullptr != __GameMode && __GameMode->StartPlay(this);
+}
+
+std::vector<ULevel*> UWorld::GetLevels() const
+{
+	std::vector<ULevel*> Levels;
+	Levels.reserve(1 + __StreamingLevels.size());
+
+	if (__PersistentLevel)
+		Levels.push_back(__PersistentLevel.get());
+
+	for (const std::unique_ptr<ULevelStreaming>& StreamingLevel : __StreamingLevels)
+	{
+		if (StreamingLevel && StreamingLevel->GetLoadedLevel())
+			Levels.push_back(StreamingLevel->GetLoadedLevel());
+	}
+
+	return Levels;
+}
+
+bool UWorld::AddStreamingLevel(std::unique_ptr<ULevelStreaming> _StreamingLevel)
+{
+	if (!_StreamingLevel)
+		return false;
+
+	__StreamingLevels.push_back(std::move(_StreamingLevel));
+	return true;
+}
+
+bool UWorld::RemoveStreamingLevel(ULevelStreaming* _StreamingLevel)
+{
+	if (!_StreamingLevel)
+		return false;
+
+	auto Iter = std::find_if(
+		__StreamingLevels.begin(),
+		__StreamingLevels.end(),
+		[_StreamingLevel](const std::unique_ptr<ULevelStreaming>& _Entry)
+		{
+			return _Entry.get() == _StreamingLevel;
+		});
+
+	if (__StreamingLevels.end() == Iter)
+		return false;
+
+	(*Iter)->UnloadLevel();
+	__StreamingLevels.erase(Iter);
+	return true;
+}
+
 void UWorld::Tick(float _DeltaTime)
 {
+	UpdateLevelStreaming();
+
+	if (__PersistentLevel)
+		__PersistentLevel->Tick(_DeltaTime);
+
+	for (const std::unique_ptr<ULevelStreaming>& StreamingLevel : __StreamingLevels)
+	{
+		if (StreamingLevel && StreamingLevel->GetLoadedLevel())
+			StreamingLevel->GetLoadedLevel()->Tick(_DeltaTime);
+	}
+
 	RunTickGroup(ETickingGroup::TG_PrePhysics, _DeltaTime);
+}
+
+void UWorld::UpdateLevelStreaming()
+{
+	for (const std::unique_ptr<ULevelStreaming>& StreamingLevel : __StreamingLevels)
+	{
+		if (!StreamingLevel)
+			continue;
+
+		if (StreamingLevel->ShouldBeLoaded())
+		{
+			if (!StreamingLevel->HasLoadedLevel())
+			{
+				StreamingLevel->SetLoadedLevel(std::make_unique<ULevel>(
+					this,
+					StreamingLevel->GetWorldAssetPackageFName()));
+			}
+
+			StreamingLevel->GetLoadedLevel()->SetVisible(
+				StreamingLevel->ShouldBeVisible());
+		}
+		else if (StreamingLevel->HasLoadedLevel())
+		{
+			StreamingLevel->UnloadLevel();
+		}
+	}
 }
 
 void UWorld::RunTickGroup(ETickingGroup _TickGroup, float _DeltaTime)
@@ -22,10 +125,38 @@ void UWorld::RunTickGroup(ETickingGroup _TickGroup, float _DeltaTime)
 
 	__TickTaskManager.RunTickGroup(_TickGroup, _DeltaTime);
 
+	for (const std::unique_ptr<ULevelStreaming>& StreamingLevel : __StreamingLevels)
+	{
+		if (StreamingLevel && StreamingLevel->GetLoadedLevel())
+			StreamingLevel->GetLoadedLevel()->RunTickGroup(_TickGroup, _DeltaTime);
+	}
+
 	__bIsTicking = false;
 
 	FlushPendingDestroyComponents();
 	FlushPendingDestroyActors();
+}
+
+void UWorld::RegisterEngineSystemTickFunction(IEngineSystem* _EngineSystem)
+{
+	std::lock_guard<std::recursive_mutex> Lock(__WorldMutex);
+
+	if (nullptr == _EngineSystem || false == _EngineSystem->UsesTickGroup())
+		return;
+
+	__TickTaskManager.AddTickFunction(
+		&_EngineSystem->PrimaryEngineSystemTick, _EngineSystem);
+}
+
+void UWorld::UnregisterEngineSystemTickFunction(IEngineSystem* _EngineSystem)
+{
+	std::lock_guard<std::recursive_mutex> Lock(__WorldMutex);
+
+	if (nullptr == _EngineSystem || false == _EngineSystem->UsesTickGroup())
+		return;
+
+	__TickTaskManager.RemoveTickFunction(
+		&_EngineSystem->PrimaryEngineSystemTick);
 }
 
 bool UWorld::DestroyActor(AActor* _Actor)
@@ -100,9 +231,9 @@ void UWorld::RegisterActorTickFunctions(AActor* _Actor)
 
 	__TickTaskManager.AddTickFunction(&_Actor->PrimaryActorTick, _Actor);
 
-	for (const std::unique_ptr<UActorComponent>& Component : _Actor->GetComponents())
+	for (UActorComponent* Component : _Actor->GetComponents())
 	{
-		RegisterComponentTickFunction(Component.get());
+		RegisterComponentTickFunction(Component);
 		Component->RegisterComponentWithWorld(this);
 	}
 }
@@ -116,10 +247,10 @@ void UWorld::UnregisterActorTickFunctions(AActor* _Actor)
 
 	__TickTaskManager.RemoveTickFunction(&_Actor->PrimaryActorTick);
 
-	for (const std::unique_ptr<UActorComponent>& Component : _Actor->GetComponents())
+	for (UActorComponent* Component : _Actor->GetComponents())
 	{
 		Component->UnregisterComponent();
-		UnregisterComponentTickFunction(Component.get());
+		UnregisterComponentTickFunction(Component);
 	}
 }
 

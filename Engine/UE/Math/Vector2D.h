@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "UE/CoreTypes.h"
 #include "UE/Math/MathFwd.h"

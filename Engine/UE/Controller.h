@@ -2,7 +2,7 @@
 #include "Actor.h"
 
 UCLASS(Abstract, MinimalAPI)
-class AController : public AActor
+class ENGINE_API AController : public AActor
 {
 	GENERATED_BODY()
 

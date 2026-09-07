@@ -7,11 +7,9 @@ void FComponentTickFunction::ExecuteTick(UActorComponent* _Target, float _DeltaT
 	if (nullptr == _Target || false == bCanEverTick || _Target->IsPendingDestroy())
 		return;
 
-	if (AActor* Owner = dynamic_cast<AActor*>(_Target->GetOwner()))
-	{
-		if (Owner->IsPendingDestroy())
-			return;
-	}
+	if (AActor* Owner = _Target->GetOwner();
+		nullptr != Owner && Owner->IsPendingDestroy())
+		return;
 
 	_Target->TickComponent(_DeltaTime);
 }
@@ -34,10 +32,13 @@ void UActorComponent::InitializeComponent()
 
 void UActorComponent::DestroyComponent()
 {
-	MarkPendingDestroy();
+	if (__bPendingDestroy)
+		return;
 
-	if (AActor* Owner = dynamic_cast<AActor*>(__Owner))
+	if (AActor* Owner = __Owner)
 		Owner->DestroyComponent(this);
+	else
+		MarkPendingDestroy();
 }
 
 void UActorComponent::OnRegister()

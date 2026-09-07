@@ -1,7 +1,7 @@
 #pragma once
 
 #include "InputTypes.h"
-#include "Subsystem.h"
+#include "EngineSystem.h"
 
 #include <unordered_map>
 #include <mutex>
@@ -12,16 +12,19 @@ class APlayerController;
 class FWindowsInputApplication;
 
 
-class InputSubsystem final : public ISubsystem
+UCLASS()
+class ENGINE_API InputEngineSystem final : public IEngineSystem
 {
+	GENERATED_BODY()
+
 public:
-	InputSubsystem();
-	~InputSubsystem() override;
+	InputEngineSystem();
+	~InputEngineSystem() override;
 
 	virtual HRESULT Initialize() override;
 	virtual void Deinitialize() override;
 	virtual void Tick(float _DeltaTime) override;
-	virtual bool IsTickable() const override { return false; }
+	virtual bool IsTickable() const override { return true; }
 
 	void TickInput(float _DeltaTime);
 

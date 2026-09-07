@@ -111,33 +111,36 @@ enum class EInputEvent : uint8_t
 
 
 USTRUCT()
-struct FInputActionKeyMapping
+struct ENGINE_API FInputActionKeyMapping
 {
 	GENERATED_BODY()
 
 	UPROPERTY()
 	std::string __ActionName;
+
 	UPROPERTY()
 	EKey __Key = EKey::Invalid;
 };
 
 
 USTRUCT()
-struct FInputAxisKeyMapping
+struct ENGINE_API FInputAxisKeyMapping
 {
 	GENERATED_BODY()
 
 	UPROPERTY()
 	std::string __AxisName;
+
 	UPROPERTY()
 	EKey __Key = EKey::Invalid;
+
 	UPROPERTY()
 	float __Scale = 0.0f;
 };
 
 
 USTRUCT()
-struct FKeyInputEvent
+struct ENGINE_API FKeyInputEvent
 {
 	GENERATED_BODY()
 
@@ -146,7 +149,7 @@ struct FKeyInputEvent
 };
 
 USTRUCT()
-struct FAnalogInputEvent
+struct ENGINE_API FAnalogInputEvent
 {
 	GENERATED_BODY()
 

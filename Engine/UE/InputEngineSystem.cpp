@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "InputSubsystem.h"
+#include "InputEngineSystem.h"
 
 #include "LaunchEngineLoop.h"
 #include "PlayerController.h"
@@ -93,7 +93,7 @@ namespace
 
 }
 
-EKey InputSubsystem::GetKeyFromVirtualKey(uint32_t _VirtualKey)
+EKey InputEngineSystem::GetKeyFromVirtualKey(uint32_t _VirtualKey)
 {
 	for (const FPolledKey& PolledKey : PolledKeys)
 	{
@@ -112,10 +112,10 @@ EKey InputSubsystem::GetKeyFromVirtualKey(uint32_t _VirtualKey)
 	}
 }
 
-InputSubsystem::InputSubsystem() = default;
-InputSubsystem::~InputSubsystem() = default;
+InputEngineSystem::InputEngineSystem() = default;
+InputEngineSystem::~InputEngineSystem() = default;
 
-HRESULT InputSubsystem::Initialize()
+HRESULT InputEngineSystem::Initialize()
 {
 	__KeyStates.clear();
 	for (const FPolledKey& PolledKey : PolledKeys)
@@ -129,7 +129,7 @@ HRESULT InputSubsystem::Initialize()
 	return E_FAIL;
 }
 
-void InputSubsystem::Deinitialize()
+void InputEngineSystem::Deinitialize()
 {
 	std::lock_guard<std::mutex> Lock(__PlayerControllerMutex);
 	__PlayerController = nullptr;
@@ -139,12 +139,12 @@ void InputSubsystem::Deinitialize()
 	__PlatformApplication.reset();
 }
 
-void InputSubsystem::Tick(float _DeltaTime)
+void InputEngineSystem::Tick(float _DeltaTime)
 {
 	TickInput(_DeltaTime);
 }
 
-void InputSubsystem::TickInput(float _DeltaTime)
+void InputEngineSystem::TickInput(float _DeltaTime)
 {
 	APlayerController* PlayerController = nullptr;
 	{
@@ -213,13 +213,13 @@ void InputSubsystem::TickInput(float _DeltaTime)
 	PlayerController->TickPlayerInput(InputEvents, AnalogEvents, _DeltaTime, false);
 }
 
-void InputSubsystem::SetPlayerController(APlayerController* _PlayerController)
+void InputEngineSystem::SetPlayerController(APlayerController* _PlayerController)
 {
 	std::lock_guard<std::mutex> Lock(__PlayerControllerMutex);
 	__PlayerController = _PlayerController;
 }
 
-void InputSubsystem::ClearPlayerController(APlayerController* _PlayerController)
+void InputEngineSystem::ClearPlayerController(APlayerController* _PlayerController)
 {
 	std::lock_guard<std::mutex> Lock(__PlayerControllerMutex);
 	if (__PlayerController == _PlayerController)

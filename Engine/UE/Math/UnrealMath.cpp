@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 
 // Copyright Epic Games, Inc. All Rights Reserved.
 

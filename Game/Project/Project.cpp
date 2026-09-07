@@ -1,14 +1,20 @@
-// Project.cpp : Defines the functions for the static library.
-//
+
+
 
 #include "pch.h"
 #include "Project.h"
 #include "Player.h"
+#include "ProjectGameInstanceSubsystem.h"
+#include "ProjectGameMode.h"
 #include "UE/Engine.h"
+#include "UE/GameInstance.h"
+#include "UE/Level.h"
 #include "UE/World.h"
-#include "UE/InputSubsystem.h"
+#include "UE/InputEngineSystem.h"
 #include "UE/PlayerController.h"
 #include "UE/PlayerInput.h"
+#include "UE/ResourceEngineSystem.h"
+#include "UE/GameplayStatics.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -25,6 +31,68 @@ namespace
 
 	const std::filesystem::path InputSettingsPath =
 		std::filesystem::path("Saved") / "Config" / "InputMappings.cfg";
+	const std::filesystem::path GameModeSettingsPath =
+		std::filesystem::path("Saved") / "Config" / "EditorDefaultPawn.cfg";
+
+	std::string ReadGameModeSelection()
+	{
+		std::ifstream Input(GameModeSettingsPath);
+		std::string Selection;
+		if (Input.is_open())
+			Input >> Selection;
+		return Selection;
+	}
+	void LoadInputSettings(UPlayerInput* _PlayerInput);
+	void StoreActionMapping(const std::string& _MappingName, EKey _Key);
+	void StoreAxisMapping(const std::string& _MappingName, EKey _Key, float _Scale);
+	void ConfigureMovementMappings(UPlayerInput* _PlayerInput, bool _bProjectGameMode);
+
+	bool ConfigureProjectWorld(UWorld* _World)
+	{
+		if (nullptr == _World)
+			return false;
+
+		AGameModeBase* GameMode = _World->GetAuthGameMode<AGameModeBase>();
+		if (nullptr == GameMode)
+			return false;
+
+		APawn* Player = GameMode->GetDefaultPawn();
+		APlayerController* PlayerController = GameMode->GetPlayerController();
+		if (nullptr == Player || nullptr == PlayerController)
+			return false;
+
+		UPlayerInput* PlayerInput = PlayerController->GetPlayerInput();
+		if (nullptr == PlayerInput)
+			return false;
+
+		ResourceEngineSystem* Resources = GEngine->GetEngineSystem<ResourceEngineSystem>();
+		if (nullptr == Resources)
+			return false;
+
+		const TCHAR* LevelName = _World->IsPersistentLevel(TEXT("Stage2"))
+			? TEXT("Stage2") : TEXT("Stage1");
+		FLevelAssetData LevelAsset;
+		if (Resources->LoadLevelAsset(LevelName, LevelAsset) &&
+			LevelAsset.bHasPlayerLocation)
+		{
+			Player->SetActorLocation(LevelAsset.PlayerLocation);
+		}
+
+		ProjectPlayerInput = PlayerInput;
+		PlayerController->Possess(Player);
+		LoadInputSettings(PlayerInput);
+		PlayerInput->SetActionMapping({ "OpenNextLevel", EKey::F8 });
+		StoreActionMapping("OpenNextLevel", EKey::F8);
+
+		ConfigureMovementMappings(
+			PlayerInput,
+			nullptr != dynamic_cast<AProjectGameMode*>(GameMode));
+
+		if (InputEngineSystem* Input = GEngine->GetEngineSystem<InputEngineSystem>())
+			Input->SetPlayerController(PlayerController);
+
+		return PlayerController->GetPawn() == Player;
+	}
 
 	bool SaveInputSettings()
 	{
@@ -88,7 +156,8 @@ namespace
 			if ("Action" == Type)
 			{
 				SavedActionMappings.push_back({ MappingName, Key });
-				_PlayerInput->SetActionMapping({ MappingName, Key });
+                if (_PlayerInput)
+                    _PlayerInput->SetActionMapping({ MappingName, Key });
 			}
 			else if ("Axis" == Type)
 			{
@@ -96,7 +165,8 @@ namespace
 				if (Input >> Scale)
 				{
 					SavedAxisMappings.push_back({ MappingName, Key, Scale });
-					_PlayerInput->SetAxisMapping({ MappingName, Key, Scale });
+                    if (_PlayerInput)
+                        _PlayerInput->SetAxisMapping({ MappingName, Key, Scale });
 				}
 			}
 			else
@@ -131,22 +201,113 @@ namespace
 
 		SavedAxisMappings.push_back({ _MappingName, _Key, _Scale });
 	}
+
+	void ConfigureMovementMappings(UPlayerInput* _PlayerInput, bool _bProjectGameMode)
+	{
+		if (nullptr == _PlayerInput)
+			return;
+
+		for (const FInputAxisKeyMapping& Mapping : SavedAxisMappings)
+		{
+			if (Mapping.__AxisName == "MoveHorizontal" ||
+				Mapping.__AxisName == "MoveVertical")
+			{
+				_PlayerInput->RemoveAxisMapping(Mapping);
+			}
+		}
+
+		SavedAxisMappings.erase(
+			std::remove_if(
+				SavedAxisMappings.begin(),
+				SavedAxisMappings.end(),
+				[](const FInputAxisKeyMapping& _Mapping)
+				{
+					return _Mapping.__AxisName == "MoveHorizontal" ||
+						_Mapping.__AxisName == "MoveVertical";
+				}),
+			SavedAxisMappings.end());
+
+		const std::vector<FInputAxisKeyMapping> MovementMappings =
+			_bProjectGameMode
+			? std::vector<FInputAxisKeyMapping>
+			{
+				{ "MoveHorizontal", EKey::Left, -1.0f },
+				{ "MoveHorizontal", EKey::Right, 1.0f },
+				{ "MoveVertical", EKey::Up, -1.0f },
+				{ "MoveVertical", EKey::Down, 1.0f }
+			}
+			: std::vector<FInputAxisKeyMapping>
+			{
+				{ "MoveHorizontal", EKey::A, -1.0f },
+				{ "MoveHorizontal", EKey::D, 1.0f },
+				{ "MoveVertical", EKey::W, -1.0f },
+				{ "MoveVertical", EKey::S, 1.0f }
+			};
+
+		for (const FInputAxisKeyMapping& Mapping : MovementMappings)
+		{
+			_PlayerInput->SetAxisMapping(Mapping);
+			StoreAxisMapping(
+				Mapping.__AxisName,
+				Mapping.__Key,
+				Mapping.__Scale);
+		}
+	}
 }
 
 bool InitializeProject()
+{
+	return InitializeProjectWithGameMode(
+		ReadGameModeSelection() == "EngineGameMode");
+}
+
+bool InitializeProjectWithGameMode(bool _UseEngineGameMode)
 {
 	UWorld* World = GEngine->GetWorld();
 	if (nullptr == World)
 		return false;
 
-	InputSubsystem* Input = GEngine->GetSubsystem<InputSubsystem>();
+	UGameInstance* GameInstance = GEngine->GetGameInstance();
+	if (nullptr == GameInstance)
+		return false;
+
+	UProjectGameInstanceSubsystem* ProjectState =
+		GameInstance->CreateSubsystem<UProjectGameInstanceSubsystem>();
+	if (nullptr == ProjectState)
+		return false;
+
+	GEngine->SetDefaultGameModeFactory([_UseEngineGameMode]
+	{
+		if (_UseEngineGameMode)
+			return std::unique_ptr<AGameModeBase>(std::make_unique<AGameModeBase>());
+
+		return std::unique_ptr<AGameModeBase>(
+			std::make_unique<AProjectGameMode>());
+	});
+	GEngine->SetWorldInitializer(ConfigureProjectWorld);
+	if (ResourceEngineSystem* Resources = GEngine->GetEngineSystem<ResourceEngineSystem>())
+	{
+		Resources->AddContentRoot(TEXT("Content"));
+		Resources->AddContentRoot(TEXT("Game/Project/Content"));
+		Resources->AddContentRoot(TEXT("../../Project/Content"));
+	}
+
+	if (nullptr == World->GetAuthGameMode<AGameModeBase>())
+	{
+		ProjectState->MarkProjectInitialized();
+		return UGameplayStatics::OpenLevel(nullptr, TEXT("Stage1"));
+	}
+
+	InputEngineSystem* Input = GEngine->GetEngineSystem<InputEngineSystem>();
 	if (nullptr == Input)
 		return false;
 
-	APlayer* Player = World->SpawnActor<APlayer>();
-	APlayerController* PlayerController = World->SpawnActor<APlayerController>();
-	if (nullptr == Player || nullptr == PlayerController)
+	AGameModeBase* GameMode =
+		World->GetAuthGameMode<AGameModeBase>();
+	if (nullptr == GameMode)
 		return false;
+	APawn* Player = GameMode->GetDefaultPawn();
+	APlayerController* PlayerController = GameMode->GetPlayerController();
 
 	UPlayerInput* PlayerInput = PlayerController->GetPlayerInput();
 	if (nullptr == PlayerInput)
@@ -160,36 +321,62 @@ bool InitializeProject()
 
 	PlayerController->Possess(Player);
 	LoadInputSettings(PlayerInput);
+	PlayerInput->SetActionMapping({ "OpenNextLevel", EKey::F8 });
+	StoreActionMapping("OpenNextLevel", EKey::F8);
+	ConfigureMovementMappings(
+		PlayerInput,
+		nullptr != dynamic_cast<AProjectGameMode*>(GameMode));
 	Input->SetPlayerController(PlayerController);
+	ProjectState->MarkProjectInitialized();
 	return PlayerController->GetPawn() == Player;
+}
+
+bool StopProject()
+{
+	ProjectPlayerInput = nullptr;
+	return nullptr != GEngine && GEngine->StopPlay();
+}
+
+bool SetProjectPaused(bool _bPaused)
+{
+	if (nullptr == GEngine || nullptr == GEngine->GetWorld())
+		return false;
+
+	GEngine->GetWorld()->SetDebugPauseExecution(_bPaused);
+	return true;
+}
+
+void LoadProjectInputMappings()
+{
+	LoadInputSettings(nullptr);
 }
 
 bool SetProjectActionMapping(const char* _MappingName, EKey _Key)
 {
-	if (nullptr == ProjectPlayerInput || nullptr == _MappingName || '\0' == _MappingName[0])
-		return false;
+    if (nullptr == _MappingName || '\0' == _MappingName[0])
+        return false;
 
-	ProjectPlayerInput->SetActionMapping({ _MappingName, _Key });
+	if (ProjectPlayerInput)
+        ProjectPlayerInput->SetActionMapping({ _MappingName, _Key });
 	StoreActionMapping(_MappingName, _Key);
 	return SaveInputSettings();
 }
 
 bool SetProjectAxisMapping(const char* _MappingName, EKey _Key, float _Scale)
 {
-	if (nullptr == ProjectPlayerInput || nullptr == _MappingName || '\0' == _MappingName[0])
-		return false;
+    if (nullptr == _MappingName || '\0' == _MappingName[0])
+        return false;
 
-	ProjectPlayerInput->SetAxisMapping({ _MappingName, _Key, _Scale });
+	if (ProjectPlayerInput)
+        ProjectPlayerInput->SetAxisMapping({ _MappingName, _Key, _Scale });
 	StoreAxisMapping(_MappingName, _Key, _Scale);
 	return SaveInputSettings();
 }
 
 bool RemoveProjectActionMapping(const FInputActionKeyMapping& _Mapping)
 {
-	if (nullptr == ProjectPlayerInput)
-		return false;
-
-	ProjectPlayerInput->RemoveActionMapping(_Mapping);
+	if (ProjectPlayerInput)
+        ProjectPlayerInput->RemoveActionMapping(_Mapping);
 	const auto Iter = std::find_if(SavedActionMappings.begin(), SavedActionMappings.end(),
 		[&_Mapping](const FInputActionKeyMapping& _Saved)
 		{
@@ -205,10 +392,8 @@ bool RemoveProjectActionMapping(const FInputActionKeyMapping& _Mapping)
 
 bool RemoveProjectAxisMapping(const FInputAxisKeyMapping& _Mapping)
 {
-	if (nullptr == ProjectPlayerInput)
-		return false;
-
-	ProjectPlayerInput->RemoveAxisMapping(_Mapping);
+	if (ProjectPlayerInput)
+        ProjectPlayerInput->RemoveAxisMapping(_Mapping);
 	const auto Iter = std::find_if(SavedAxisMappings.begin(), SavedAxisMappings.end(),
 		[&_Mapping](const FInputAxisKeyMapping& _Saved)
 		{

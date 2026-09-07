@@ -32,6 +32,8 @@ class FWindowsGDIRHI final : public FDynamicRHI
 {
 public:
 	virtual ~FWindowsGDIRHI() override;
+	virtual const char* GetName() const override { return "GDI"; }
+	virtual ERHIInterfaceType GetInterfaceType() const override { return ERHIInterfaceType::GDI; }
 
 	virtual bool Init() override;
 	virtual void Shutdown() override;
@@ -58,4 +60,12 @@ public:
 
 private:
 	FWindowsGDIViewport* __DrawingViewport = nullptr;
+};
+
+class FWindowsGDIRHIModule final : public IDynamicRHIModule
+{
+public:
+	virtual const char* GetName() const override { return "GDI"; }
+	virtual bool IsSupported() const override;
+	virtual std::unique_ptr<FDynamicRHI> CreateRHI() override;
 };

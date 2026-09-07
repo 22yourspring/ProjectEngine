@@ -4,6 +4,7 @@
 
 class AActor;
 class UActorComponent;
+class IEngineSystem;
 
 enum class ETickingGroup
 {
@@ -29,6 +30,11 @@ struct FActorTickFunction : public FTickFunction
 struct FComponentTickFunction : public FTickFunction
 {
 	void ExecuteTick(UActorComponent* _Target, float _DeltaTime);
+};
+
+struct FEngineSystemTickFunction : public FTickFunction
+{
+	void ExecuteTick(IEngineSystem* _Target, float _DeltaTime);
 };
 
 class FTickableGameObject

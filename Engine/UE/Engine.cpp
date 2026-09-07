@@ -9,28 +9,27 @@ UEngine::~UEngine() = default;
 
 HRESULT UEngine::Initialize()
 {
-	if (nullptr == __CurrentWorld)
-		__CurrentWorld = std::make_unique<UWorld>();
-
-	std::vector<std::pair<std::type_index, ISubsystem*>> Subsystems;
+	std::vector<std::pair<std::type_index, IEngineSystem*>> EngineSystems;
 
 	{
-		std::lock_guard<std::mutex> Lock(__SubsystemMutex);
+		std::lock_guard<std::mutex> Lock(__EngineSystemMutex);
 
-		for (auto& SubsystemPair : __Subsystems)
+		for (auto& EngineSystemPair : __EngineSystems)
 		{
 			
-			Subsystems.emplace_back(SubsystemPair.first, SubsystemPair.second.Instance.get());
+			EngineSystems.emplace_back(EngineSystemPair.first, EngineSystemPair.second.Instance.get());
 		}
 	}
 
-	for (auto& SubsystemPair : Subsystems)
+	for (auto& EngineSystemPair : EngineSystems)
 	{
-		if (false == InitializeSubsystemEntry(
-			SubsystemPair.first, SubsystemPair.second, SubsystemPair.first.name(),
-			ESubsystemInitializeReason::EngineLoading))
+		if (false == InitializeEngineSystemEntry(
+			EngineSystemPair.first, EngineSystemPair.second, EngineSystemPair.first.name(),
+			EEngineSystemInitializeReason::EngineLoading))
 			return E_FAIL;
-		
+
+		if (UWorld* World = GetWorld())
+			World->RegisterEngineSystemTickFunction(EngineSystemPair.second);
 	}
 
 	return S_OK;
@@ -38,60 +37,54 @@ HRESULT UEngine::Initialize()
 
 void UEngine::Deinitialize()
 {
-	__CurrentWorld.reset();
-
-	std::vector<std::unique_ptr<ISubsystem>> Subsystems;
+	std::vector<std::unique_ptr<IEngineSystem>> EngineSystems;
 
 	{		
-		std::lock_guard<std::mutex> Lock(__SubsystemMutex);
+		std::lock_guard<std::mutex> Lock(__EngineSystemMutex);
 
-		for (auto& SubsystemPair : __Subsystems)
+		for (auto& EngineSystemPair : __EngineSystems)
 		{                                                         
 			
-			if (SubsystemPair.second.Instance)                    
+			if (EngineSystemPair.second.Instance)                    
 			{                     
-				Subsystems.emplace_back(std::move(SubsystemPair.second.Instance));
+				EngineSystems.emplace_back(std::move(EngineSystemPair.second.Instance));
 			}                                                      
 		}                                                          
 		
-		__Subsystems.clear();
+		__EngineSystems.clear();
 	}
 
-	for (std::unique_ptr<ISubsystem>& Subsystem : Subsystems)
+	for (std::unique_ptr<IEngineSystem>& EngineSystem : EngineSystems)
 	{  
-		if (Subsystem)                                       
-			Subsystem->Deinitialize();                       
+		if (EngineSystem)                                       
+			EngineSystem->Deinitialize();                       
 	}
 }
 
 void UEngine::Tick(float _DeltaTime)
 {	
-	std::vector<ISubsystem*> Subsystems;
+	std::vector<IEngineSystem*> EngineSystems;
 
 	{		
-		std::lock_guard<std::mutex> Lock(__SubsystemMutex);
+		std::lock_guard<std::mutex> Lock(__EngineSystemMutex);
 
-		for (auto& SubsystemPair : __Subsystems)
+		for (auto& EngineSystemPair : __EngineSystems)
 		{
-			if (SubsystemPair.second.Instance)
-				Subsystems.push_back(SubsystemPair.second.Instance.get());
+			if (EngineSystemPair.second.Instance)
+				EngineSystems.push_back(EngineSystemPair.second.Instance.get());
 		}
 	}
 		
-	for (auto Subsystem : Subsystems)
+	for (auto EngineSystem : EngineSystems)
 	{
-		if (Subsystem->IsTickable())
-			Subsystem->Tick(_DeltaTime);
+		if (EngineSystem->IsTickable() && false == EngineSystem->UsesTickGroup())
+			EngineSystem->Tick(_DeltaTime);
 	}
 
-	if (__CurrentWorld)
-		__CurrentWorld->Tick(_DeltaTime);
 }
 
 void UEngine::RunTickGroup(ETickingGroup _TickGroup, float _DeltaTime)
 {
-	if (__CurrentWorld)
-		__CurrentWorld->RunTickGroup(_TickGroup, _DeltaTime);
 }
 
 void UEngine::SetGameLoopStarted(bool _bGameLoopStarted)
@@ -99,18 +92,18 @@ void UEngine::SetGameLoopStarted(bool _bGameLoopStarted)
 	__bGameLoopStarted.store(_bGameLoopStarted, std::memory_order_release);
 }
 
-bool UEngine::InitializeSubsystemEntry(std::type_index _TypeIndex, ISubsystem* _Subsystem,
-	const char* _TypeName, ESubsystemInitializeReason _Reason)
+bool UEngine::InitializeEngineSystemEntry(std::type_index _TypeIndex, IEngineSystem* _EngineSystem,
+	const char* _TypeName, EEngineSystemInitializeReason _Reason)
 {
-	if (nullptr == _Subsystem)
+	if (nullptr == _EngineSystem)
 		return false;
 
 	{		
-		std::unique_lock<std::mutex> Lock(__SubsystemMutex);
-		FSubsystemEntry& Entry = __Subsystems[_TypeIndex];
+		std::unique_lock<std::mutex> Lock(__EngineSystemMutex);
+		FEngineSystemEntry& Entry = __EngineSystems[_TypeIndex];
 				
 		while (Entry.bInitializing)
-			__SubsystemCondition.wait(Lock);
+			__EngineSystemCondition.wait(Lock);
 				
 		if (Entry.bInitialized)
 			return true;
@@ -119,26 +112,29 @@ bool UEngine::InitializeSubsystemEntry(std::type_index _TypeIndex, ISubsystem* _
 	}
 
 	const bool bMeasureLazyInitialize =
-		ESubsystemInitializeReason::RuntimeLazyAccess == _Reason;
+		EEngineSystemInitializeReason::RuntimeLazyAccess == _Reason;
 
 	std::chrono::steady_clock::time_point StartTime;
 	if (bMeasureLazyInitialize)
 		StartTime = std::chrono::steady_clock::now();
 
-	const int Result = _Subsystem->Initialize();
+	const int Result = _EngineSystem->Initialize();
 
 	std::chrono::steady_clock::time_point EndTime;
 	if (bMeasureLazyInitialize)
 		EndTime = std::chrono::steady_clock::now();
 
 	{
-		std::lock_guard<std::mutex> Lock(__SubsystemMutex);
-		FSubsystemEntry& Entry = __Subsystems[_TypeIndex];
+		std::lock_guard<std::mutex> Lock(__EngineSystemMutex);
+		FEngineSystemEntry& Entry = __EngineSystems[_TypeIndex];
 		Entry.bInitializing = false;
 		Entry.bInitialized = SUCCEEDED(Result);
 	}
 
-	__SubsystemCondition.notify_all();
+	if (SUCCEEDED(Result) && GetWorld() && _EngineSystem->UsesTickGroup())
+		GetWorld()->RegisterEngineSystemTickFunction(_EngineSystem);
+
+	__EngineSystemCondition.notify_all();
 
 	if (bMeasureLazyInitialize && SUCCEEDED(Result) &&
 		__bGameLoopStarted.load(std::memory_order_acquire))
@@ -154,11 +150,11 @@ bool UEngine::InitializeSubsystemEntry(std::type_index _TypeIndex, ISubsystem* _
 			sprintf_s(
 				Message,
 				"%s subsystem was initialized lazily at runtime and took %lld ms.\n"
-				"Consider creating it in FEngineLoop::SubsystemBootstrapper().",
+				"Consider creating it in FEngineLoop::EngineSystemBootstrapper().",
 				_TypeName,
 				ElapsedTimeMs);
 
-			MessageBoxA(nullptr, Message, "Subsystem Lazy Initialize Warning", MB_OK);
+			MessageBoxA(nullptr, Message, "EngineSystem Lazy Initialize Warning", MB_OK);
 		}
 	}
 

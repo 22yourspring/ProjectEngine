@@ -1,21 +1,25 @@
 #pragma once
 
-#include "Subsystem.h"
+#include "EngineSystem.h"
 
 #include <Windows.h>
 #include <memory>
 
 class FAppTimeRenderProxy;
 
-class AppTimeSubsystem : public ISubsystem
+UCLASS()
+class ENGINE_API AppTimeEngineSystem : public IEngineSystem
 {
+	GENERATED_BODY()
+
 public:
-	AppTimeSubsystem() = default;
-	virtual ~AppTimeSubsystem() override = default;
+	AppTimeEngineSystem() = default;
+	virtual ~AppTimeEngineSystem() override = default;
 
 	virtual HRESULT Initialize() override;
 	virtual void Deinitialize() override;
 	virtual void Tick(float _DeltaTime) override;
+	virtual bool UsesTickGroup() const override { return true; }
 
 	double GetCurrentTime() const { return __CurrentTime; }
 	double GetDeltaTime() const { return __DeltaTime; }
@@ -28,8 +32,6 @@ private:
 	void UpdateFramesPerSecond();
 
 	void PublishRenderData() const;
-
-	void PublishEngineLoopData() const;
 
 private:
 	LARGE_INTEGER __Frequency = {};

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "UE/CoreTypes.h"
 #include "UE/Math/MathFwd.h"
@@ -264,8 +264,8 @@ namespace FMath
 		FVector& HitLocation,
 		FVector& HitNormal,
 		float& HitTime);
-	float PointDistToLine(const FVector& Point, const FVector& Direction, const FVector& Origin, FVector& OutClosestPoint);
-	float PointDistToLine(const FVector& Point, const FVector& Direction, const FVector& Origin);
+	CORE_API float PointDistToLine(const FVector& Point, const FVector& Direction, const FVector& Origin, FVector& OutClosestPoint);
+	CORE_API float PointDistToLine(const FVector& Point, const FVector& Direction, const FVector& Origin);
 
 	template <typename T>
 	UE::Math::TVector<T> ClosestPointOnSegment(
@@ -360,27 +360,27 @@ namespace FMath
 	bool PointsAreCoplanar(const std::vector<FVector>& Points, float Tolerance = UE_KINDA_SMALL_NUMBER);
 	bool GetDotDistance(FVector2D& OutDotDist, const FVector& Direction, const FVector& AxisX, const FVector& AxisY, const FVector& AxisZ);
 	FVector2D GetAzimuthAndElevation(const FVector& Direction, const FVector& AxisX, const FVector& AxisY, const FVector& AxisZ);
-	FVector VInterpNormalRotationTo(const FVector& Current, const FVector& Target, float DeltaTime, float RotationSpeedDegrees);
-	FVector VInterpConstantTo(const FVector& Current, const FVector& Target, float DeltaTime, float InterpSpeed);
-	FVector VInterpTo(const FVector& Current, const FVector& Target, float DeltaTime, float InterpSpeed);
-	FVector2D Vector2DInterpConstantTo(const FVector2D& Current, const FVector2D& Target, float DeltaTime, float InterpSpeed);
+	CORE_API FVector VInterpNormalRotationTo(const FVector& Current, const FVector& Target, float DeltaTime, float RotationSpeedDegrees);
+	CORE_API FVector VInterpConstantTo(const FVector& Current, const FVector& Target, float DeltaTime, float InterpSpeed);
+	CORE_API FVector VInterpTo(const FVector& Current, const FVector& Target, float DeltaTime, float InterpSpeed);
+	CORE_API FVector2D Vector2DInterpConstantTo(const FVector2D& Current, const FVector2D& Target, float DeltaTime, float InterpSpeed);
 	template <typename T>
-	UE::Math::TVector2<T> Vector2DInterpTo(
+	CORE_API UE::Math::TVector2<T> Vector2DInterpTo(
 		const UE::Math::TVector2<T>& Current,
 		const UE::Math::TVector2<T>& Target,
 		float DeltaTime,
 		float InterpSpeed);
-	FRotator RInterpConstantTo(const FRotator& Current, const FRotator& Target, float DeltaTime, float InterpSpeed);
-	FRotator RInterpTo(const FRotator& Current, const FRotator& Target, float DeltaTime, float InterpSpeed);
-	FLinearColor CInterpTo(const FLinearColor& Current, const FLinearColor& Target, float DeltaTime, float InterpSpeed);
+	CORE_API FRotator RInterpConstantTo(const FRotator& Current, const FRotator& Target, float DeltaTime, float InterpSpeed);
+	CORE_API FRotator RInterpTo(const FRotator& Current, const FRotator& Target, float DeltaTime, float InterpSpeed);
+	CORE_API FLinearColor CInterpTo(const FLinearColor& Current, const FLinearColor& Target, float DeltaTime, float InterpSpeed);
 	template<class T>
-	UE::Math::TQuat<T> QInterpConstantTo(
+	CORE_API UE::Math::TQuat<T> QInterpConstantTo(
 		const UE::Math::TQuat<T>& Current,
 		const UE::Math::TQuat<T>& Target,
 		float DeltaTime,
 		float InterpSpeed);
 	template<class T>
-	UE::Math::TQuat<T> QInterpTo(
+	CORE_API UE::Math::TQuat<T> QInterpTo(
 		const UE::Math::TQuat<T>& Current,
 		const UE::Math::TQuat<T>& Target,
 		float DeltaTime,

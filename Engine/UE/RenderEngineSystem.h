@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Subsystem.h"
+#include "EngineSystem.h"
 #include "DynamicRHI.h"
 
 #include <memory>
@@ -10,11 +10,14 @@
 class UGameViewportClient;
 class ISceneViewExtension;
 
-class RenderSubsystem : public ISubsystem
+UCLASS()
+class ENGINE_API RenderEngineSystem : public IEngineSystem
 {
+	GENERATED_BODY()
+
 public:
-    RenderSubsystem();
-    virtual ~RenderSubsystem() override;
+    RenderEngineSystem();
+    virtual ~RenderEngineSystem() override;
 
     virtual HRESULT Initialize() override;
     virtual void Deinitialize() override;

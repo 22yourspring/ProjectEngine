@@ -6,12 +6,12 @@
 #include <thread>
 
 class UEngine;
-class AppTimeSubsystem;
+class AppTimeEngineSystem;
 
-class FEngineLoop : public IEngineLoop, public TSingleton<FEngineLoop>
+class LAUNCH_API FEngineLoop : public IEngineLoop, public TSingleton<FEngineLoop>
 {
 	friend class TSingleton<FEngineLoop>;
-	friend class AppTimeSubsystem;
+	friend class AppTimeEngineSystem;
 
 private:
 	FEngineLoop();
@@ -19,9 +19,10 @@ private:
 
 public:
 	virtual HRESULT Initialize(POINT _Resolution = {}) override;
+	HRESULT InitializeForEmbeddedViewport(HWND _WindowHandle, POINT _Resolution);
 	virtual void Deinitialize() override;
 	HRESULT ResolutionInitialize(POINT _Resolution);
-	HRESULT SubsystemBootstrapper();
+	HRESULT EngineSystemBootstrapper();
 
 	virtual void Progress() override;
 
@@ -40,6 +41,7 @@ protected:
 	float	__DeltaTime = 0.0f;
 
 private:
+	HRESULT InitializeWithWindow(HWND _WindowHandle, POINT _Resolution, bool _IsEmbeddedViewport);
 	void SetDeltaTime(float _DeltaTime) { __DeltaTime = _DeltaTime; }
 
 private:

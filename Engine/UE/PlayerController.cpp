@@ -3,7 +3,7 @@
 
 #include "InputComponent.h"
 #include "Engine.h"
-#include "InputSubsystem.h"
+#include "InputEngineSystem.h"
 #include "Pawn.h"
 #include "PlayerInput.h"
 
@@ -18,7 +18,7 @@ APlayerController::APlayerController()
 
 APlayerController::~APlayerController()
 {
-	if (InputSubsystem* Input = GEngine->GetSubsystem<InputSubsystem>())
+	if (InputEngineSystem* Input = GEngine->GetEngineSystem<InputEngineSystem>())
 		Input->ClearPlayerController(this);
 }
 

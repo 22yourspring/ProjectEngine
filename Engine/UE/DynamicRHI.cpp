@@ -1,14 +1,52 @@
 #include "pch.h"
 #include "DynamicRHI.h"
 
+#include <algorithm>
+#include <cwctype>
+
 #if defined(_WIN32)
-#include "WindowsGDIRHI.h"
+#include "D3D11DynamicRHI.h"
+#include "Windows/WindowsGDIRHI.h"
 #endif
+
+namespace
+{
+	ERHIInterfaceType GPreferredRHIInterface = ERHIInterfaceType::GDI;
+
+	bool HasCommandLineSwitch(const wchar_t* _Switch)
+	{
+		if (nullptr == _Switch)
+			return false;
+
+		std::wstring CommandLine = GetCommandLineW();
+		std::transform(CommandLine.begin(), CommandLine.end(), CommandLine.begin(),
+			[](wchar_t Character) { return static_cast<wchar_t>(std::towlower(Character)); });
+		return std::wstring::npos != CommandLine.find(_Switch);
+	}
+}
+
+void RHISetPreferredInterface(ERHIInterfaceType _InterfaceType)
+{
+	GPreferredRHIInterface = _InterfaceType;
+}
 
 std::unique_ptr<FDynamicRHI> PlatformCreateDynamicRHI()
 {
 #if defined(_WIN32)
-	return std::make_unique<FWindowsGDIRHI>();
+	std::unique_ptr<IDynamicRHIModule> DynamicRHIModule;
+	const bool bForceGDI = HasCommandLineSwitch(L"-gdi");
+	const bool bUseD3D11 = false == bForceGDI &&
+		(HasCommandLineSwitch(L"-d3d11") ||
+		 ERHIInterfaceType::D3D11 == GPreferredRHIInterface);
+	if (bUseD3D11)
+		DynamicRHIModule = std::make_unique<FD3D11DynamicRHIModule>();
+	else
+		DynamicRHIModule = std::make_unique<FWindowsGDIRHIModule>();
+
+	if (nullptr == DynamicRHIModule || false == DynamicRHIModule->IsSupported())
+		return nullptr;
+
+	return DynamicRHIModule->CreateRHI();
 #else
 	return nullptr;
 #endif

@@ -166,10 +166,10 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Engine\UE\UE.vcxproj">
-      <Project>{d694771a-a68d-404e-bc7e-a1821b5d0bce}</Project>
+      <Project>{e355b0d7-ab45-481d-9747-6e4e5a9142a4}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Project\Project.vcxproj">
-      <Project>{d522d384-93d4-4757-bb14-4e0ce0474d2d}</Project>
+      <Project>{31824ac1-990a-4a3b-8fc7-42665181cf6f}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

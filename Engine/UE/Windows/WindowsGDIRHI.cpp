@@ -243,3 +243,13 @@ void FWindowsGDIRHI::RHIEndDrawingViewport(FRHIViewport* _Viewport, bool _bPrese
 
 	__DrawingViewport = nullptr;
 }
+
+bool FWindowsGDIRHIModule::IsSupported() const
+{
+	return true;
+}
+
+std::unique_ptr<FDynamicRHI> FWindowsGDIRHIModule::CreateRHI()
+{
+	return std::make_unique<FWindowsGDIRHI>();
+}

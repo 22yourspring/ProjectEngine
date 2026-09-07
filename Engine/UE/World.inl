@@ -10,3 +10,12 @@ T* UWorld::SpawnActor(Args&&... _Args)
 
 	return Actor;
 }
+
+template<typename T>
+T* UWorld::GetAuthGameMode() const
+{
+	static_assert(std::is_base_of<AGameModeBase, T>::value,
+		"T must derive from AGameModeBase.");
+
+	return dynamic_cast<T*>(__GameMode.get());
+}

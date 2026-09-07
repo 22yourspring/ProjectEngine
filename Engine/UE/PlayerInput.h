@@ -12,7 +12,7 @@ class UInputComponent;
 
 
 UCLASS(Transient, MinimalAPI)
-class UPlayerInput : public UObject
+class ENGINE_API UPlayerInput : public UObject
 {
 	GENERATED_BODY()
 

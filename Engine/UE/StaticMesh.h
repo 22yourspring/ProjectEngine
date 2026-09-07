@@ -3,8 +3,11 @@
 #include "Object.h"
 #include "DynamicRHI.h"
 
-class UStaticMesh : public UObject
+UCLASS(BlueprintType, MinimalAPI, HideCategories=(Object))
+class ENGINE_API UStaticMesh : public UObject
 {
+	GENERATED_BODY()
+
 public:
 	void SetSize(int32 _Width, int32 _Height) { __Width = _Width; __Height = _Height; }
 	void SetColor(const FColor& _Color) { __Color = _Color; }

@@ -12,33 +12,36 @@ DECLARE_DELEGATE_OneParam(FInputAxisHandlerSignature, float);
 
 
 USTRUCT()
-struct FInputActionBinding
+struct ENGINE_API FInputActionBinding
 {
 	GENERATED_BODY()
 
 	UPROPERTY()
 	std::string __ActionName;
+
 	UPROPERTY()
 	EInputEvent __KeyEvent = EInputEvent::Pressed;
+
 	FInputActionHandlerSignature __ActionDelegate;
 	bool __bConsumeInput = true;
 };
 
 
 USTRUCT()
-struct FInputAxisBinding
+struct ENGINE_API FInputAxisBinding
 {
 	GENERATED_BODY()
 
 	UPROPERTY()
 	std::string __AxisName;
+
 	FInputAxisHandlerSignature __AxisDelegate;
 	bool __bConsumeInput = false;
 };
 
 
 UCLASS(Transient, MinimalAPI)
-class UInputComponent : public UActorComponent
+class ENGINE_API UInputComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

@@ -5,7 +5,7 @@ class UInputComponent;
 class AController;
 
 UCLASS(BlueprintType, Blueprintable, MinimalAPI)
-class APawn : public AActor
+class ENGINE_API APawn : public AActor
 {
 	GENERATED_BODY()
 

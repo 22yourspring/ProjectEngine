@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EngineSystem.h"
+#include "EngineMinimal.h"
 #include "Math/Vector.h"
 #include "PrimitiveSceneProxy.h"
 #include <mutex>

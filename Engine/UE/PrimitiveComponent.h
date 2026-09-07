@@ -5,7 +5,7 @@
 class FPrimitiveSceneProxy;
 
 UCLASS(Abstract, MinimalAPI)
-class UPrimitiveComponent : public USceneComponent
+class ENGINE_API UPrimitiveComponent : public USceneComponent
 {
 	GENERATED_BODY()
 

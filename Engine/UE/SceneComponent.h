@@ -4,7 +4,7 @@
 #include "Math/Vector.h"
 
 UCLASS(MinimalAPI)
-class USceneComponent : public UActorComponent
+class ENGINE_API USceneComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
