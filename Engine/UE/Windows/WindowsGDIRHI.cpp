@@ -1,4 +1,6 @@
 #include "pch.h"
+#include <cstring>
+#pragma comment(lib, "msimg32.lib")
 #include "WindowsGDIRHI.h"
 
 namespace
@@ -213,6 +215,100 @@ void FWindowsGDIRHI::RHIDrawLine(int32 _StartX, int32 _StartY, int32 _EndX, int3
 	MoveToEx(BackBufferDC, _StartX, _StartY, nullptr);
 	LineTo(BackBufferDC, _EndX, _EndY);
 	SelectObject(BackBufferDC, PreviousPen);
+}
+
+namespace
+{
+    class FGDITexture final : public FRHITexture
+    {
+    public:
+        HDC __DC = nullptr;
+        HBITMAP __Bitmap = nullptr;
+        HGDIOBJ __Previous = nullptr;
+        uint32 __Width = 0, __Height = 0;
+        ~FGDITexture() override
+        {
+            if (__Previous) SelectObject(__DC, __Previous);
+            if (__Bitmap) DeleteObject(__Bitmap);
+            if (__DC) DeleteDC(__DC);
+        }
+    };
+}
+
+FTextureRHIRef FWindowsGDIRHI::RHICreateTexture2D(uint32 _Width, uint32 _Height, const std::vector<uint8>& _Pixels)
+{
+    if (!_Width || !_Height || _Width > 8192 || _Height > 8192 || _Pixels.size() != uint64(_Width) * _Height * 4) return nullptr;
+    auto Texture = std::make_shared<FGDITexture>();
+    Texture->__DC = CreateCompatibleDC(nullptr);
+    if (!Texture->__DC) return nullptr;
+    BITMAPINFO Info = {};
+    Info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    Info.bmiHeader.biWidth = static_cast<LONG>(_Width);
+    Info.bmiHeader.biHeight = -static_cast<LONG>(_Height);
+    Info.bmiHeader.biPlanes = 1;
+    Info.bmiHeader.biBitCount = 32;
+    Info.bmiHeader.biCompression = BI_RGB;
+    void* Pixels = nullptr;
+    Texture->__Bitmap = CreateDIBSection(Texture->__DC, &Info, DIB_RGB_COLORS, &Pixels, nullptr, 0);
+    if (!Texture->__Bitmap || !Pixels) return nullptr;
+    auto* Target = static_cast<uint8*>(Pixels);
+    for (size_t Index = 0; Index < _Pixels.size(); Index += 4)
+    {
+        const uint32 Alpha = _Pixels[Index + 3];
+        Target[Index] = static_cast<uint8>(_Pixels[Index + 2] * Alpha / 255);
+        Target[Index + 1] = static_cast<uint8>(_Pixels[Index + 1] * Alpha / 255);
+        Target[Index + 2] = static_cast<uint8>(_Pixels[Index] * Alpha / 255);
+        Target[Index + 3] = static_cast<uint8>(Alpha);
+    }
+    Texture->__Previous = SelectObject(Texture->__DC, Texture->__Bitmap);
+    Texture->__Width = _Width;
+    Texture->__Height = _Height;
+    return Texture;
+}
+
+void FWindowsGDIRHI::RHIDrawTexture(FRHITexture* _Texture, int32 _X, int32 _Y, int32 _Width, int32 _Height)
+{
+    const auto* Texture = dynamic_cast<FGDITexture*>(_Texture);
+    if (!Texture || !__DrawingViewport || _Width <= 0 || _Height <= 0) return;
+    const BLENDFUNCTION Blend = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
+    AlphaBlend(__DrawingViewport->GetBackBufferDC(), _X, _Y, _Width, _Height,
+        Texture->__DC, 0, 0, Texture->__Width, Texture->__Height, Blend);
+}
+
+void FWindowsGDIRHI::RHIDrawQuad(const FVector* _Corners, const FColor& _Color, FRHITexture* _Texture)
+{
+    if (!__DrawingViewport || !_Corners) return;
+    const auto DC = __DrawingViewport->GetBackBufferDC();
+    const auto* Texture = dynamic_cast<FGDITexture*>(_Texture);
+    const int Saved = SaveDC(DC);
+    if (!Saved) return;
+    if (Texture)
+    {
+        SetGraphicsMode(DC, GM_ADVANCED);
+        const XFORM Transform = {
+            float((_Corners[1].X - _Corners[0].X) / Texture->__Width),
+            float((_Corners[1].Y - _Corners[0].Y) / Texture->__Width),
+            float((_Corners[3].X - _Corners[0].X) / Texture->__Height),
+            float((_Corners[3].Y - _Corners[0].Y) / Texture->__Height),
+            float(_Corners[0].X), float(_Corners[0].Y)};
+        if (SetWorldTransform(DC, &Transform))
+        {
+            const BLENDFUNCTION Blend = {AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
+            AlphaBlend(DC, 0, 0, Texture->__Width, Texture->__Height,
+                Texture->__DC, 0, 0, Texture->__Width, Texture->__Height, Blend);
+        }
+    }
+    else
+    {
+        POINT Points[4];
+        for (int Index = 0; Index < 4; ++Index) Points[Index] = {LONG(_Corners[Index].X), LONG(_Corners[Index].Y)};
+        wil::unique_hbrush Brush(CreateSolidBrush(ToColorRef(_Color)));
+        SelectObject(DC, Brush.get()); SelectObject(DC, GetStockObject(NULL_PEN));
+        Polygon(DC, Points, 4);
+        RestoreDC(DC, Saved);
+        return;
+    }
+    RestoreDC(DC, Saved);
 }
 
 void FWindowsGDIRHI::RHIDrawRectangle(int32 _Left, int32 _Top, int32 _Right, int32 _Bottom,

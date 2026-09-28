@@ -37,6 +37,9 @@ public:
 
 	virtual bool Init() override;
 	virtual void Shutdown() override;
+	FTextureRHIRef RHICreateTexture2D(uint32 _Width, uint32 _Height, const std::vector<uint8>& _Pixels) override;
+	void RHIDrawTexture(FRHITexture* _Texture, int32 _X, int32 _Y, int32 _Width, int32 _Height) override;
+    void RHIDrawQuad(const FVector* _Corners, const FColor& _Color, FRHITexture* _Texture = nullptr) override;
 
 	virtual FViewportRHIRef RHICreateViewport(
 		const FRHIViewportDesc& _Desc) override;

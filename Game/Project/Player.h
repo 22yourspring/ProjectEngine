@@ -5,7 +5,7 @@
 
 class UStaticMesh;
 class UStaticMeshComponent;
-class USceneComponent;
+class UBoxComponent;
 class UInputComponent;
 
 UCLASS()
@@ -16,6 +16,7 @@ class APlayer final : public ACharacter
 public:
 	APlayer();
 	virtual ~APlayer() override;
+    void Serialize(FArchive& _Archive) override;
 
 protected:
 	virtual void Tick(float _DeltaTime) override;
@@ -36,7 +37,7 @@ private:
 	std::unique_ptr<UStaticMesh>	__PlayerMesh;
 
 	UPROPERTY()
-	USceneComponent*				__RootSceneComponent = nullptr;
+	UBoxComponent*				__CollisionComponent = nullptr;
 
 	UPROPERTY()
 	UStaticMeshComponent*			__MeshComponent = nullptr;

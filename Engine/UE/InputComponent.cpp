@@ -7,7 +7,7 @@ UInputComponent::UInputComponent()
 
 UInputComponent::~UInputComponent() = default;
 
-bool UInputComponent::ProcessAction(const std::string& _ActionName, EInputEvent _KeyEvent)
+bool UInputComponent::ProcessAction(const FString& _ActionName, EInputEvent _KeyEvent)
 {
 	bool bConsumed = false;
 
@@ -23,7 +23,7 @@ bool UInputComponent::ProcessAction(const std::string& _ActionName, EInputEvent 
 	return bConsumed;
 }
 
-bool UInputComponent::ProcessAxis(const std::string& _AxisName, float _Value)
+bool UInputComponent::ProcessAxis(const FString& _AxisName, float _Value)
 {
 	bool bConsumed = false;
 

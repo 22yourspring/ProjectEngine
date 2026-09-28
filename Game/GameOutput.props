@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <GameOutputRoot>$(SolutionDir)Game\$(GameProjectName)\</GameOutputRoot>
+    <OutDir>$(GameOutputRoot)Binaries\Win64\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <Target Name="ValidateGameProjectName" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(GameProjectName)'=='' Or $([System.String]::Copy('$(GameProjectName)').Contains(';'))" Text="Exactly one game project must determine the output directory." />
+  </Target>
+</Project>

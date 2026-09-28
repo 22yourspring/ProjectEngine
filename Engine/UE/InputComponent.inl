@@ -2,7 +2,7 @@
 
 template <typename UserClass>
 FInputActionBinding& UInputComponent::BindAction(
-	const std::string& _ActionName, EInputEvent _KeyEvent,
+	const FString& _ActionName, EInputEvent _KeyEvent,
 	UserClass* _Object, void(UserClass::* _Function)())
 {
 	FInputActionBinding Binding;
@@ -15,7 +15,7 @@ FInputActionBinding& UInputComponent::BindAction(
 
 template <typename UserClass>
 FInputAxisBinding& UInputComponent::BindAxis(
-	const std::string& _AxisName,
+	const FString& _AxisName,
 	UserClass* _Object, void(UserClass::* _Function)(float))
 {
 	FInputAxisBinding Binding;

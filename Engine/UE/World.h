@@ -5,6 +5,7 @@
 #include "LevelStreaming.h"
 #include "GameModeBase.h"
 #include "TickTaskManager.h"
+#include "PhysScene_Chaos.h"
 #include <atomic>
 #include <mutex>
 #include <type_traits>
@@ -19,10 +20,12 @@ class ENGINE_API UWorld : public UObject
 
 	friend class AActor;
 	friend class UActorComponent;
+    friend class FPhysScene_Chaos;
 
 public:
 	explicit UWorld(const FName& _PersistentLevelName = FName(TEXT("PersistentLevel")));
 	~UWorld();
+    UWorld* GetWorld() const override { return const_cast<UWorld*>(this); }
 
 	template<typename T, typename... Args>
 	T* SpawnActor(Args&&... _Args);
@@ -50,6 +53,34 @@ public:
 	}
 	std::vector<ULevel*> GetLevels() const;
 	FScene* GetScene() const { return __Scene.get(); }
+	FPhysScene* GetPhysicsScene() const { return __PhysicsScene.get(); }
+	bool LineTraceSingleByChannel(FHitResult& _OutHit, const FVector& _Start, const FVector& _End, ECollisionChannel _TraceChannel, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam, const FCollisionResponseParams& _ResponseParam = FCollisionResponseParams::DefaultResponseParam) const;
+	bool SweepSingleByChannel(FHitResult& _OutHit, const FVector& _Start, const FVector& _End, const FQuat& _Rot, ECollisionChannel _TraceChannel, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam, const FCollisionResponseParams& _ResponseParam = FCollisionResponseParams::DefaultResponseParam) const;
+	bool OverlapMultiByChannel(std::vector<FOverlapResult>& _OutOverlaps, const FVector& _Pos, const FQuat& _Rot, ECollisionChannel _TraceChannel, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam, const FCollisionResponseParams& _ResponseParam = FCollisionResponseParams::DefaultResponseParam) const;
+
+    bool LineTraceMultiByChannel(std::vector<FHitResult>& _OutHits, const FVector& _Start, const FVector& _End, ECollisionChannel _TraceChannel, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam, const FCollisionResponseParams& _ResponseParam = FCollisionResponseParams::DefaultResponseParam) const;
+    bool LineTraceTestByChannel(const FVector& _Start, const FVector& _End, ECollisionChannel _TraceChannel, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam, const FCollisionResponseParams& _ResponseParam = FCollisionResponseParams::DefaultResponseParam) const;
+    bool LineTraceSingleByObjectType(FHitResult& _OutHit, const FVector& _Start, const FVector& _End, const FCollisionObjectQueryParams& _ObjectQueryParams, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool LineTraceMultiByObjectType(std::vector<FHitResult>& _OutHits, const FVector& _Start, const FVector& _End, const FCollisionObjectQueryParams& _ObjectQueryParams, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool LineTraceTestByObjectType(const FVector& _Start, const FVector& _End, const FCollisionObjectQueryParams& _ObjectQueryParams, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool LineTraceSingleByProfile(FHitResult& _OutHit, const FVector& _Start, const FVector& _End, FName _ProfileName, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool LineTraceMultiByProfile(std::vector<FHitResult>& _OutHits, const FVector& _Start, const FVector& _End, FName _ProfileName, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool LineTraceTestByProfile(const FVector& _Start, const FVector& _End, FName _ProfileName, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool SweepMultiByChannel(std::vector<FHitResult>& _OutHits, const FVector& _Start, const FVector& _End, const FQuat& _Rot, ECollisionChannel _TraceChannel, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam, const FCollisionResponseParams& _ResponseParam = FCollisionResponseParams::DefaultResponseParam) const;
+    bool SweepTestByChannel(const FVector& _Start, const FVector& _End, const FQuat& _Rot, ECollisionChannel _TraceChannel, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam, const FCollisionResponseParams& _ResponseParam = FCollisionResponseParams::DefaultResponseParam) const;
+    bool SweepSingleByObjectType(FHitResult& _OutHit, const FVector& _Start, const FVector& _End, const FQuat& _Rot, const FCollisionObjectQueryParams& _ObjectQueryParams, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool SweepMultiByObjectType(std::vector<FHitResult>& _OutHits, const FVector& _Start, const FVector& _End, const FQuat& _Rot, const FCollisionObjectQueryParams& _ObjectQueryParams, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool SweepTestByObjectType(const FVector& _Start, const FVector& _End, const FQuat& _Rot, const FCollisionObjectQueryParams& _ObjectQueryParams, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool SweepSingleByProfile(FHitResult& _OutHit, const FVector& _Start, const FVector& _End, const FQuat& _Rot, FName _ProfileName, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool SweepMultiByProfile(std::vector<FHitResult>& _OutHits, const FVector& _Start, const FVector& _End, const FQuat& _Rot, FName _ProfileName, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool SweepTestByProfile(const FVector& _Start, const FVector& _End, const FQuat& _Rot, FName _ProfileName, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool OverlapAnyTestByChannel(const FVector& _Pos, const FQuat& _Rot, ECollisionChannel _TraceChannel, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam, const FCollisionResponseParams& _ResponseParam = FCollisionResponseParams::DefaultResponseParam) const;
+    bool OverlapBlockingTestByChannel(const FVector& _Pos, const FQuat& _Rot, ECollisionChannel _TraceChannel, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam, const FCollisionResponseParams& _ResponseParam = FCollisionResponseParams::DefaultResponseParam) const;
+    bool OverlapMultiByObjectType(std::vector<FOverlapResult>& _OutOverlaps, const FVector& _Pos, const FQuat& _Rot, const FCollisionObjectQueryParams& _ObjectQueryParams, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool OverlapAnyTestByObjectType(const FVector& _Pos, const FQuat& _Rot, const FCollisionObjectQueryParams& _ObjectQueryParams, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool OverlapMultiByProfile(std::vector<FOverlapResult>& _OutOverlaps, const FVector& _Pos, const FQuat& _Rot, FName _ProfileName, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool OverlapAnyTestByProfile(const FVector& _Pos, const FQuat& _Rot, FName _ProfileName, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
+    bool OverlapBlockingTestByProfile(const FVector& _Pos, const FQuat& _Rot, FName _ProfileName, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params = FCollisionQueryParams::DefaultQueryParam) const;
 
 	bool AddStreamingLevel(std::unique_ptr<ULevelStreaming> _StreamingLevel);
 	bool RemoveStreamingLevel(ULevelStreaming* _StreamingLevel);
@@ -73,6 +104,7 @@ private:
 	void FlushPendingDestroyActors();
 	void FlushPendingDestroyComponents();
 
+	std::unique_ptr<FPhysScene> __PhysicsScene;
 	std::unique_ptr<FScene>							__Scene;
 	std::unique_ptr<AGameModeBase>					__GameMode;
 	std::unique_ptr<ULevel>							__PersistentLevel;

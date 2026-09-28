@@ -58,7 +58,6 @@ void AppTimeEngineSystem::Tick(float _DeltaTime)
 	UpdateFramesPerSecond();
 	PublishRenderData();
 
-	FEngineLoop::GetInstance()->SetDeltaTime(static_cast<float>(__DeltaTime));
 }
 
 double AppTimeEngineSystem::MeasureDeltaTime()

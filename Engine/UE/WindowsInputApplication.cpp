@@ -3,7 +3,7 @@
 
 namespace
 {
-	constexpr wchar_t InputApplicationProperty[] = L"EngineSession.WindowsInputApplication";
+	constexpr wchar_t InputApplicationProperty[] = TEXT("EngineSession.WindowsInputApplication");
 }
 
 FWindowsInputApplication::~FWindowsInputApplication()

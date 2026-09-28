@@ -30,6 +30,9 @@ public:
 
 	UWorld* GetWorld() const { return __OwningWorld; }
 	const FName& GetLevelName() const { return __LevelName; }
+    FString GetMapName() const;
+    void SetLevelName(const FName& _Name) { __LevelName = _Name; }
+    const std::vector<std::unique_ptr<AActor>>& GetActors() const { return __Actors; }
 
 private:
 	UWorld*	__OwningWorld = nullptr;

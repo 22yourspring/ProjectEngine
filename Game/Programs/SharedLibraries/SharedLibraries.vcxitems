@@ -15,5 +15,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)EngineLibraries.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)GameModuleAccess.h" />
   </ItemGroup>
 </Project>

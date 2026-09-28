@@ -25,7 +25,7 @@ public:
 	virtual void OnUnregister();
 	void RegisterComponentWithWorld(UWorld* _World);
 	void UnregisterComponent();
-	UWorld* GetWorld() const { return __World; }
+	UWorld* GetWorld() const override { return __World; }
 
 	bool IsPendingDestroy() const { return __bPendingDestroy; }
 

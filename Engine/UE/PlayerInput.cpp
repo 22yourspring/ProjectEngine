@@ -128,7 +128,7 @@ void UPlayerInput::EvaluateInputDelegates(const std::vector<UInputComponent*>& _
 		}
 	}
 
-	std::unordered_map<std::string, float> AxisValues;
+	std::unordered_map<FString, float> AxisValues;
 	for (const FInputAxisKeyMapping& Mapping : AxisMappings)
 	{
 		if (__KeyStateMap[Mapping.__Key])

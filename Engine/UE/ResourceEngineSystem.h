@@ -2,6 +2,7 @@
 
 #include "EngineSystem.h"
 #include "Math/Vector.h"
+#include "PackageStore.h"
 
 #include <filesystem>
 #include <mutex>
@@ -29,8 +30,10 @@ public:
 
 	void AddContentRoot(const TCHAR* _ContentRoot);
 	bool LoadLevelAsset(const TCHAR* _LevelName, FLevelAssetData& _OutData) const;
+	FPackageStore& GetPackageStore() { return __Packages; }
 
 private:
 	mutable std::mutex __ContentRootMutex;
 	std::vector<std::filesystem::path> __ContentRoots;
+	FPackageStore __Packages;
 };

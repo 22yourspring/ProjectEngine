@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PhysXRoot>$(MSBuildThisFileDirectory)</PhysXRoot>
+    <PhysXConfiguration Condition="'$(Configuration)'=='Debug'">debug</PhysXConfiguration>
+    <PhysXConfiguration Condition="'$(Configuration)'=='Release'">release</PhysXConfiguration>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>PX_PHYSX_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(PhysXRoot)sdk\physx\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(PhysXRoot)lib\Win64\$(PhysXConfiguration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>PhysXExtensions_static_64.lib;PhysXCooking_static_64.lib;PhysX_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXCommon_static_64.lib;PhysXFoundation_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXVehicle_static_64.lib;PhysXVehicle2_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Target Name="ValidatePhysXPackage" BeforeTargets="ClCompile">
+    <Error Condition="'$(Platform)'!='x64'" Text="The bundled PhysX libraries require x64." />
+    <Error Condition="'$(PhysXConfiguration)'==''" Text="The bundled PhysX libraries support Debug and Release." />
+    <Error Condition="!Exists('$(PhysXRoot)lib\Win64\$(PhysXConfiguration)\PhysX_static_64.lib')" Text="PhysX libraries are missing. Run Engine/ThirdParty/PhysX/Build.ps1." />
+  </Target>
+</Project>

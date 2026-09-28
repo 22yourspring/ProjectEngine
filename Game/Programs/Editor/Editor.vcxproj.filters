@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -13,11 +13,42 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\Editor ImGui">
-      <UniqueIdentifier>{1A8B5321-935A-4E35-86E0-33E86DCF4911}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\ImGui Libraries">
+    <Filter Include="Source Files\ThirdParty\ImGui">
       <UniqueIdentifier>{8920F05F-3540-4139-8393-E1E20AD48E62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ContentBrowser">
+      <UniqueIdentifier>{3395A3FA-7CD1-4C87-8085-7E52562D3688}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\EditorSubsystem">
+      <UniqueIdentifier>{D911DB08-8848-4D43-A2EA-A2F35415E6D7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Launch">
+      <UniqueIdentifier>{9436789E-359A-42BA-93F6-F691AE91392A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LevelEditor">
+      <UniqueIdentifier>{3C7E4F0D-AFEB-4089-9AE6-95605078FA4C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LevelEditor\Assets">
+      <UniqueIdentifier>{8F52DC42-B7F3-4B62-BDB5-68EB3CA29ED5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MaterialEditor">
+      <UniqueIdentifier>{FDCC51DF-B954-4BAD-A2E0-FE45E8532F61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UnrealEd">
+      <UniqueIdentifier>{5D1BCFB7-E984-4B7C-8846-679F0B029E54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UnrealEd\AutoReimport">
+      <UniqueIdentifier>{45B0A687-1059-4AE4-91D9-EB4DF8CC3306}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UnrealEd\Factories">
+      <UniqueIdentifier>{A651B6A2-5E09-4310-8263-2F690CF1A8D7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UnrealEd\FileHelpers">
+      <UniqueIdentifier>{715A399C-6478-4460-89DB-C4CB9617B382}</UniqueIdentifier>
+    </Filter>
+
+    <Filter Include="Source Files\UnrealEd\Subsystems">
+      <UniqueIdentifier>{D6285D09-B34E-4974-B41C-130710AD58D3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -31,60 +62,60 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Editor.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Launch</Filter>
     </ClInclude>
     <ClInclude Include="EditorImGui.h">
-      <Filter>Source Files\Editor ImGui</Filter>
+      <Filter>Source Files\LevelEditor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Engine\ThirdParty\ImGui\imconfig.h">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Engine\ThirdParty\ImGui\imgui.h">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Engine\ThirdParty\ImGui\imgui_internal.h">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Engine\ThirdParty\ImGui\imstb_rectpack.h">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Engine\ThirdParty\ImGui\imstb_textedit.h">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Engine\ThirdParty\ImGui\imstb_truetype.h">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Engine\ThirdParty\ImGui\backends\imgui_impl_dx11.h">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Engine\ThirdParty\ImGui\backends\imgui_impl_win32.h">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Launch</Filter>
     </ClCompile>
     <ClCompile Include="EditorImGui.cpp">
-      <Filter>Source Files\Editor ImGui</Filter>
+      <Filter>Source Files\LevelEditor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Engine\ThirdParty\ImGui\imgui.cpp">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Engine\ThirdParty\ImGui\imgui_draw.cpp">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Engine\ThirdParty\ImGui\imgui_tables.cpp">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Engine\ThirdParty\ImGui\imgui_widgets.cpp">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Engine\ThirdParty\ImGui\backends\imgui_impl_win32.cpp">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Engine\ThirdParty\ImGui\backends\imgui_impl_dx11.cpp">
-      <Filter>Source Files\ImGui Libraries</Filter>
+      <Filter>Source Files\ThirdParty\ImGui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -99,5 +130,35 @@
     <Image Include="Editor.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AssetImport.h"><Filter>Source Files\UnrealEd\Factories</Filter></ClInclude>
+    <ClCompile Include="AssetImport.cpp"><Filter>Source Files\UnrealEd\Factories</Filter></ClCompile>
+    <ClCompile Include="EditorAssets.cpp"><Filter>Source Files\LevelEditor\Assets</Filter></ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AssetImportTask.h"><Filter>Source Files\UnrealEd</Filter></ClInclude>
+    <ClInclude Include="EditorReimportHandler.h"><Filter>Source Files\UnrealEd</Filter></ClInclude>
+    <ClInclude Include="AutoReimportManager.h"><Filter>Source Files\UnrealEd\AutoReimport</Filter></ClInclude>
+    <ClInclude Include="EditorActorSubsystem.h"><Filter>Source Files\UnrealEd\Subsystems</Filter></ClInclude>
+    <ClCompile Include="EditorReimportHandler.cpp"><Filter>Source Files\UnrealEd</Filter></ClCompile>
+    <ClCompile Include="AutoReimportManager.cpp"><Filter>Source Files\UnrealEd\AutoReimport</Filter></ClCompile>
+    <ClCompile Include="EditorActorSubsystem.cpp"><Filter>Source Files\UnrealEd\Subsystems</Filter></ClCompile>
+    <ClCompile Include="AssetWorkflow.cpp"><Filter>Source Files\LevelEditor\Assets</Filter></ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EditorSubsystem.h"><Filter>Source Files\EditorSubsystem</Filter></ClInclude>
+    <ClInclude Include="NativeClassHierarchy.h"><Filter>Source Files\ContentBrowser</Filter></ClInclude>
+    <ClCompile Include="NativeClassHierarchy.cpp"><Filter>Source Files\ContentBrowser</Filter></ClCompile>
+    <ClCompile Include="ContentBrowserSources.cpp"><Filter>Source Files\ContentBrowser</Filter></ClCompile>
+  </ItemGroup>
+  <ItemGroup><ClCompile Include="EditorFileUtils.cpp"><Filter>Source Files\UnrealEd\FileHelpers</Filter></ClCompile></ItemGroup>
+  <ItemGroup><ClCompile Include="MaterialEditor.cpp"><Filter>Source Files\MaterialEditor</Filter></ClCompile></ItemGroup>
+  <ItemGroup><ClCompile Include="CollisionEditor.cpp"><Filter>Source Files\DetailCustomizations</Filter></ClCompile></ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\DetailCustomizations" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\ThirdParty"><UniqueIdentifier>{2fd8663c-bcab-47a9-8163-acd5d3bedc13}</UniqueIdentifier></Filter>
   </ItemGroup>
 </Project>

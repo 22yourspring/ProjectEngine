@@ -2,6 +2,11 @@
 #include "Level.h"
 #include <algorithm>
 
+FString ULevel::GetMapName() const
+{
+    return __LevelName.ToString();
+}
+
 ULevel::ULevel(UWorld* _OwningWorld, const FName& _LevelName)
 	: __OwningWorld(_OwningWorld), __LevelName(_LevelName)
 {

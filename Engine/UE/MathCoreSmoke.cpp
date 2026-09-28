@@ -16,10 +16,10 @@
 
 void CompileMathCoreSmokeTest()
 {
-	const FString Text(TEXT("  ProjectEngine,String,Math  "));
+	const FString Text(TEXT("  UnrealEngine,String,Math  "));
 	const FString Trimmed = Text.TrimStartAndEnd();
 	const bool ContainsMath = Text.Contains(TEXT("math"));
-	const bool StartsWithProject = Trimmed.StartsWith(TEXT("Project"));
+	const bool StartsWithUnreal = Trimmed.StartsWith(TEXT("Unreal"));
 	const FString Replaced = Text.Replace(TEXT("String"), TEXT("FString"));
 	const FString Left = Trimmed.Left(7);
 	const FString Right = Trimmed.Right(4);
@@ -43,7 +43,7 @@ void CompileMathCoreSmokeTest()
 
 	(void)Cross;
 	(void)ContainsMath;
-	(void)StartsWithProject;
+	(void)StartsWithUnreal;
 	(void)Replaced;
 	(void)Left;
 	(void)Right;

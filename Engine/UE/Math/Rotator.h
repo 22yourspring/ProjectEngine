@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include "UE/StringUtility.h"
 
 #include "UE/CoreTypes.h"
@@ -354,19 +356,19 @@ public:
 	 *
 	 * @return Text describing the vector.
 	 */
-	[[nodiscard]] std::string ToString() const;
+	[[nodiscard]] FString ToString() const;
 
 	/** Get a short textural representation of this vector, for compact readable logging. */
-	[[nodiscard]] std::string ToCompactString() const;
+	[[nodiscard]] FString ToCompactString() const;
 
 	/**
-	 * Initialize this Rotator based on an std::string. The String is expected to contain P=, Y=, R=.
+	 * Initialize this Rotator based on an FString. The String is expected to contain P=, Y=, R=.
 	 * The TRotator will be bogus when InitFromString returns false.
 	 *
-	 * @param InSourceString	std::string containing the rotator values.
+	 * @param InSourceString	FString containing the rotator values.
 	 * @return true if the P,Y,R values were read successfully; false otherwise.
 	 */
-	bool InitFromString( const std::string& InSourceString );
+	bool InitFromString( const FString& InSourceString );
 
 	/**
 	 * Utility to check if there are any non-finite values (NaN or Inf) in this Rotator.
@@ -726,20 +728,20 @@ inline void TRotator<T>::SetComponentForAxis(EAxis::Type Axis, T Component)
 }
 
 template<typename T>
-UE_FORCEINLINE_HINT std::string TRotator<T>::ToString() const
+UE_FORCEINLINE_HINT FString TRotator<T>::ToString() const
 {
 	return StringFormat("P=%f Y=%f R=%f", Pitch, Yaw, Roll );
 }
 
 template<typename T>
-inline std::string TRotator<T>::ToCompactString() const
+inline FString TRotator<T>::ToCompactString() const
 {
 	if( IsNearlyZero() )
 	{
-		return std::string("R(0)");
+		return FString("R(0)");
 	}
 
-	std::string ReturnString("R(");
+	FString ReturnString("R(");
 	bool bIsEmptyString = true;
 	if( !FMath::IsNearlyZero(Pitch) )
 	{
@@ -750,7 +752,7 @@ inline std::string TRotator<T>::ToCompactString() const
 	{
 		if( !bIsEmptyString )
 		{
-			ReturnString += std::string(", ");
+			ReturnString += FString(", ");
 		}
 		ReturnString += StringFormat("Y=%.2f", Yaw);
 		bIsEmptyString = false;
@@ -759,17 +761,17 @@ inline std::string TRotator<T>::ToCompactString() const
 	{
 		if( !bIsEmptyString )
 		{
-			ReturnString += std::string(", ");
+			ReturnString += FString(", ");
 		}
 		ReturnString += StringFormat("R=%.2f", Roll);
 		bIsEmptyString = false;
 	}
-	ReturnString += std::string(")");
+	ReturnString += FString(")");
 	return ReturnString;
 }
 
 template<typename T>
-inline bool TRotator<T>::InitFromString( const std::string& InSourceString )
+inline bool TRotator<T>::InitFromString( const FString& InSourceString )
 {
 	Pitch = Yaw = Roll = 0;
 

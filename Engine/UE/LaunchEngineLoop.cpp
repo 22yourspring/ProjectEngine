@@ -5,44 +5,37 @@
 #include "AppTimeEngineSystem.h"
 #include "InputEngineSystem.h"
 #include "ResourceEngineSystem.h"
+#include "PathEngineSystem.h"
+#include <chrono>
 
 FEngineLoop::FEngineLoop() = default;
 FEngineLoop::~FEngineLoop() = default;
 
-HRESULT FEngineLoop::Initialize(POINT _Resolution)
-{
-	return InitializeWithWindow(GetActiveWindow(), _Resolution, false);
-}
-
 HRESULT FEngineLoop::InitializeForEmbeddedViewport(HWND _WindowHandle, POINT _Resolution)
 {
-	return InitializeWithWindow(_WindowHandle, _Resolution, true);
+	if (__bInitialized.load(std::memory_order_acquire))
+		return S_FALSE;
+	if (nullptr == _WindowHandle || FALSE == IsWindow(_WindowHandle))
+		return E_HANDLE;
+	if (_Resolution.x <= 0 || _Resolution.y <= 0)
+		return E_INVALIDARG;
+
+	__Hwnd = _WindowHandle;
+	return Initialize(_Resolution);
 }
 
-HRESULT FEngineLoop::InitializeWithWindow(
-	HWND _WindowHandle,
-	POINT _Resolution,
-	bool _IsEmbeddedViewport)
+HRESULT FEngineLoop::Initialize(POINT _Resolution)
 {
 	if (__bInitialized.load(std::memory_order_acquire))
 		return S_FALSE;
 
-	__Hwnd = _WindowHandle;
+	if (nullptr == __Hwnd)
+		__Hwnd = GetActiveWindow();
 	if (nullptr == __Hwnd)
 		return E_HANDLE;
 
-	if (_IsEmbeddedViewport)
-	{
-		if (_Resolution.x <= 0 || _Resolution.y <= 0)
-			return E_INVALIDARG;
-
-		__Resolution = _Resolution;
-	}
-	else
-	{
-		if (FAILED(ResolutionInitialize(_Resolution)))
-			return E_FAIL;
-	}
+	if (FAILED(ResolutionInitialize(_Resolution)))
+		return E_FAIL;
 
 	__Engine = std::make_unique<UGameEngine>();
 	GEngine = __Engine.get();
@@ -88,6 +81,14 @@ HRESULT FEngineLoop::InitializeWithWindow(
 
 HRESULT FEngineLoop::ResolutionInitialize(POINT _Resolution)
 {
+	if (GetWindowLongPtr(__Hwnd, GWL_STYLE) & WS_CHILD)
+	{
+		if (_Resolution.x <= 0 || _Resolution.y <= 0)
+			return E_INVALIDARG;
+		__Resolution = _Resolution;
+		return S_OK;
+	}
+
 	const bool bBorderlessFullscreen = _Resolution.x <= 0 || _Resolution.y <= 0;
 
 	if (bBorderlessFullscreen)
@@ -171,6 +172,9 @@ HRESULT FEngineLoop::EngineSystemBootstrapper()
 	if (nullptr == GEngine)
 		return E_POINTER;
 
+	if (nullptr == GEngine->CreateEngineSystem<PathEngineSystem>())
+		return E_FAIL;
+
 	if (nullptr == GEngine->CreateEngineSystem<AppTimeEngineSystem>())
 		return E_FAIL;
 
@@ -203,10 +207,16 @@ void FEngineLoop::Thread_Shutdown()
 
 void FEngineLoop::Update()
 {
+	using FClock = std::chrono::steady_clock;
+	auto PreviousFrame = FClock::now();
 	while (__ThreadRunning)
 	{
+		const auto FrameStart = FClock::now();
+		__DeltaTime = (std::min)(0.1f, std::chrono::duration<float>(FrameStart - PreviousFrame).count());
+		PreviousFrame = FrameStart;
 		__Engine.get()->Tick(__DeltaTime);
 		__Engine.get()->RunTickGroup(ETickingGroup::TG_PostUpdateWork, __DeltaTime);
+		std::this_thread::sleep_until(FrameStart + std::chrono::microseconds(8333));
 	}	
 }
 
@@ -214,7 +224,9 @@ void FEngineLoop::Render()
 {
 	while (__ThreadRunning)
 	{
+		const auto FrameStart = std::chrono::steady_clock::now();
 		if (auto Renderer = __Engine.get()->GetEngineSystem<RenderEngineSystem>())
 			Renderer->Render();
+		std::this_thread::sleep_until(FrameStart + std::chrono::microseconds(8333));
 	}
 }

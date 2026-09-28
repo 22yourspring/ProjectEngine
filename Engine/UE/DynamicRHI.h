@@ -3,6 +3,7 @@
 #include "EngineMinimal.h"
 #include "CoreTypes.h"
 #include "Math/Color.h"
+#include "Math/Vector.h"
 
 class RHI_API FRHIViewport
 {
@@ -11,6 +12,14 @@ public:
 };
 
 using FViewportRHIRef = std::shared_ptr<FRHIViewport>;
+
+class RHI_API FRHITexture
+{
+public:
+    virtual ~FRHITexture() = default;
+};
+
+using FTextureRHIRef = std::shared_ptr<FRHITexture>;
 
 enum class ERHIPresentMode
 {
@@ -44,6 +53,9 @@ public:
 	virtual bool Init() = 0;
 
 	virtual void Shutdown() = 0;
+	virtual FTextureRHIRef RHICreateTexture2D(uint32 _Width, uint32 _Height, const std::vector<uint8>& _Pixels) = 0;
+	virtual void RHIDrawTexture(FRHITexture* _Texture, int32 _X, int32 _Y, int32 _Width, int32 _Height) = 0;
+    virtual void RHIDrawQuad(const FVector* _Corners, const FColor& _Color, FRHITexture* _Texture = nullptr) = 0;
 
 	virtual FViewportRHIRef RHICreateViewport(
 		const FRHIViewportDesc& _Desc) = 0;

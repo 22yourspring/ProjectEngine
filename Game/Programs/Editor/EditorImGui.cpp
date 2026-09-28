@@ -1,9 +1,20 @@
 #include "framework.h"
 #include "EditorImGui.h"
+#include "UE/World.h"
 #include "Resource.h"
 #include "UE/CoreMinimal.h"
-#include "Game/Project/Project.h"
+#include "GameModuleAccess.h"
+#include "UE/PathEngineSystem.h"
 #include "UE/InputEngineSystem.h"
+#include "UE/ResourceEngineSystem.h"
+#include "UE/Texture2D.h"
+#include "UE/SoundWave.h"
+#include "UE/AudioComponent.h"
+#include "AssetImport.h"
+#include "AutoReimportManager.h"
+#include "EditorActorSubsystem.h"
+#include <commdlg.h>
+#pragma comment(lib, "comdlg32.lib")
 
 #include "ThirdParty/ImGui/imgui.h"
 #include "ThirdParty/ImGui/imgui_internal.h"
@@ -19,8 +30,15 @@
 #include <filesystem>
 #include <iterator>
 #include <map>
+#include <cmath>
+#include <cstdio>
+#include <cstring>
+#include <tuple>
+#include <chrono>
+#include <fstream>
 #include <Windows.h>
 #include <shellapi.h>
+#include "ThirdParty/WIL/include/wil/resource.h"
 #pragma push_macro("Super")
 #undef Super
 #include <wrl/client.h>
@@ -35,7 +53,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
 
 ID3D11ShaderResourceView* FEditorImGui::LoadIconTexture(const std::filesystem::path& _Path)
 {
-    const std::string Key = _Path.string();
+    const FString Key(_Path.wstring());
     auto Found = __IconTextures.find(Key);
     if (Found != __IconTextures.end()) return Found->second.Get();
     NSVGimage* Image = nsvgParseFromFile(_Path.string().c_str(), "px", 96.0f);
@@ -61,7 +79,7 @@ void FEditorImGui::RevealContentPath(const std::filesystem::path& _Path)
     std::filesystem::path Current = _Path;
     while (!Current.empty())
     {
-        __TreeOpenOverrides[Current.string()] = true;
+        __TreeOpenOverrides[FString(Current.wstring()).ToUtf8()] = true;
         const std::filesystem::path Parent = Current.parent_path();
         if (Parent == Current)
             break;
@@ -73,18 +91,20 @@ const char* FEditorImGui::GetContentIcon(const std::filesystem::directory_entry&
 {
     if (_Entry.is_directory())
         return "[DIR]";
-    const std::wstring Extension = _Entry.path().extension().wstring();
-    if (_wcsicmp(Extension.c_str(), L".cpp") == 0 ||
-        _wcsicmp(Extension.c_str(), L".h") == 0 ||
-        _wcsicmp(Extension.c_str(), L".inl") == 0)
+    const FString Extension = _Entry.path().extension().wstring();
+    if (_wcsicmp(Extension.c_str(), TEXT(".cpp")) == 0 ||
+        _wcsicmp(Extension.c_str(), TEXT(".h")) == 0 ||
+        _wcsicmp(Extension.c_str(), TEXT(".inl")) == 0)
         return "[C++]";
-    if (_wcsicmp(Extension.c_str(), L".umap") == 0)
+    if (_wcsicmp(Extension.c_str(), TEXT(".umap")) == 0)
         return "[MAP]";
-    if (_wcsicmp(Extension.c_str(), L".ini") == 0 ||
-        _wcsicmp(Extension.c_str(), L".json") == 0)
+    if (_wcsicmp(Extension.c_str(), TEXT(".uasset")) == 0)
+        return "[ASSET]";
+    if (_wcsicmp(Extension.c_str(), TEXT(".ini")) == 0 ||
+        _wcsicmp(Extension.c_str(), TEXT(".json")) == 0)
         return "[CFG]";
-    if (_wcsicmp(Extension.c_str(), L".txt") == 0 ||
-        _wcsicmp(Extension.c_str(), L".md") == 0)
+    if (_wcsicmp(Extension.c_str(), TEXT(".txt")) == 0 ||
+        _wcsicmp(Extension.c_str(), TEXT(".md")) == 0)
         return "[TXT]";
     return "[FILE]";
 }
@@ -98,22 +118,26 @@ void FEditorImGui::DrawContentFolder(const std::filesystem::path& _Path, int _De
     {
         if (Error || !Entry.is_directory(Error))
             continue;
-        const std::string Name = Entry.path().filename().string();
-        ImGui::PushID(Entry.path().string().c_str());
+        const FString Name = FString(Entry.path().filename().wstring()).ToUtf8();
+        ImGui::PushID(FString(Entry.path().wstring()).ToUtf8().c_str());
         const ImGuiTreeNodeFlags SelectionFlag =
             __ContentBrowserFocusedPath == Entry.path() ? ImGuiTreeNodeFlags_Selected : 0;
-        const std::string PathKey = Entry.path().string();
+        const FString PathKey = FString(Entry.path().wstring()).ToUtf8();
         const auto OpenOverride = __TreeOpenOverrides.find(PathKey);
         if (OpenOverride != __TreeOpenOverrides.end())
             ImGui::SetNextItemOpen(OpenOverride->second);
         const bool IsOpen = ImGui::TreeNodeEx(
-            Name.c_str(),
+            Name.ToUtf8().c_str(),
             ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick |
             SelectionFlag);
+        __DropTargets.push_back({ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), Entry.path()});
         const bool DoubleClicked = ImGui::IsItemHovered() &&
             ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
         if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
+        {
             __ContentBrowserFocusedPath = Entry.path();
+            __ContentBrowserSelection = Entry.path();
+        }
         if (DoubleClicked && IsOpen)
         {
             // An already-open folder is entered on double click, not
@@ -415,14 +439,21 @@ void FEditorImGui::DrawMainDockspace()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("ProjectEngine Editor", nullptr, HostFlags);
+    ImGui::Begin("UnrealEngine Editor", nullptr, HostFlags);
     ImGui::PopStyleVar(3);
 
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu("File"))
         {
-            ImGui::MenuItem("Save All", "Ctrl+Shift+S");
+            if (ImGui::MenuItem("New Level", "Ctrl+N")) RequestFileAction(EFileAction::NewLevel);
+            if (ImGui::MenuItem("Open Level...", "Ctrl+O")) RequestFileAction(EFileAction::OpenLevel);
+            if (ImGui::MenuItem("Save Current Level", "Ctrl+S")) SaveLevelFile();
+            if (ImGui::MenuItem("Save Current Level As...", "Ctrl+Alt+S")) SaveLevelFile(true);
+            if (ImGui::MenuItem("Save All", "Ctrl+Shift+S")) SaveEditorAssetActors();
+            ImGui::Separator();
+            if (ImGui::MenuItem("Open Project...")) RequestFileAction(EFileAction::OpenProject);
+            if (ImGui::MenuItem("Register Project File Action")) RegisterProjectFileAction();
             ImGui::Separator();
             if (ImGui::MenuItem("Exit"))
                 PostMessageW(__MainWindow, WM_CLOSE, 0, 0);
@@ -437,10 +468,12 @@ void FEditorImGui::DrawMainDockspace()
             ImGui::Separator();
             if (ImGui::BeginMenu("Editor Preferences"))
             {
+                if (ImGui::MenuItem("Loading & Saving...")) __ShowAssetPreferences = true;
                 if (ImGui::MenuItem("Keyboard Shortcuts..."))
                 {
                     __ShowProjectSettings = true;
                     __ProjectSettingsInputPage = true;
+                    __ProjectSettingsCollisionPage = false;
                 }
                 ImGui::EndMenu();
             }
@@ -448,6 +481,7 @@ void FEditorImGui::DrawMainDockspace()
             {
                 __ShowProjectSettings = true;
                 __ProjectSettingsInputPage = false;
+                __ProjectSettingsCollisionPage = false;
             }
             ImGui::EndMenu();
         }
@@ -496,7 +530,7 @@ void FEditorImGui::DrawMainDockspace()
         if (ImGui::BeginMenu("Help"))
         {
             if (ImGui::MenuItem("About..."))
-                ImGui::OpenPopup("AboutProjectEngine");
+                ImGui::OpenPopup("AboutUnrealEngine");
             ImGui::EndMenu();
         }
 
@@ -511,7 +545,9 @@ void FEditorImGui::DrawMainDockspace()
             "##EditorTitleBarDrag", ImVec2(DragWidth, ImGui::GetFrameHeight()));
         const ImVec2 DragMinimum = ImGui::GetItemRectMin();
         const ImVec2 DragMaximum = ImGui::GetItemRectMax();
-        const char* WindowTitle = "ProjectEngine Editor";
+        wchar_t NativeTitle[1024] = {}; GetWindowTextW(__MainWindow, NativeTitle, 1024);
+        const auto TitleText = FString(NativeTitle).ToUtf8();
+        const char* WindowTitle = TitleText.c_str();
         const ImVec2 TitleSize = ImGui::CalcTextSize(WindowTitle);
         ImGui::GetWindowDrawList()->AddText(
             ImVec2(
@@ -555,10 +591,10 @@ void FEditorImGui::DrawMainDockspace()
         ImGui::EndMenuBar();
     }
 
-    if (ImGui::BeginPopupModal("AboutProjectEngine", nullptr,
+    if (ImGui::BeginPopupModal("AboutUnrealEngine", nullptr,
         ImGuiWindowFlags_AlwaysAutoResize))
     {
-        ImGui::TextUnformatted("ProjectEngine Editor");
+        ImGui::TextUnformatted("UnrealEngine Editor");
         ImGui::TextDisabled("Dear ImGui editor interface");
         ImGui::Separator();
         if (ImGui::Button("OK", ImVec2(90.0f, 0.0f)))
@@ -570,9 +606,7 @@ void FEditorImGui::DrawMainDockspace()
     ImGui::BeginChild("LevelEditorToolbar", ImVec2(0.0f, ToolbarHeight),
         ImGuiChildFlags_Borders, ImGuiWindowFlags_NoScrollbar);
     ImGui::SetCursorPosY(8.0f);
-    ImGui::BeginDisabled();
-    ImGui::Button("+ Add");
-    ImGui::EndDisabled();
+    DrawAddActor();
     ImGui::SameLine();
     if (ImGui::Button("Blueprints"))
         ImGui::OpenPopup("BlueprintsMenu");
@@ -592,17 +626,9 @@ void FEditorImGui::DrawMainDockspace()
     ImGui::EndDisabled();
 
     ImGui::SameLine(ImGui::GetWindowWidth() * 0.48f);
-    std::filesystem::path ToolbarRoot = std::filesystem::current_path();
-    std::error_code ToolbarError;
-    while (!ToolbarRoot.empty() && !std::filesystem::exists(ToolbarRoot / "ProjectEngine.sln", ToolbarError))
-    {
-        const auto Parent = ToolbarRoot.parent_path();
-        if (Parent == ToolbarRoot) break;
-        ToolbarRoot = Parent;
-    }
-    const std::filesystem::path ToolbarImages = ToolbarRoot / "Engine" / "Images";
+    const std::filesystem::path ToolbarContent = __RootDirectory / "Engine" / "Content";
     ImGui::BeginDisabled(__IsPlaying);
-    ID3D11ShaderResourceView* PlayIcon = LoadIconTexture(ToolbarImages / "Play.svg");
+    ID3D11ShaderResourceView* PlayIcon = LoadIconTexture(ToolbarContent / "Play.svg");
     if (PlayIcon && ImGui::ImageButton("##Play", reinterpret_cast<ImTextureID>(PlayIcon), ImVec2(22.0f, 22.0f)))
         PostMessageW(__MainWindow, WM_COMMAND, IDM_PLAY, 0);
     else if (!PlayIcon && ImGui::Button("> Play"))
@@ -613,7 +639,7 @@ void FEditorImGui::DrawMainDockspace()
     ImGui::SameLine();
     ImGui::BeginDisabled(false == __IsPlaying);
     ID3D11ShaderResourceView* PauseIcon = LoadIconTexture(
-        ToolbarImages / (__IsPaused ? "Resume.svg" : "Pause.svg"));
+        ToolbarContent / (__IsPaused ? "Resume.svg" : "Pause.svg"));
     if (PauseIcon)
     {
         if (ImGui::ImageButton(
@@ -632,7 +658,7 @@ void FEditorImGui::DrawMainDockspace()
     ImGui::EndDisabled();
     ImGui::SameLine();
     ImGui::BeginDisabled(false == __IsPlaying);
-    ID3D11ShaderResourceView* StopIcon = LoadIconTexture(ToolbarImages / "Stop.svg");
+    ID3D11ShaderResourceView* StopIcon = LoadIconTexture(ToolbarContent / "Stop.svg");
     if (StopIcon && ImGui::ImageButton("##Stop", reinterpret_cast<ImTextureID>(StopIcon), ImVec2(22.0f, 22.0f)))
         PostMessageW(__MainWindow, WM_COMMAND, IDM_STOP, 0);
     else if (!StopIcon)
@@ -646,6 +672,8 @@ void FEditorImGui::DrawMainDockspace()
         ImGui::OpenPopup("ViewportSettings");
     if (ImGui::BeginPopup("ViewportSettings"))
     {
+        if (ImGui::MenuItem("Immersive Mode", "F11", __ImmersiveViewport))
+            __ToggleImmersiveRequested = true;
         ImGui::TextUnformatted("Viewport Options");
         ImGui::Separator();
         ImGui::Checkbox("Constrain Aspect Ratio", &__ConstrainViewportAspectRatio);
@@ -687,11 +715,13 @@ void FEditorImGui::DrawMainDockspace()
         ? DrawerResizeHandleHeight : 0.0f;
     const float DockspaceHeight = (std::max)(
         1.0f,
-        AvailableSize.y - StatusBarHeight - DrawerHeight - ResizeHandleHeight);
-    const ImGuiID DockspaceID = ImGui::GetID("ProjectEngineDockspace");
+        AvailableSize.y - StatusBarHeight);
+    const ImVec2 DockspacePosition = ImGui::GetCursorScreenPos();
+    const ImGuiID DockspaceID = ImGui::GetID("UnrealEngineDockspace");
     if (false == __DockLayoutCreated)
     {
-        BuildInitialDockLayout(DockspaceID, ImVec2(AvailableSize.x, DockspaceHeight));
+        if (!ImGui::DockBuilderGetNode(DockspaceID))
+            BuildInitialDockLayout(DockspaceID, ImVec2(AvailableSize.x, DockspaceHeight));
         __DockLayoutCreated = true;
     }
     ImGui::DockSpace(DockspaceID, ImVec2(0.0f, DockspaceHeight));
@@ -699,6 +729,21 @@ void FEditorImGui::DrawMainDockspace()
     bool DrawerHovered = false;
     bool ResizeHandleHovered = false;
     bool ResizeHandleActive = false;
+    __ContentDrawerTop = -1.0f;
+    if (ResizeHandleHeight > 0.0f)
+    {
+        __ContentDrawerTop = DockspacePosition.y + DockspaceHeight - DrawerHeight - ResizeHandleHeight;
+        ImGui::SetNextWindowPos(ImVec2(DockspacePosition.x, __ContentDrawerTop));
+        ImGui::SetNextWindowSize(ImVec2(AvailableSize.x, DrawerHeight + ResizeHandleHeight));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+        ImGui::Begin("Content Drawer Overlay", nullptr,
+            ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoDocking |
+            ImGuiWindowFlags_NoFocusOnAppearing);
+        if (!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel))
+            ImGui::BringWindowToDisplayFront(ImGui::GetCurrentWindow());
+    }
     if (ResizeHandleHeight > 0.0f)
     {
         ImGui::InvisibleButton("ContentDrawerResizeHandle",
@@ -717,6 +762,11 @@ void FEditorImGui::DrawMainDockspace()
     }
     if (DrawerHeight > 1.0f)
         DrawerHovered = DrawContentBrowser(DrawerHeight);
+    if (ResizeHandleHeight > 0.0f)
+    {
+        ImGui::End();
+        ImGui::PopStyleVar(2);
+    }
 
     const float PreviousStatusBarY = ImGui::GetCursorPosY();
     ImGui::SetCursorPosY((std::max)(0.0f, PreviousStatusBarY - 10.0f));
@@ -769,7 +819,8 @@ void FEditorImGui::DrawMainDockspace()
     ImGui::PopStyleColor();
 
     const double CurrentTime = ImGui::GetTime();
-    if (DrawerHovered || ResizeHandleHovered || ResizeHandleActive || StatusBarHovered)
+    if (__ContentDrawerPinned || DrawerHovered || ResizeHandleHovered || ResizeHandleActive || StatusBarHovered || ImGui::GetDragDropPayload() ||
+        ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel))
     {
         __ContentDrawerOpen = true;
         __ContentDrawerCloseTime = CurrentTime + 0.35;
@@ -777,50 +828,6 @@ void FEditorImGui::DrawMainDockspace()
     else if (__ContentDrawerOpen && CurrentTime >= __ContentDrawerCloseTime)
     {
         __ContentDrawerOpen = false;
-    }
-    ImGui::End();
-}
-
-void FEditorImGui::DrawWorldOutliner()
-{
-    ImGui::Begin("World Outliner");
-    static char Search[64] = {};
-    ImGui::SetNextItemWidth(-1.0f);
-    ImGui::InputTextWithHint("##OutlinerSearch", "Search Actors", Search, sizeof(Search));
-    if (ImGui::TreeNodeEx("Stage1", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        ImGui::Selectable("Player", true);
-        if (ImGui::TreeNodeEx("Enemies", ImGuiTreeNodeFlags_DefaultOpen))
-        {
-            ImGui::Selectable("Enemy_0");
-            ImGui::Selectable("Enemy_1");
-            ImGui::Selectable("Enemy_2");
-            ImGui::TreePop();
-        }
-        ImGui::TreePop();
-    }
-    ImGui::End();
-}
-
-void FEditorImGui::DrawDetails()
-{
-    ImGui::Begin("Details");
-    ImGui::TextColored(ImVec4(0.35f, 0.70f, 1.0f, 1.0f), "Player");
-    ImGui::Separator();
-    if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        static float Location[3] = { 0.0f, 0.0f, 0.0f };
-        static float Rotation[3] = { 0.0f, 0.0f, 0.0f };
-        static float Scale[3] = { 1.0f, 1.0f, 1.0f };
-        ImGui::DragFloat3("Location", Location, 0.1f);
-        ImGui::DragFloat3("Rotation", Rotation, 0.1f);
-        ImGui::DragFloat3("Scale", Scale, 0.01f);
-    }
-    if (ImGui::CollapsingHeader("Actor", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        static bool TickEnabled = true;
-        ImGui::Checkbox("Start with Tick Enabled", &TickEnabled);
-        ImGui::TextDisabled("Class: APlayer");
     }
     ImGui::End();
 }
@@ -849,8 +856,12 @@ void FEditorImGui::DrawWorldSettings()
     ImGui::Begin("World Settings", &__ShowWorldSettings);
     if (ImGui::CollapsingHeader("GameMode", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        DrawGameModeSelector("GameMode Override");
-        ImGui::TextDisabled("Applies to the current level.");
+        const char* Modes[] = {"None (Project Default)", "GameModeBase", "ProjectGameMode"};
+        int Mode = __LevelGameMode + 1;
+        ImGui::BeginDisabled(__IsPlaying);
+        if (ImGui::Combo("GameMode Override", &Mode, Modes, 3)) __LevelGameMode = Mode - 1;
+        ImGui::EndDisabled();
+        ImGui::TextDisabled("Saved with this level.");
     }
     ImGui::End();
 }
@@ -865,18 +876,20 @@ void FEditorImGui::DrawProjectSettings()
     ImGui::BeginChild("ProjectSettingsCategories", ImVec2(190.0f, 0.0f),
         ImGuiChildFlags_Borders);
     ImGui::TextDisabled("Project");
-    if (ImGui::Selectable("Maps & Modes", false == __ProjectSettingsInputPage))
-        __ProjectSettingsInputPage = false;
+    if (ImGui::Selectable("Maps & Modes", !__ProjectSettingsInputPage && !__ProjectSettingsCollisionPage))
+    { __ProjectSettingsInputPage = false; __ProjectSettingsCollisionPage = false; }
     ImGui::Spacing();
     ImGui::TextDisabled("Engine");
-    if (ImGui::Selectable("Input", __ProjectSettingsInputPage))
-        __ProjectSettingsInputPage = true;
+    if (ImGui::Selectable("Input", __ProjectSettingsInputPage && !__ProjectSettingsCollisionPage))
+    { __ProjectSettingsInputPage = true; __ProjectSettingsCollisionPage = false; }
+    if (ImGui::Selectable("Collision", __ProjectSettingsCollisionPage)) __ProjectSettingsCollisionPage = true;
     ImGui::EndChild();
     ImGui::SameLine();
     ImGui::BeginChild("ProjectSettingsDetails", ImVec2(0.0f, 0.0f));
-    ImGui::TextUnformatted(__ProjectSettingsInputPage ? "Input" : "Maps & Modes");
+    ImGui::TextUnformatted(__ProjectSettingsCollisionPage ? "Collision" : (__ProjectSettingsInputPage ? "Input" : "Maps & Modes"));
     ImGui::Separator();
-    if (__ProjectSettingsInputPage)
+    if (__ProjectSettingsCollisionPage) DrawCollisionSettings();
+    else if (__ProjectSettingsInputPage)
     {
         static char Search[64] = {};
         ImGui::SetNextItemWidth(-1.0f);
@@ -919,21 +932,21 @@ void FEditorImGui::DrawProjectSettings()
 
         auto DrawKeySelector = [](const char* _ID, EKey _CurrentKey, bool _IsWaiting, auto _OnClicked)
         {
-            const char* Label = _IsWaiting ? "Press a key..." :
-                (EKey::Invalid == _CurrentKey ? "Select a key" : GetKeyName(_CurrentKey).data());
-            if (ImGui::Button(Label, ImVec2(220.0f, 0.0f)))
+            const auto Label = _IsWaiting ? FString(TEXT("Press a key...")) :
+                (EKey::Invalid == _CurrentKey ? FString(TEXT("Select a key")) : GetKeyName(_CurrentKey));
+            if (ImGui::Button(Label.ToUtf8().c_str(), ImVec2(220.0f, 0.0f)))
                 _OnClicked();
         };
 
         if (ImGui::CollapsingHeader("Action Mappings", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            std::map<std::string, std::vector<FInputActionKeyMapping>> Groups;
+            std::map<FString, std::vector<FInputActionKeyMapping>> Groups;
             for (const auto& Mapping : GetProjectActionMappings())
                 Groups[Mapping.__ActionName].push_back(Mapping);
             for (auto& [Name, Mappings] : Groups)
             {
-                ImGui::PushID(Name.c_str());
-                if (ImGui::TreeNodeEx(Name.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+                ImGui::PushID(Name.ToUtf8().c_str());
+                if (ImGui::TreeNodeEx(Name.ToUtf8().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
                 {
                     for (size_t Index = 0; Index < Mappings.size(); ++Index)
                     {
@@ -950,7 +963,7 @@ void FEditorImGui::DrawProjectSettings()
                         ImGui::PopID();
                     }
                     if (ImGui::SmallButton("+ Add Key"))
-                        SetProjectActionMapping(Name.c_str(), EKey::Invalid);
+                        SetProjectActionMapping(Name, EKey::Invalid);
                     ImGui::TreePop();
                 }
                 ImGui::PopID();
@@ -959,13 +972,13 @@ void FEditorImGui::DrawProjectSettings()
 
         if (ImGui::CollapsingHeader("Axis Mappings", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            std::map<std::string, std::vector<FInputAxisKeyMapping>> Groups;
+            std::map<FString, std::vector<FInputAxisKeyMapping>> Groups;
             for (const auto& Mapping : GetProjectAxisMappings())
                 Groups[Mapping.__AxisName].push_back(Mapping);
             for (auto& [Name, Mappings] : Groups)
             {
-                ImGui::PushID(Name.c_str());
-                if (ImGui::TreeNodeEx(Name.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+                ImGui::PushID(Name.ToUtf8().c_str());
+                if (ImGui::TreeNodeEx(Name.ToUtf8().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
                 {
                     for (size_t Index = 0; Index < Mappings.size(); ++Index)
                     {
@@ -982,7 +995,7 @@ void FEditorImGui::DrawProjectSettings()
                         if (ImGui::DragFloat("Scale", &Scale, 0.05f))
                         {
                             RemoveProjectAxisMapping(Mapping);
-                            SetProjectAxisMapping(Mapping.__AxisName.c_str(), Mapping.__Key, Scale);
+                            SetProjectAxisMapping(Mapping.__AxisName, Mapping.__Key, Scale);
                         }
                         ImGui::SameLine();
                         if (ImGui::SmallButton("X"))
@@ -990,7 +1003,7 @@ void FEditorImGui::DrawProjectSettings()
                         ImGui::PopID();
                     }
                     if (ImGui::SmallButton("+ Add Key"))
-                        SetProjectAxisMapping(Name.c_str(), EKey::Invalid, 1.0f);
+                        SetProjectAxisMapping(Name, EKey::Invalid, 1.0f);
                     ImGui::TreePop();
                 }
                 ImGui::PopID();
@@ -999,7 +1012,7 @@ void FEditorImGui::DrawProjectSettings()
     }
     else if (ImGui::CollapsingHeader("Default Modes", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        DrawGameModeSelector("Default GameMode");
+        DrawMapSettings();
     }
     ImGui::EndChild();
     ImGui::End();
@@ -1024,25 +1037,70 @@ bool FEditorImGui::DrawContentBrowser(float _Height)
         false);
     if (false == __ContentDrawerShowingOutputLog)
     {
-    std::filesystem::path Root = std::filesystem::current_path();
+    const auto* ProjectPaths = GEngine ? GEngine->GetEngineSystem<PathEngineSystem>() : nullptr;
+    std::filesystem::path Root = ProjectPaths
+        ? ProjectPaths->GetProjectContentDirectory() : __RootDirectory;
     std::error_code Error;
-    while (!Root.empty() && !std::filesystem::exists(Root / "ProjectEngine.sln", Error))
-    {
-        const auto Parent = Root.parent_path();
-        if (Parent == Root)
-            break;
-        Root = Parent;
-    }
-    ImGui::BeginChild("ContentBrowserFolders", ImVec2(210.0f, 0.0f), ImGuiChildFlags_Borders);
+
+    const float AvailableWidth = (std::max)(1.0f, ImGui::GetContentRegionAvail().x);
+    const float SplitterWidth = (std::min)(6.0f, AvailableWidth * 0.05f);
+    const float MinimumSourcesWidth = (std::min)(120.0f, AvailableWidth * 0.3f);
+    const float MaximumSourcesWidth = (std::max)(MinimumSourcesWidth, AvailableWidth - SplitterWidth - (std::min)(180.0f, AvailableWidth * 0.4f));
+    const float SourcesWidth = (std::clamp)(__ContentBrowserSourcesWidth, MinimumSourcesWidth, MaximumSourcesWidth);
+    ImGui::BeginChild("ContentBrowserFolders", ImVec2(SourcesWidth, 0.0f), ImGuiChildFlags_Borders);
     if (!Root.empty() && std::filesystem::exists(Root, Error))
     {
-        ImGui::TextUnformatted(Root.filename().string().c_str());
+        if (ImGui::Selectable("Content", __ContentSource == EContentSource::ProjectContent && (__ContentBrowserSelection.empty() || __ContentBrowserSelection == Root)))
+        {
+            __ContentSource = EContentSource::ProjectContent;
+            __ContentBrowserSelection = Root;
+            __ContentBrowserFocusedPath = Root;
+        }
         ImGui::Separator();
-        DrawContentFolder(Root);
+        if (__ContentSource == EContentSource::ProjectContent) DrawContentFolder(Root);
     }
+    if (__ShowEngineContent && ProjectPaths)
+    {
+        const auto EngineRoot = ProjectPaths->GetEngineContentDirectory();
+        if (ImGui::Selectable("Engine Content", __ContentSource == EContentSource::EngineContent && __ContentBrowserSelection == EngineRoot))
+        {
+            __ContentSource = EContentSource::EngineContent;
+            __ContentBrowserSelection = EngineRoot;
+            __ContentBrowserFocusedPath = EngineRoot;
+        }
+        if (__ContentSource == EContentSource::EngineContent) DrawContentFolder(EngineRoot);
+    }
+    if (__ShowCppClasses)
+    {
+        ImGui::SeparatorText("C++ Classes");
+        DrawClassFolders(false, {});
+        if (__ShowEngineContent)
+        {
+            ImGui::SeparatorText("Engine C++ Classes");
+            DrawClassFolders(true, {});
+        }
+    }
+    if (__ContentSource == EContentSource::EngineContent && ProjectPaths) Root = ProjectPaths->GetEngineContentDirectory();
     ImGui::EndChild();
-    ImGui::SameLine();
+    ImGui::SameLine(0.0f, 0.0f);
+    ImGui::InvisibleButton("ContentBrowserSplitter", ImVec2(SplitterWidth, (std::max)(1.0f, ImGui::GetContentRegionAvail().y)));
+    if (ImGui::IsItemHovered() || ImGui::IsItemActive())
+    {
+        ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+        ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImGui::GetColorU32(ImGui::IsItemActive() ? ImGuiCol_SeparatorActive : ImGuiCol_SeparatorHovered));
+    }
+    if (ImGui::IsItemActive() && ImGui::GetIO().MouseDelta.x != 0.0f)
+        __ContentBrowserSourcesWidth = (std::clamp)(SourcesWidth + ImGui::GetIO().MouseDelta.x, MinimumSourcesWidth, MaximumSourcesWidth);
+    ImGui::SameLine(0.0f, 0.0f);
     ImGui::BeginChild("ContentBrowserAssets", ImVec2(0.0f, 0.0f));
+    if (__ContentSource == EContentSource::ProjectClasses || __ContentSource == EContentSource::EngineClasses)
+    {
+        DrawNativeClassAssets();
+        ImGui::EndChild();
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
+        return DrawerHovered;
+    }
     if (ImGui::IsWindowHovered() && ImGui::GetIO().KeyCtrl &&
         ImGui::GetIO().MouseWheel != 0.0f)
     {
@@ -1051,60 +1109,84 @@ bool FEditorImGui::DrawContentBrowser(float _Height)
     }
     const std::filesystem::path DisplayPath = __ContentBrowserSelection.empty()
         ? Root : __ContentBrowserSelection;
-    ImGui::Text("Content / %s", DisplayPath.filename().string().c_str());
+    ImGui::Text("%s / %s", __ContentSource == EContentSource::EngineContent ? "Engine Content" : "Content", FString(DisplayPath.filename().wstring()).ToUtf8().c_str());
+    ImGui::SameLine();
+    DrawMaterialCreation(DisplayPath);
+    ImGui::SameLine();
+    if (ImGui::Button("Import...")) BeginAssetImport(DisplayPath);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(220);
+    ImGui::InputTextWithHint("##AssetSearch", "Search Assets", __AssetSearch, sizeof(__AssetSearch));
+    ImGui::SameLine();
+    DrawContentSourceSettings();
+    __DropTargets.push_back({DrawerMinimum, DrawerMaximum, DisplayPath});
     ImGui::Separator();
     std::vector<std::filesystem::directory_entry> Entries;
     for (const auto& Entry : std::filesystem::directory_iterator(DisplayPath, Error))
     {
-        if (!Error && (Entry.is_regular_file(Error) || Entry.is_directory(Error)))
+        if (!Error && (Entry.is_directory(Error) || (Entry.is_regular_file(Error) &&
+            __AssetKinds.find(Entry.path().wstring()) != __AssetKinds.end())))
             Entries.emplace_back(Entry);
     }
     std::sort(Entries.begin(), Entries.end(), [](const auto& Left, const auto& Right)
     {
-        const bool LeftDirectory = Left.is_directory();
-        const bool RightDirectory = Right.is_directory();
+        std::error_code Error;
+        const bool LeftDirectory = Left.is_directory(Error);
+        const bool RightDirectory = Right.is_directory(Error);
         if (LeftDirectory != RightDirectory)
             return LeftDirectory > RightDirectory;
-        return Left.path().filename().string() < Right.path().filename().string();
+        return FString(Left.path().filename().wstring()).ToUtf8() < FString(Right.path().filename().wstring()).ToUtf8();
     });
     int Column = 0;
     for (const auto& Entry : Entries)
     {
-        const std::string FileName = Entry.path().filename().string();
-        ImGui::PushID(Entry.path().string().c_str());
-        const bool IsDirectory = Entry.is_directory();
-        const std::string DisplayName = FileName;
+        const FString FileName = FString(Entry.path().filename().wstring()).ToUtf8();
+        if (__AssetSearch[0] && !FileName.Contains(FString(__AssetSearch), ESearchCase::CaseSensitive)) continue;
+        ImGui::PushID(FString(Entry.path().wstring()).ToUtf8().c_str());
+        const bool IsDirectory = Entry.is_directory(Error);
+        const FString DisplayName = IsDirectory ? FileName : FString(Entry.path().stem().wstring()).ToUtf8();
         const bool WasFocused = __ContentBrowserFocusedPath == Entry.path();
         if (WasFocused)
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.000f, 0.439f, 0.878f, 1.0f));
-        std::filesystem::path IconPath = Root / "Engine" / "Images" /
+        std::filesystem::path IconPath = __RootDirectory / "Engine" / "Content" /
             (IsDirectory ? "Folder.svg" : "Actor.svg");
         if (!IsDirectory)
         {
-            const std::wstring Extension = Entry.path().extension().wstring();
-            if (_wcsicmp(Extension.c_str(), L".cpp") == 0 || _wcsicmp(Extension.c_str(), L".h") == 0)
-                IconPath = Root / "Engine" / "Images" / "Blueprint.svg";
-            else if (_wcsicmp(Extension.c_str(), L".umap") == 0)
-                IconPath = Root / "Engine" / "Images" / "World.svg";
-            else if (_wcsicmp(Extension.c_str(), L".png") == 0 || _wcsicmp(Extension.c_str(), L".jpg") == 0)
-                IconPath = Root / "Engine" / "Images" / "Texture2D.svg";
+            const FString Extension = Entry.path().extension().wstring();
+            if (_wcsicmp(Extension.c_str(), TEXT(".umap")) == 0)
+                IconPath = __RootDirectory / "Engine" / "Content" / "World.svg";
+            else if (__AssetKinds.at(Entry.path().wstring()) == 1)
+                IconPath = __RootDirectory / "Engine" / "Content" / "Texture2D.svg";
         }
         ImGui::BeginGroup();
-        if (ID3D11ShaderResourceView* Icon = LoadIconTexture(IconPath))
+        ID3D11ShaderResourceView* Thumbnail = !IsDirectory && !_wcsicmp(Entry.path().extension().c_str(), L".uasset")
+            ? GetAssetThumbnail(Entry.path()) : nullptr;
+        if (ID3D11ShaderResourceView* Icon = Thumbnail ? Thumbnail : LoadIconTexture(IconPath))
         {
             const float CursorX = ImGui::GetCursorPosX();
             ImGui::SetCursorPosX(CursorX + 38.0f);
             const float IconSize = __ContentBrowserTileSize * 0.46f;
-            ImGui::Image(reinterpret_cast<ImTextureID>(Icon), ImVec2(IconSize, IconSize));
+            ImGui::ImageButton("##AssetThumbnail", reinterpret_cast<ImTextureID>(Icon), ImVec2(IconSize, IconSize));
             if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
                 __ContentBrowserFocusedPath = Entry.path();
         }
-        ImGui::Button(DisplayName.c_str(), ImVec2(__ContentBrowserTileSize, 28.0f));
+        ImGui::Button(DisplayName.ToUtf8().c_str(), ImVec2(__ContentBrowserTileSize, 28.0f));
         if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
             __ContentBrowserFocusedPath = Entry.path();
+        if (!IsDirectory)
+        {
+            const auto Kind = __AssetKinds.find(Entry.path().wstring());
+            ImGui::TextDisabled("%s", Kind != __AssetKinds.end() && Kind->second != 3 ? (Kind->second == 1 ? "Texture2D" : Kind->second == 4 ? "Material" : Kind->second == 5 ? "Material Instance" : "SoundWave") : "Level");
+        }
         if (WasFocused)
             ImGui::PopStyleColor();
         ImGui::EndGroup();
+        if (!IsDirectory && !_wcsicmp(Entry.path().extension().c_str(), L".uasset"))
+        {
+            DrawAssetDragSource(Entry.path());
+            DrawAssetContextMenu(Entry.path());
+        }
+        if (IsDirectory) __DropTargets.push_back({ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), Entry.path()});
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
         {
             if (IsDirectory)
@@ -1115,17 +1197,14 @@ bool FEditorImGui::DrawContentBrowser(float _Height)
             }
             else
             {
-                const std::wstring Extension = Entry.path().extension().wstring();
-                if (_wcsicmp(Extension.c_str(), L".umap") != 0)
+                const FString Extension = Entry.path().extension().wstring();
+                if (_wcsicmp(Extension.c_str(), TEXT(".uasset")) == 0)
                 {
-                    // Documents and source files use the user's Windows
-                    // file association (normally Visual Studio).
-                    const std::wstring FilePath = Entry.path().wstring();
-                    const HINSTANCE Result = ShellExecuteW(
-                        nullptr, L"open", FilePath.c_str(), nullptr, nullptr,
-                        SW_SHOWNORMAL);
-                    if (reinterpret_cast<INT_PTR>(Result) <= 32)
-                        ImGui::OpenPopup("FileOpenError");
+                    OpenAsset(Entry.path());
+                }
+                else if (_wcsicmp(Extension.c_str(), TEXT(".umap")) == 0)
+                {
+                    OpenEditorMap(Entry.path());
                 }
             }
         }
@@ -1139,18 +1218,11 @@ bool FEditorImGui::DrawContentBrowser(float _Height)
     }
     if (Entries.empty())
         ImGui::TextDisabled("Select a folder to view its assets.");
-    if (ImGui::BeginPopup("FileOpenError"))
-    {
-        ImGui::TextUnformatted("Windows could not open this file.");
-        if (ImGui::Button("OK"))
-            ImGui::CloseCurrentPopup();
-        ImGui::EndPopup();
-    }
     ImGui::EndChild();
     }
     else
     {
-        ImGui::TextColored(ImVec4(0.45f, 0.75f, 1.0f, 1.0f), "LogInit: ProjectEngine Editor initialized");
+        ImGui::TextColored(ImVec4(0.45f, 0.75f, 1.0f, 1.0f), "LogInit: UnrealEngine Editor initialized");
         ImGui::TextUnformatted("LogRHI: DirectX 11 viewport active");
         ImGui::TextDisabled("LogEditor: Dear ImGui Win32 + DX11 backends active");
     }
@@ -1159,10 +1231,44 @@ bool FEditorImGui::DrawContentBrowser(float _Height)
     return DrawerHovered;
 }
 
+void FEditorImGui::DrawViewportOptions()
+{
+    if (ImGui::Button("v##ViewportOptions")) ImGui::OpenPopup("Viewport Options");
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Viewport Options");
+    if (ImGui::BeginPopup("Viewport Options"))
+    {
+        if (ImGui::MenuItem("Immersive Mode", "F11", __ImmersiveViewport))
+            __ToggleImmersiveRequested = true;
+        ImGui::MenuItem("Constrain Aspect Ratio", nullptr, &__ConstrainViewportAspectRatio);
+        ImGui::EndPopup();
+    }
+    ImGui::SameLine();
+    ImGui::TextUnformatted("Perspective");
+    if (!__EditedMap.empty())
+    {
+        ImGui::SameLine();
+        ImGui::TextDisabled("| %s", FString(__EditedMap.stem().wstring()).ToUtf8().c_str());
+    }
+    if (__ImmersiveViewport)
+    {
+        ImGui::SameLine();
+        if (ImGui::Button("Restore Viewport (F11)")) __ToggleImmersiveRequested = true;
+    }
+}
+
 void FEditorImGui::DrawViewport()
 {
-    ImGui::Begin("Viewport", nullptr,
-        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    if (__ImmersiveViewport)
+    {
+        const auto* Viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(Viewport->Pos);
+        ImGui::SetNextWindowSize(Viewport->Size);
+    }
+    ImGui::Begin(__ImmersiveViewport ? "Immersive Viewport" : "Viewport", nullptr,
+        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
+        (__ImmersiveViewport ? ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking |
+            ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove : 0));
+    DrawViewportOptions();
     const ImVec2 ContentPosition = ImGui::GetCursorScreenPos();
     const ImVec2 ContentSize = ImGui::GetContentRegionAvail();
 
@@ -1219,10 +1325,88 @@ void FEditorImGui::DrawViewport()
                 SWP_NOACTIVATE | SWP_SHOWWINDOW);
         }
     }
+    if (Width > 0 && Height > 0)
+    {
+        const int ClipHeight = __ContentDrawerTop >= 0.0f
+            ? (std::clamp)(static_cast<int>(__ContentDrawerTop) - static_cast<int>(Position.y), 0, Height)
+            : Height;
+        if (__ViewportClipHeight != ClipHeight || __ViewportClipWidth != Width)
+        {
+            wil::unique_hrgn Region(CreateRectRgn(0, 0, Width, ClipHeight));
+            if (Region)
+            {
+                if (SetWindowRgn(__ViewportWindow, Region.get(), TRUE))
+                {
+                    Region.release();
+                    __ViewportClipHeight = ClipHeight;
+                    __ViewportClipWidth = Width;
+                }
+            }
+        }
+    }
     ImGui::Dummy(ContentSize);
+    DrawViewportAssetDrop(ContentPosition, FittedSize);
+    const bool HideViewport = __ShowImport || __ShowAsset || __ShowAssetPreferences || __ShowProjectSettings ||
+        ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
+    if (IsWindowVisible(__ViewportWindow) == HideViewport)
+        ShowWindow(__ViewportWindow, HideViewport ? SW_HIDE : SW_SHOWNA);
     ImGui::End();
 }
 
+
+void FEditorImGui::InitializeLayoutSettings()
+{
+    if (!__LayoutIniFilename.IsEmpty()) return;
+    auto* Paths = GEngine ? GEngine->GetEngineSystem<PathEngineSystem>() : nullptr;
+    if (!Paths) return;
+    const auto File = Paths->GetProjectSavedDirectory() / L"Config/EditorLayout.ini";
+    std::error_code Error;
+    std::filesystem::create_directories(File.parent_path(), Error);
+    if (Error) return;
+    __LayoutIniFilename = FString(File.wstring());
+    const auto Utf8 = __LayoutIniFilename.ToUtf8();
+    __LayoutIniUtf8.assign(Utf8.begin(), Utf8.end());
+    __LayoutIniUtf8.push_back(0);
+    ImGuiSettingsHandler Handler;
+    Handler.TypeName = "UnrealEngineLayout";
+    Handler.TypeHash = ImHashStr(Handler.TypeName);
+    Handler.UserData = this;
+    Handler.ReadOpenFn = [](ImGuiContext*, ImGuiSettingsHandler* _Handler, const char* _Name) -> void*
+    {
+        return std::strcmp(_Name, "Editor") == 0 ? _Handler->UserData : nullptr;
+    };
+    Handler.ReadLineFn = [](ImGuiContext*, ImGuiSettingsHandler*, void* _Entry, const char* _Line)
+    {
+        auto& Editor = *static_cast<FEditorImGui*>(_Entry);
+        float Value = 0.0f;
+        int Flag = 0;
+        if (std::sscanf(_Line, "SourcesWidth=%f", &Value) == 1 && std::isfinite(Value))
+            Editor.__ContentBrowserSourcesWidth = (std::clamp)(Value, 120.0f, 4096.0f);
+        else if (std::sscanf(_Line, "TileSize=%f", &Value) == 1 && std::isfinite(Value))
+            Editor.__ContentBrowserTileSize = (std::clamp)(Value, 84.0f, 240.0f);
+        else if (std::sscanf(_Line, "DrawerHeight=%f", &Value) == 1 && std::isfinite(Value))
+            Editor.__ContentDrawerHeight = (std::clamp)(Value, 100.0f, 4096.0f);
+        else if (std::sscanf(_Line, "DrawerPinned=%d", &Flag) == 1)
+            Editor.__ContentDrawerPinned = Flag != 0;
+        else if (std::sscanf(_Line, "WorldSettings=%d", &Flag) == 1)
+            Editor.__ShowWorldSettings = Flag != 0;
+        else if (std::sscanf(_Line, "ProjectSettings=%d", &Flag) == 1)
+            Editor.__ShowProjectSettings = Flag != 0;
+    };
+    Handler.WriteAllFn = [](ImGuiContext*, ImGuiSettingsHandler* _Handler, ImGuiTextBuffer* _Output)
+    {
+        const auto& Editor = *static_cast<FEditorImGui*>(_Handler->UserData);
+        _Output->appendf("[UnrealEngineLayout][Editor]\nSourcesWidth=%.3f\nTileSize=%.3f\nDrawerHeight=%.3f\nDrawerPinned=%d\nWorldSettings=%d\nProjectSettings=%d\n\n",
+            Editor.__ContentBrowserSourcesWidth, Editor.__ContentBrowserTileSize, Editor.__ContentDrawerHeight,
+            Editor.__ContentDrawerPinned, Editor.__ShowWorldSettings, Editor.__ShowProjectSettings);
+    };
+    ImGui::AddSettingsHandler(&Handler);
+    ImGui::GetIO().IniFilename = __LayoutIniUtf8.data();
+    ImGui::LoadIniSettingsFromDisk(__LayoutIniUtf8.data());
+    __DockLayoutCreated = false;
+    __ContentDrawerOpen = __ContentDrawerPinned;
+    __ContentDrawerOpenAmount = __ContentDrawerPinned ? 1.0f : 0.0f;
+}
 
 bool FEditorImGui::Initialize(HWND _MainWindow, HWND _ViewportWindow)
 {
@@ -1231,12 +1415,30 @@ bool FEditorImGui::Initialize(HWND _MainWindow, HWND _ViewportWindow)
 
     __MainWindow = _MainWindow;
     __ViewportWindow = _ViewportWindow;
-    LoadProjectInputMappings();
+    std::vector<wchar_t> Executable(32768, 0);
+    const DWORD Length = GetModuleFileNameW(nullptr, Executable.data(),
+        static_cast<DWORD>(Executable.size()));
+    if (0 == Length || Length >= Executable.size())
+        return false;
+    Executable[Length] = 0;
+    __RootDirectory = std::filesystem::path(Executable.data()).parent_path();
+    std::error_code Error;
+    while (!std::filesystem::is_directory(__RootDirectory / "Engine" / "Content", Error))
+    {
+        const std::filesystem::path Parent = __RootDirectory.parent_path();
+        if (Parent == __RootDirectory || Parent.empty())
+            return false;
+        __RootDirectory = Parent;
+    }
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& IO = ImGui::GetIO();
+    IO.IniFilename = nullptr;
     IO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    if (std::filesystem::exists("C:/Windows/Fonts/segoeui.ttf"))
+    if (std::filesystem::exists("C:/Windows/Fonts/malgun.ttf"))
+        IO.FontDefault = IO.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/malgun.ttf", 14.0f, nullptr, IO.Fonts->GetGlyphRangesKorean());
+    else if (std::filesystem::exists("C:/Windows/Fonts/segoeui.ttf"))
         IO.FontDefault = IO.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/segoeui.ttf", 14.0f);
     ApplyEditorStyle();
 
@@ -1252,9 +1454,18 @@ bool FEditorImGui::Initialize(HWND _MainWindow, HWND _ViewportWindow)
 
 void FEditorImGui::Shutdown()
 {
+    __CollisionPreviewWorld.reset();
+    __AutoReimport.reset();
+    __EditorActorSubsystem.reset();
+    __AssetThumbnails.clear();
+    __PreviewAudio.reset();
+    __PreviewTexture.Reset();
+    __PreviewAsset = nullptr;
+    __IconTextures.clear();
     if (nullptr == ImGui::GetCurrentContext())
         return;
 
+    if (!__LayoutIniFilename.IsEmpty()) ImGui::SaveIniSettingsToDisk(__LayoutIniUtf8.data());
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
@@ -1265,6 +1476,8 @@ void FEditorImGui::Shutdown()
     __MainWindow = nullptr;
     __ViewportWindow = nullptr;
     __DockLayoutCreated = false;
+    __LayoutIniFilename.Empty();
+    __LayoutIniUtf8.clear();
 }
 
 void FEditorImGui::Render()
@@ -1273,17 +1486,59 @@ void FEditorImGui::Render()
         return;
 
     __IsRenderingEditorImGui = true;
+    using FProfileClock = std::chrono::steady_clock;
+    static std::ofstream Profile = []
+    {
+        wchar_t Path[32768] = {};
+        const auto Length = GetEnvironmentVariableW(L"UE_EDITOR_PROFILE", Path, 32768);
+        std::ofstream Output;
+        if (Length && Length < 32768)
+        {
+            Output.open(std::filesystem::path(Path));
+            Output << "playing,assets_ms,panels_ms,viewport_ms,present_ms,total_ms\n";
+        }
+        return Output;
+    }();
+    const auto ProfileStart = FProfileClock::now();
+    InitializeLayoutSettings();
+    const auto LayoutBefore = std::make_tuple(__ContentBrowserSourcesWidth, __ContentBrowserTileSize, __ContentDrawerHeight, __ContentDrawerPinned, __ShowWorldSettings, __ShowProjectSettings);
+    UpdateContentSources();
+    TickAssetWorkflow();
+    TickProjectSession();
+    __DropTargets.clear();
+    const auto ProfileAssets = FProfileClock::now();
 
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
-    DrawMainDockspace();
-    DrawWorldOutliner();
-    DrawDetails();
-    DrawWorldSettings();
-    DrawProjectSettings();
+    if (__ToggleImmersiveRequested)
+    {
+        __ImmersiveViewport = !__ImmersiveViewport;
+        __ToggleImmersiveRequested = false;
+    }
+    if (__ImmersiveViewport)
+    {
+        __ContentDrawerTop = -1.0f;
+        if (auto* Host = ImGui::FindWindowByName("UnrealEngine Editor"))
+            ImGui::DockSpace(Host->GetID("UnrealEngineDockspace"), ImVec2(0, 0), ImGuiDockNodeFlags_KeepAliveOnly);
+    }
+    else
+    {
+        DrawMainDockspace();
+        DrawWorldOutliner();
+        DrawDetails();
+        DrawWorldSettings();
+        DrawProjectSettings();
+        DrawCollisionPreview();
+    }
+    const auto ProfilePanels = FProfileClock::now();
     DrawViewport();
+    DrawAssetWindows();
+    DrawFileDialogs();
+    if (LayoutBefore != std::make_tuple(__ContentBrowserSourcesWidth, __ContentBrowserTileSize, __ContentDrawerHeight, __ContentDrawerPinned, __ShowWorldSettings, __ShowProjectSettings))
+        ImGui::MarkIniSettingsDirty();
     ImGui::Render();
+    const auto ProfileViewport = FProfileClock::now();
 
     if (!__RenderTargetView)
     {
@@ -1297,6 +1552,15 @@ void FEditorImGui::Render()
     __DeviceContext->ClearRenderTargetView(RenderTarget, ClearColor);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
     __SwapChain->Present(1, 0);
+    if (Profile.is_open())
+    {
+        const auto End = FProfileClock::now();
+        auto Milliseconds = [](auto _Start, auto _End) { return std::chrono::duration<double, std::milli>(_End - _Start).count(); };
+        Profile << __IsPlaying << ',' << Milliseconds(ProfileStart, ProfileAssets) << ','
+            << Milliseconds(ProfileAssets, ProfilePanels) << ',' << Milliseconds(ProfilePanels, ProfileViewport) << ','
+            << Milliseconds(ProfileViewport, End) << ',' << Milliseconds(ProfileStart, End) << '\n';
+        Profile.flush();
+    }
     __IsRenderingEditorImGui = false;
 }
 
@@ -1316,6 +1580,7 @@ void FEditorImGui::SetEditorState(
     bool _IsPaused,
     bool _UseEngineGameMode)
 {
+    if (__IsPlaying != _IsPlaying) __WaitingForWorldChange = true;
     __IsPlaying = _IsPlaying;
     __IsPaused = _IsPaused;
     __UseEngineGameMode = _UseEngineGameMode;
@@ -1329,6 +1594,15 @@ bool FEditorImGui::HandleWindowMessage(
 {
     if (nullptr == ImGui::GetCurrentContext())
         return false;
+
+    if (_Message == WM_KEYDOWN && _WParam == VK_F11 &&
+        !__WaitingForKey && !__WaitingForAxis && !ImGui::GetIO().WantTextInput &&
+        !(GetKeyState(VK_CONTROL) & 0x8000) && !(GetKeyState(VK_SHIFT) & 0x8000) &&
+        !(GetKeyState(VK_MENU) & 0x8000))
+    {
+        if (!(_LParam & (1LL << 30))) __ToggleImmersiveRequested = true;
+        return true;
+    }
 
     if (__WaitingForKey || __WaitingForAxis)
     {
@@ -1347,13 +1621,13 @@ bool FEditorImGui::HandleWindowMessage(
                 if (__WaitingForKey)
                 {
                     RemoveProjectActionMapping(__ActionKeyToReplace);
-                    SetProjectActionMapping(__ActionKeyToReplace.__ActionName.c_str(), Key);
+                    SetProjectActionMapping(__ActionKeyToReplace.__ActionName, Key);
                 }
                 else
                 {
                     RemoveProjectAxisMapping(__AxisKeyToReplace);
                     SetProjectAxisMapping(
-                        __AxisKeyToReplace.__AxisName.c_str(), Key, __AxisKeyToReplace.__Scale);
+                        __AxisKeyToReplace.__AxisName, Key, __AxisKeyToReplace.__Scale);
                 }
                 __WaitingForKey = false;
                 __WaitingForAxis = false;

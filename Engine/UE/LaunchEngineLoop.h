@@ -41,10 +41,6 @@ protected:
 	float	__DeltaTime = 0.0f;
 
 private:
-	HRESULT InitializeWithWindow(HWND _WindowHandle, POINT _Resolution, bool _IsEmbeddedViewport);
-	void SetDeltaTime(float _DeltaTime) { __DeltaTime = _DeltaTime; }
-
-private:
 	HWND						__Hwnd = nullptr;
 	POINT						__Resolution = {};
 

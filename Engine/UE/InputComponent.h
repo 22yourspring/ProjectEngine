@@ -17,7 +17,7 @@ struct ENGINE_API FInputActionBinding
 	GENERATED_BODY()
 
 	UPROPERTY()
-	std::string __ActionName;
+	FString __ActionName;
 
 	UPROPERTY()
 	EInputEvent __KeyEvent = EInputEvent::Pressed;
@@ -33,7 +33,7 @@ struct ENGINE_API FInputAxisBinding
 	GENERATED_BODY()
 
 	UPROPERTY()
-	std::string __AxisName;
+	FString __AxisName;
 
 	FInputAxisHandlerSignature __AxisDelegate;
 	bool __bConsumeInput = false;
@@ -50,15 +50,15 @@ public:
 	virtual ~UInputComponent() override;
 
 	template <typename UserClass>
-	FInputActionBinding& BindAction(const std::string& _ActionName, EInputEvent _KeyEvent,
+	FInputActionBinding& BindAction(const FString& _ActionName, EInputEvent _KeyEvent,
 		UserClass* _Object, void(UserClass::* _Function)());
 
 	template <typename UserClass>
-	FInputAxisBinding& BindAxis(const std::string& _AxisName,
+	FInputAxisBinding& BindAxis(const FString& _AxisName,
 		UserClass* _Object, void(UserClass::* _Function)(float));
 
-	bool ProcessAction(const std::string& _ActionName, EInputEvent _KeyEvent);
-	bool ProcessAxis(const std::string& _AxisName, float _Value);
+	bool ProcessAction(const FString& _ActionName, EInputEvent _KeyEvent);
+	bool ProcessAxis(const FString& _AxisName, float _Value);
 
 	int32_t __Priority = 0;
 	bool __bBlockInput = false;

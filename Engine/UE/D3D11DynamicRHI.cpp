@@ -14,6 +14,12 @@ using Microsoft::WRL::ComPtr;
 
 namespace
 {
+	class FD3D11Texture final : public FRHITexture
+	{
+	public:
+		ComPtr<ID3D11ShaderResourceView> __View;
+	};
+
 	constexpr D3D_FEATURE_LEVEL RequestedFeatureLevels[] =
 	{
 		D3D_FEATURE_LEVEL_11_1,
@@ -101,6 +107,58 @@ bool FD3D11Viewport::Initialize(
 	__LogicalSizeY = _Desc.SizeY;
 	__PresentMode = _Desc.PresentMode;
 	return CreateBackBuffer();
+}
+
+FTextureRHIRef FD3D11DynamicRHI::RHICreateTexture2D(uint32 _Width, uint32 _Height, const std::vector<uint8>& _Pixels)
+{
+    if (!__Device || !_Width || !_Height || _Width > 8192 || _Height > 8192 || _Pixels.size() != uint64(_Width) * _Height * 4) return nullptr;
+    D3D11_TEXTURE2D_DESC Desc = {};
+    Desc.Width = _Width;
+    Desc.Height = _Height;
+    Desc.MipLevels = Desc.ArraySize = 1;
+    Desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    Desc.SampleDesc.Count = 1;
+    Desc.Usage = D3D11_USAGE_IMMUTABLE;
+    Desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    D3D11_SUBRESOURCE_DATA Data = { _Pixels.data(), _Width * 4, 0 };
+    ComPtr<ID3D11Texture2D> Texture;
+    auto Resource = std::make_shared<FD3D11Texture>();
+    if (FAILED(__Device->CreateTexture2D(&Desc, &Data, Texture.GetAddressOf())) ||
+        FAILED(__Device->CreateShaderResourceView(Texture.Get(), nullptr, Resource->__View.GetAddressOf()))) return nullptr;
+    return Resource;
+}
+
+void FD3D11DynamicRHI::RHIDrawTexture(FRHITexture* _Texture, int32 _X, int32 _Y, int32 _Width, int32 _Height)
+{
+    const auto* Texture = dynamic_cast<FD3D11Texture*>(_Texture);
+    if (!__DrawingViewport || !Texture || _Width <= 0 || _Height <= 0) return;
+    const FColor White = { 255, 255, 255, 255 };
+    const float Left = static_cast<float>(_X), Top = static_cast<float>(_Y);
+    const float Right = Left + _Width, Bottom = Top + _Height;
+    FD3D11SimpleVertex Vertices[] =
+    {
+        MakeVertex(Left, Top, White), MakeVertex(Right, Top, White), MakeVertex(Right, Bottom, White),
+        MakeVertex(Left, Top, White), MakeVertex(Right, Bottom, White), MakeVertex(Left, Bottom, White)
+    };
+    Vertices[1].UV[0] = Vertices[2].UV[0] = Vertices[4].UV[0] = 1.0f;
+    Vertices[2].UV[1] = Vertices[4].UV[1] = Vertices[5].UV[1] = 1.0f;
+    DrawVertices(Vertices, 6, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, Texture->__View.Get());
+}
+
+void FD3D11DynamicRHI::RHIDrawQuad(const FVector* _Corners, const FColor& _Color, FRHITexture* _Texture)
+{
+    if (!__DrawingViewport || !_Corners) return;
+    const auto* Texture = dynamic_cast<FD3D11Texture*>(_Texture);
+    FD3D11SimpleVertex Vertices[6];
+    const int Indices[] = {0, 1, 2, 0, 2, 3};
+    for (int Index = 0; Index < 6; ++Index)
+    {
+        const int Corner = Indices[Index];
+        Vertices[Index] = MakeVertex(float(_Corners[Corner].X), float(_Corners[Corner].Y), _Color);
+        Vertices[Index].UV[0] = Corner == 1 || Corner == 2 ? 1.f : 0.f;
+        Vertices[Index].UV[1] = Corner >= 2 ? 1.f : 0.f;
+    }
+    DrawVertices(Vertices, 6, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, Texture ? Texture->__View.Get() : nullptr);
 }
 
 bool FD3D11Viewport::CreateBackBuffer()
@@ -211,6 +269,8 @@ void FD3D11DynamicRHI::Shutdown()
 	}
 
 	__RasterizerState.Reset();
+	__WhiteTexture.Reset();
+	__TextureSampler.Reset();
 	__BlendState.Reset();
 	__DynamicVertexBuffer.Reset();
 	__InputLayout.Reset();
@@ -228,12 +288,14 @@ struct VSInput
 {
     float2 Position : POSITION;
     float4 Color : COLOR0;
+    float2 UV : TEXCOORD0;
 };
 
 struct PSInput
 {
     float4 Position : SV_POSITION;
     float4 Color : COLOR0;
+    float2 UV : TEXCOORD0;
 };
 
 PSInput VSMain(VSInput Input)
@@ -241,12 +303,16 @@ PSInput VSMain(VSInput Input)
     PSInput Output;
     Output.Position = float4(Input.Position, 0.0f, 1.0f);
     Output.Color = Input.Color;
+    Output.UV = Input.UV;
     return Output;
 }
 
+Texture2D AssetTexture : register(t0);
+SamplerState AssetSampler : register(s0);
+
 float4 PSMain(PSInput Input) : SV_TARGET
 {
-    return Input.Color;
+    return Input.Color * AssetTexture.Sample(AssetSampler, Input.UV);
 }
 )";
 
@@ -256,7 +322,7 @@ float4 PSMain(PSInput Input) : SV_TARGET
 	if (FAILED(D3DCompile(
 		ShaderSource,
 		sizeof(ShaderSource),
-		"ProjectEngineSimpleRHI",
+		"UnrealEngineSimpleRHI",
 		nullptr,
 		nullptr,
 		"VSMain",
@@ -273,7 +339,7 @@ float4 PSMain(PSInput Input) : SV_TARGET
 	if (FAILED(D3DCompile(
 		ShaderSource,
 		sizeof(ShaderSource),
-		"ProjectEngineSimpleRHI",
+		"UnrealEngineSimpleRHI",
 		nullptr,
 		nullptr,
 		"PSMain",
@@ -303,7 +369,8 @@ float4 PSMain(PSInput Input) : SV_TARGET
 	constexpr D3D11_INPUT_ELEMENT_DESC InputElements[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 8, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 8, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 	if (FAILED(__Device->CreateInputLayout(
 		InputElements,
@@ -341,6 +408,14 @@ float4 PSMain(PSInput Input) : SV_TARGET
 		return false;
 
 	D3D11_RASTERIZER_DESC RasterizerDesc = {};
+	const auto White = RHICreateTexture2D(1, 1, { 255, 255, 255, 255 });
+	if (!White) return false;
+	__WhiteTexture = static_cast<FD3D11Texture*>(White.get())->__View;
+	D3D11_SAMPLER_DESC Sampler = {};
+	Sampler.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	Sampler.AddressU = Sampler.AddressV = Sampler.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	Sampler.MaxLOD = D3D11_FLOAT32_MAX;
+	if (FAILED(__Device->CreateSamplerState(&Sampler, __TextureSampler.GetAddressOf()))) return false;
 	RasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	RasterizerDesc.CullMode = D3D11_CULL_NONE;
 	RasterizerDesc.DepthClipEnable = TRUE;
@@ -428,7 +503,7 @@ FD3D11DynamicRHI::FD3D11SimpleVertex FD3D11DynamicRHI::MakeVertex(
 void FD3D11DynamicRHI::DrawVertices(
 	const FD3D11SimpleVertex* _Vertices,
 	uint32 _VertexCount,
-	D3D11_PRIMITIVE_TOPOLOGY _Topology)
+	D3D11_PRIMITIVE_TOPOLOGY _Topology, ID3D11ShaderResourceView* _Texture)
 {
 	if (nullptr == __DrawingViewport || nullptr == _Vertices ||
 		0 == _VertexCount || _VertexCount > 6 || nullptr == __DeviceContext)
@@ -458,6 +533,10 @@ void FD3D11DynamicRHI::DrawVertices(
 	__DeviceContext->IASetPrimitiveTopology(_Topology);
 	__DeviceContext->VSSetShader(__VertexShader.Get(), nullptr, 0);
 	__DeviceContext->PSSetShader(__PixelShader.Get(), nullptr, 0);
+	ID3D11ShaderResourceView* Texture = _Texture ? _Texture : __WhiteTexture.Get();
+	ID3D11SamplerState* Sampler = __TextureSampler.Get();
+	__DeviceContext->PSSetShaderResources(0, 1, &Texture);
+	__DeviceContext->PSSetSamplers(0, 1, &Sampler);
 	__DeviceContext->RSSetState(__RasterizerState.Get());
 	const float BlendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	__DeviceContext->OMSetBlendState(__BlendState.Get(), BlendFactor, 0xffffffffu);

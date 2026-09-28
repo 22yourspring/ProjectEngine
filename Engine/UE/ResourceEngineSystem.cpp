@@ -1,11 +1,21 @@
 #include "pch.h"
 #include "ResourceEngineSystem.h"
+#include "Engine.h"
+#include "PathEngineSystem.h"
+#include "GameMapsSettings.h"
 
 #include <fstream>
 #include <string>
 
 HRESULT ResourceEngineSystem::Initialize()
 {
+	PathEngineSystem* Paths = GEngine ? GEngine->GetEngineSystem<PathEngineSystem>() : nullptr;
+	if (nullptr == Paths || Paths->GetProjectDirectory().empty())
+		return E_UNEXPECTED;
+	AddContentRoot(Paths->GetProjectContentDirectory().c_str());
+	AddContentRoot(Paths->GetEngineContentDirectory().c_str());
+	__Packages.Mount(TEXT("/Game/"), Paths->GetProjectContentDirectory());
+	__Packages.Mount(TEXT("/Engine/"), Paths->GetEngineContentDirectory());
 	return S_OK;
 }
 
@@ -45,8 +55,9 @@ bool ResourceEngineSystem::LoadLevelAsset(
 	std::filesystem::path MapPath;
 	for (const std::filesystem::path& Root : ContentRoots)
 	{
-		const std::filesystem::path Candidate =
-			Root / "Maps" / (std::wstring(_LevelName) + L".umap");
+        const FString Name(_LevelName);
+        const std::filesystem::path Candidate = UGameMapsSettings::ResolveMap(Root,
+            FString(Name.StartsWith(TEXT("/Game/"), ESearchCase::CaseSensitive) ? Name : FString(TEXT("/Game/Levels/")) + Name));
 		if (std::filesystem::exists(Candidate))
 		{
 			MapPath = Candidate;

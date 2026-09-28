@@ -7,9 +7,13 @@
 =============================================================================*/
 
 #include "UE/Math/UnrealMath.h"
+#include "UE/Math/Transform.h"
 #include <cstddef>
 #include <string>
 #include <vector>
+
+const FLinearColor FLinearColor::Red(1.f, 0.f, 0.f, 1.f);
+const FLinearColor FLinearColor::Green(0.f, 1.f, 0.f, 1.f);
 
 /*-----------------------------------------------------------------------------
 	Globals
@@ -20,6 +24,8 @@ template<> const FMatrix44d FMatrix44d::Identity(FPlane4d(1, 0, 0, 0), FPlane4d(
 
 template<> const FQuat4f FQuat4f::Identity(0.f, 0.f, 0.f, 1.f);
 template<> const FQuat4d FQuat4d::Identity(0.0, 0.0, 0.0, 1.0);
+template<> const FTransform3f FTransform3f::Identity(FQuat4f(0, 0, 0, 1), FVector3f(0, 0, 0), FVector3f(1, 1, 1));
+template<> const FTransform3d FTransform3d::Identity(FQuat4d(0, 0, 0, 1), FVector3d(0, 0, 0), FVector3d(1, 1, 1));
 
 template<> const FRotator3f FRotator3f::ZeroRotator(0, 0, 0);
 template<> const FRotator3d FRotator3d::ZeroRotator(0, 0, 0);
@@ -2795,16 +2801,16 @@ double FMath::RoundHalfToZero(double F)
 	}
 }
 
-std::string FMath::FormatIntToHumanReadable(int32 Val)
+FString FMath::FormatIntToHumanReadable(int32 Val)
 {
-	std::string Src = std::to_string(Val);
-	for (std::ptrdiff_t Pos = static_cast<std::ptrdiff_t>(Src.size()) - 3; Pos > 0; Pos -= 3)
+	FString Src = FString::Printf(TEXT("%d"), Val);
+	for (std::ptrdiff_t Pos = static_cast<std::ptrdiff_t>(Src.Len()) - 3; Pos > 0; Pos -= 3)
 	{
 		if (Src[static_cast<std::size_t>(Pos - 1)] == '-')
 		{
 			break;
 		}
-		Src.insert(static_cast<std::size_t>(Pos), 1, ',');
+		Src.InsertAt(static_cast<int32>(Pos), TEXT(','));
 	}
 	return Src;
 }
@@ -2816,11 +2822,11 @@ std::string FMath::FormatIntToHumanReadable(int32 Val)
  * @param	Value	The string to convert.
  * @return			The converted value.
  */
-float Val(const std::string& Value)
+float Val(const FString& Value)
 {
 	float RetValue = 0;
 
-	for (char Char : Value)
+	for (TCHAR Char : Value)
 	{
 		if (Char >= '0' && Char <= '9')
 		{
@@ -2836,13 +2842,13 @@ float Val(const std::string& Value)
 	return RetValue;
 }
 
-std::string GrabChar(std::string* pStr)
+FString GrabChar(FString* pStr)
 {
-	std::string Result;
-	while (!pStr->empty())
+	FString Result;
+	while (!pStr->IsEmpty())
 	{
-		Result.assign(1, pStr->front());
-		pStr->erase(0, 1);
+		Result = pStr->Left(1);
+		pStr->RemoveAt(0, 1);
 		if (Result != " ")
 		{
 			break;
@@ -2851,19 +2857,19 @@ std::string GrabChar(std::string* pStr)
 	return Result;
 }
 
-bool SubEval(std::string* pStr, float* pResult, int32 Prec)
+bool SubEval(FString* pStr, float* pResult, int32 Prec)
 {
-	std::string c;
+	FString c;
 	float V, W, N;
 
 	V = W = N = 0.0f;
 
 	c = GrabChar(pStr);
 
-	if ((c >= "0" && c <= "9") || c == ".")	// Number
+	if ((c.Len() == 1 && c[0] >= TEXT('0') && c[0] <= TEXT('9')) || c == ".")	// Number
 	{
 		V = 0;
-		while (c >= "0" && c <= "9")
+		while (c.Len() == 1 && c[0] >= TEXT('0') && c[0] <= TEXT('9'))
 		{
 			V = V * 10 + Val(c);
 			c = GrabChar(pStr);
@@ -2874,7 +2880,7 @@ bool SubEval(std::string* pStr, float* pResult, int32 Prec)
 			N = 0.1f;
 			c = GrabChar(pStr);
 
-			while (c >= "0" && c <= "9")
+			while (c.Len() == 1 && c[0] >= TEXT('0') && c[0] <= TEXT('9'))
 			{
 				V = V + N * Val(c);
 				N = N / 10.0f;
@@ -2888,6 +2894,7 @@ bool SubEval(std::string* pStr, float* pResult, int32 Prec)
 		{
 			return 0;
 		}
+        if (GrabChar(pStr) != TEXT(")")) return 0;
 		c = GrabChar(pStr);
 	}
 	else if (c == "-")									// Negation
@@ -2930,7 +2937,7 @@ bool SubEval(std::string* pStr, float* pResult, int32 Prec)
 		return 0;
 	}
 PrecLoop:
-	if (c.empty())
+	if (c.IsEmpty())
 	{
 		*pResult = V;
 		return 1;
@@ -3071,13 +3078,14 @@ PrecLoop:
 	}
 }
 
-bool FMath::Eval(std::string Str, float& OutValue)
+bool FMath::Eval(FString _Expression, float& OutValue)
 {
+    auto Str = std::move(_Expression);
 	bool bResult = true;
 
 	// Check for a matching number of brackets right up front.
 	int32 Brackets = 0;
-	for (char Char : Str)
+	for (TCHAR Char : Str)
 	{
 		if (Char == '(')
 		{

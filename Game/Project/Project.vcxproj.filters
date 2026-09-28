@@ -18,7 +18,7 @@
     <Filter Include="Source Files\GameMode">
       <UniqueIdentifier>{28d6247a-3d54-4b89-bfe9-b6fb8403489a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\ProjectGameInstanceSubsystem">
+    <Filter Include="Source Files\Subsystems\ProjectGameInstanceSubsystem">
       <UniqueIdentifier>{bfb8399f-2061-4eba-b2a6-7baef58331ed}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -35,8 +35,11 @@
     <ClInclude Include="Player.h">
       <Filter>Source Files\Player</Filter>
     </ClInclude>
+    <ClInclude Include="PhysicsBoxActor.h">
+      <Filter>Source Files\Actor</Filter>
+    </ClInclude>
     <ClInclude Include="ProjectGameInstanceSubsystem.h">
-      <Filter>Source Files\ProjectGameInstanceSubsystem</Filter>
+      <Filter>Source Files\Subsystems\ProjectGameInstanceSubsystem</Filter>
     </ClInclude>
     <ClInclude Include="ProjectGameMode.h">
       <Filter>Source Files\GameMode</Filter>
@@ -55,11 +58,28 @@
     <ClCompile Include="Player.cpp">
       <Filter>Source Files\Player</Filter>
     </ClCompile>
+    <ClCompile Include="PhysicsBoxActor.cpp">
+      <Filter>Source Files\Actor</Filter>
+    </ClCompile>
     <ClCompile Include="ProjectGameMode.cpp">
       <Filter>Source Files\GameMode</Filter>
     </ClCompile>
     <ClCompile Include="ProjectGameInstanceSubsystem.cpp">
-      <Filter>Source Files\ProjectGameInstanceSubsystem</Filter>
+      <Filter>Source Files\Subsystems\ProjectGameInstanceSubsystem</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Project.uproject" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ProjectModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\Actor"><UniqueIdentifier>{d79ced6c-a7fd-4a89-852c-a41b39d28a77}</UniqueIdentifier></Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\Subsystems"><UniqueIdentifier>{70eff184-5890-48c7-a8ef-698a8fbce7ca}</UniqueIdentifier></Filter>
   </ItemGroup>
 </Project>

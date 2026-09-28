@@ -26,3 +26,20 @@ Thumbs.db
 .DS_Store
 
 AGENTS.md
+
+# Generated binaries and intermediate build files
+Intermediate/
+Binaries/
+*.dll
+*.exp
+*.log
+
+# Local editor state and recovery files
+imgui.ini
+/Saved/
+**/Saved/Autosaves/
+**/Saved/Backups/
+**/Saved/Config/AutoReimportState.txt
+**/Saved/Config/ContentBrowser.ini
+**/Saved/Config/EditorLayout.ini
+**/Saved/Config/EditorPerProjectUserSettings.ini

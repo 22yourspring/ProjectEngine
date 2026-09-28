@@ -4,6 +4,7 @@
 #include "Pawn.h"
 #include "PlayerController.h"
 #include "World.h"
+#include "PlayerStart.h"
 
 AGameModeBase::AGameModeBase()
 {
@@ -38,7 +39,15 @@ void AGameModeBase::SetPlayerControllerFactory(PlayerControllerFactory _Factory)
 
 APawn* AGameModeBase::SpawnDefaultPawn(UWorld* _World)
 {
-	return __DefaultPawnFactory ? __DefaultPawnFactory(_World) : nullptr;
+    APawn* Pawn = __DefaultPawnFactory ? __DefaultPawnFactory(_World) : nullptr;
+    if (Pawn && _World)
+        for (const auto& Actor : _World->GetPersistentLevel()->GetActors())
+            if (auto* Start = dynamic_cast<APlayerStart*>(Actor.get()); Start && !Start->IsPendingDestroy())
+            {
+                Pawn->SetActorLocation(Start->GetActorLocation());
+                break;
+            }
+    return Pawn;
 }
 
 APlayerController* AGameModeBase::SpawnPlayerController(UWorld* _World)

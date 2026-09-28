@@ -4,14 +4,14 @@
 
 #include <vector>
 
-PROJECT_API bool InitializeProject();
-PROJECT_API bool InitializeProjectWithGameMode(bool _UseEngineGameMode);
-PROJECT_API bool SetProjectPaused(bool _bPaused);
-PROJECT_API bool StopProject();
-PROJECT_API void LoadProjectInputMappings();
-PROJECT_API bool SetProjectActionMapping(const char* _MappingName, EKey _Key);
-PROJECT_API bool SetProjectAxisMapping(const char* _MappingName, EKey _Key, float _Scale);
-PROJECT_API bool RemoveProjectActionMapping(const FInputActionKeyMapping& _Mapping);
-PROJECT_API bool RemoveProjectAxisMapping(const FInputAxisKeyMapping& _Mapping);
-PROJECT_API std::vector<FInputActionKeyMapping> GetProjectActionMappings();
-PROJECT_API std::vector<FInputAxisKeyMapping> GetProjectAxisMappings();
+bool InitializeProject();
+bool InitializeProjectWithGameMode(bool _UseEngineGameMode);
+bool SetProjectPaused(bool _bPaused);
+bool StopProject();
+void LoadProjectInputMappings();
+bool SetProjectActionMapping(const FString& _MappingName, EKey _Key);
+bool SetProjectAxisMapping(const FString& _MappingName, EKey _Key, float _Scale);
+bool RemoveProjectActionMapping(const FInputActionKeyMapping& _Mapping);
+bool RemoveProjectAxisMapping(const FInputAxisKeyMapping& _Mapping);
+std::vector<FInputActionKeyMapping> GetProjectActionMappings();
+std::vector<FInputAxisKeyMapping> GetProjectAxisMappings();

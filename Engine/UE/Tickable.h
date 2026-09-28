@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pch.h"
+#include "CoreTypes.h"
 
 class AActor;
 class UActorComponent;

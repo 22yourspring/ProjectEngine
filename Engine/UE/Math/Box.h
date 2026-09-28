@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include "UE/StringUtility.h"
 
 #include "UE/CoreTypes.h"
@@ -608,14 +610,14 @@ public:
 	 *
 	 * @return A string describing the box.
 	 */
-	std::string ToString() const;
+	FString ToString() const;
 
 	/**
 	 * Get a textual representation of this box, without min/max values if invalid.
 	 *
 	 * @return A string describing the box.
 	 */
-	std::string ToCompactString() const;
+	FString ToCompactString() const;
 
 	/**
 	 * Get the vertices that make up this box.
@@ -805,15 +807,15 @@ inline bool TBox<T>::IntersectXY( const TBox<T>& Other ) const
 
 
 template<typename T>
-UE_FORCEINLINE_HINT std::string TBox<T>::ToString() const
+UE_FORCEINLINE_HINT FString TBox<T>::ToString() const
 {
-	return StringFormat("IsValid=%s, Min=(%s), Max=(%s)", IsValid ? "true" : "false", Min.ToString().c_str(), Max.ToString().c_str());
+	return StringFormat("IsValid=%s, Min=(%s), Max=(%s)", IsValid ? "true" : "false", Min.ToString().ToUtf8().c_str(), Max.ToString().ToUtf8().c_str());
 }
 
 template<typename T>
-UE_FORCEINLINE_HINT std::string TBox<T>::ToCompactString() const
+UE_FORCEINLINE_HINT FString TBox<T>::ToCompactString() const
 {
-	return IsValid ? StringFormat("Min=(%s), Max=(%s)", Min.ToString().c_str(), Max.ToString().c_str()) : "IsValid=false";
+	return IsValid ? StringFormat("Min=(%s), Max=(%s)", Min.ToString().ToUtf8().c_str(), Max.ToString().ToUtf8().c_str()) : "IsValid=false";
 }
 
 

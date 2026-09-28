@@ -18,6 +18,7 @@ APlayerController::APlayerController()
 
 APlayerController::~APlayerController()
 {
+	if (!GEngine) return;
 	if (InputEngineSystem* Input = GEngine->GetEngineSystem<InputEngineSystem>())
 		Input->ClearPlayerController(this);
 }

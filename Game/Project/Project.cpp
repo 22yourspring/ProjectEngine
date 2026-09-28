@@ -2,6 +2,7 @@
 
 
 #include "pch.h"
+#include "UE/GameMapsSettings.h"
 #include "Project.h"
 #include "Player.h"
 #include "ProjectGameInstanceSubsystem.h"
@@ -12,15 +13,20 @@
 #include "UE/World.h"
 #include "UE/InputEngineSystem.h"
 #include "UE/PlayerController.h"
+#include "UE/PlayerStart.h"
 #include "UE/PlayerInput.h"
 #include "UE/ResourceEngineSystem.h"
 #include "UE/GameplayStatics.h"
+#include "UE/PathEngineSystem.h"
 
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <limits>
+#include <regex>
+#include <sstream>
+#include <cmath>
 #include <vector>
 
 namespace
@@ -29,12 +35,14 @@ namespace
 	std::vector<FInputActionKeyMapping> SavedActionMappings;
 	std::vector<FInputAxisKeyMapping> SavedAxisMappings;
 
+	const std::filesystem::path ProjectSavedDirectory =
+		GEngine->GetEngineSystem<PathEngineSystem>()->GetProjectSavedDirectory();
 	const std::filesystem::path InputSettingsPath =
-		std::filesystem::path("Saved") / "Config" / "InputMappings.cfg";
+        GEngine->GetEngineSystem<PathEngineSystem>()->GetProjectDirectory() / TEXT("Config/DefaultInput.ini");
 	const std::filesystem::path GameModeSettingsPath =
-		std::filesystem::path("Saved") / "Config" / "EditorDefaultPawn.cfg";
+		ProjectSavedDirectory / TEXT("Config") / TEXT("EditorDefaultPawn.cfg");
 
-	std::string ReadGameModeSelection()
+	FString ReadGameModeSelection()
 	{
 		std::ifstream Input(GameModeSettingsPath);
 		std::string Selection;
@@ -43,8 +51,8 @@ namespace
 		return Selection;
 	}
 	void LoadInputSettings(UPlayerInput* _PlayerInput);
-	void StoreActionMapping(const std::string& _MappingName, EKey _Key);
-	void StoreAxisMapping(const std::string& _MappingName, EKey _Key, float _Scale);
+	void StoreActionMapping(const FString& _MappingName, EKey _Key);
+	void StoreAxisMapping(const FString& _MappingName, EKey _Key, float _Scale);
 	void ConfigureMovementMappings(UPlayerInput* _PlayerInput, bool _bProjectGameMode);
 
 	bool ConfigureProjectWorld(UWorld* _World)
@@ -69,10 +77,12 @@ namespace
 		if (nullptr == Resources)
 			return false;
 
-		const TCHAR* LevelName = _World->IsPersistentLevel(TEXT("Stage2"))
-			? TEXT("Stage2") : TEXT("Stage1");
+        const FString LevelName = _World->GetPersistentLevel()->GetMapName();
+        const auto& Actors = _World->GetPersistentLevel()->GetActors();
+        const bool HasStart = std::any_of(Actors.begin(), Actors.end(), [](const auto& _Actor)
+        { return dynamic_cast<APlayerStart*>(_Actor.get()) && !_Actor->IsPendingDestroy(); });
 		FLevelAssetData LevelAsset;
-		if (Resources->LoadLevelAsset(LevelName, LevelAsset) &&
+		if (!HasStart && Resources->LoadLevelAsset(*LevelName, LevelAsset) &&
 			LevelAsset.bHasPlayerLocation)
 		{
 			Player->SetActorLocation(LevelAsset.PlayerLocation);
@@ -101,25 +111,38 @@ namespace
 		if (Error)
 			return false;
 
-		std::ofstream Output(InputSettingsPath, std::ios::trunc);
+        std::string Preserved, InputOther, Line; bool InputSection = false;
+        std::ifstream Existing(InputSettingsPath);
+        while (std::getline(Existing, Line))
+        {
+            if (!Line.empty() && Line.back() == '\r') Line.pop_back();
+            if (!Line.empty() && Line.front() == '[') InputSection = Line == "[/Script/Engine.InputSettings]";
+            if (Line == "[/Script/Engine.InputSettings]") continue;
+            if (InputSection && (Line.rfind("+ActionMappings=", 0) == 0 || Line.rfind("+AxisMappings=", 0) == 0)) continue;
+            if (InputSection) { InputOther += Line + '\n'; continue; }
+            Preserved += Line + '\n';
+        }
+        Existing.close();
+        const auto Temporary = std::filesystem::path(InputSettingsPath.wstring() + L".tmp");
+		std::ofstream Output(Temporary, std::ios::trunc);
 		if (false == Output.is_open())
 			return false;
 
-		Output << "InputMappings 1\n";
+        Output << Preserved << "\n[/Script/Engine.InputSettings]\n" << InputOther;
 		Output << std::setprecision(std::numeric_limits<float>::max_digits10);
 		for (const FInputActionKeyMapping& Mapping : SavedActionMappings)
 		{
-			Output << "Action " << std::quoted(Mapping.__ActionName) << ' '
-				<< GetKeyName(Mapping.__Key) << '\n';
+            Output << "+ActionMappings=(ActionName=" << std::quoted(Mapping.__ActionName.ToUtf8()) << ",Key=" << GetKeyName(Mapping.__Key).ToUtf8() << ")\n";
 		}
 
 		for (const FInputAxisKeyMapping& Mapping : SavedAxisMappings)
 		{
-			Output << "Axis " << std::quoted(Mapping.__AxisName) << ' '
-				<< GetKeyName(Mapping.__Key) << ' ' << Mapping.__Scale << '\n';
+            Output << "+AxisMappings=(AxisName=" << std::quoted(Mapping.__AxisName.ToUtf8()) << ",Key=" << GetKeyName(Mapping.__Key).ToUtf8() << ",Scale=" << Mapping.__Scale << ")\n";
 		}
 
-		return Output.good();
+        Output.flush(); const bool Valid = Output.good(); Output.close();
+        if (Valid && MoveFileExW(Temporary.c_str(), InputSettingsPath.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) return true;
+        std::filesystem::remove(Temporary, Error); return false;
 	}
 
 	void LoadInputSettings(UPlayerInput* _PlayerInput)
@@ -128,6 +151,31 @@ namespace
 		SavedAxisMappings.clear();
 
 		std::ifstream Input(InputSettingsPath);
+        if (Input.is_open())
+        {
+            const std::regex Action(R"re(^\+ActionMappings=\(ActionName=("(?:\\.|[^"])*"),Key=([A-Za-z0-9_]+)\)$)re");
+            const std::regex Axis(R"re(^\+AxisMappings=\(AxisName=("(?:\\.|[^"])*"),Key=([A-Za-z0-9_]+),Scale=([-+0-9.eE]+)\)$)re");
+            std::string Line; bool InputSection = false;
+            while (std::getline(Input, Line))
+            {
+                if (!Line.empty() && Line.back() == '\r') Line.pop_back();
+                if (!Line.empty() && Line.front() == '[') InputSection = Line == "[/Script/Engine.InputSettings]";
+                if (!InputSection) continue;
+                std::smatch Match; const bool IsAction = std::regex_match(Line, Match, Action);
+                if (!IsAction && !std::regex_match(Line, Match, Axis)) continue;
+                std::string Name; std::istringstream NameStream(Match[1].str()); NameStream >> std::quoted(Name);
+                EKey Key; if (!TryParseKey(Match[2].str(), Key)) continue;
+                if (IsAction) { SavedActionMappings.push_back({Name, Key}); if (_PlayerInput) _PlayerInput->SetActionMapping({Name, Key}); }
+                else
+                {
+                    float Scale = 0; std::istringstream ScaleStream(Match[3].str());
+                    if (!(ScaleStream >> Scale) || !std::isfinite(Scale)) continue;
+                    SavedAxisMappings.push_back({Name, Key, Scale}); if (_PlayerInput) _PlayerInput->SetAxisMapping({Name, Key, Scale});
+                }
+            }
+            return;
+        }
+        Input.open(ProjectSavedDirectory / TEXT("Config/InputMappings.cfg"));
 		if (false == Input.is_open())
 			return;
 
@@ -177,7 +225,7 @@ namespace
 		}
 	}
 
-	void StoreActionMapping(const std::string& _MappingName, EKey _Key)
+	void StoreActionMapping(const FString& _MappingName, EKey _Key)
 	{
 		for (const FInputActionKeyMapping& Mapping : SavedActionMappings)
 		{
@@ -188,7 +236,7 @@ namespace
 		SavedActionMappings.push_back({ _MappingName, _Key });
 	}
 
-	void StoreAxisMapping(const std::string& _MappingName, EKey _Key, float _Scale)
+	void StoreAxisMapping(const FString& _MappingName, EKey _Key, float _Scale)
 	{
 		for (FInputAxisKeyMapping& Mapping : SavedAxisMappings)
 		{
@@ -257,8 +305,9 @@ namespace
 
 bool InitializeProject()
 {
-	return InitializeProjectWithGameMode(
-		ReadGameModeSelection() == "EngineGameMode");
+    UGameMapsSettings Settings;
+    Settings.Load(GEngine->GetEngineSystem<PathEngineSystem>()->GetProjectDirectory());
+    return InitializeProjectWithGameMode(Settings.__UseEngineGameMode);
 }
 
 bool InitializeProjectWithGameMode(bool _UseEngineGameMode)
@@ -285,17 +334,13 @@ bool InitializeProjectWithGameMode(bool _UseEngineGameMode)
 			std::make_unique<AProjectGameMode>());
 	});
 	GEngine->SetWorldInitializer(ConfigureProjectWorld);
-	if (ResourceEngineSystem* Resources = GEngine->GetEngineSystem<ResourceEngineSystem>())
-	{
-		Resources->AddContentRoot(TEXT("Content"));
-		Resources->AddContentRoot(TEXT("Game/Project/Content"));
-		Resources->AddContentRoot(TEXT("../../Project/Content"));
-	}
 
 	if (nullptr == World->GetAuthGameMode<AGameModeBase>())
 	{
 		ProjectState->MarkProjectInitialized();
-		return UGameplayStatics::OpenLevel(nullptr, TEXT("Stage1"));
+        UGameMapsSettings Settings;
+        Settings.Load(GEngine->GetEngineSystem<PathEngineSystem>()->GetProjectDirectory());
+        return UGameplayStatics::OpenLevel(nullptr, Settings.__GameDefaultMap.IsEmpty() ? TEXT("Stage1") : *Settings.__GameDefaultMap);
 	}
 
 	InputEngineSystem* Input = GEngine->GetEngineSystem<InputEngineSystem>();
@@ -351,9 +396,9 @@ void LoadProjectInputMappings()
 	LoadInputSettings(nullptr);
 }
 
-bool SetProjectActionMapping(const char* _MappingName, EKey _Key)
+bool SetProjectActionMapping(const FString& _MappingName, EKey _Key)
 {
-    if (nullptr == _MappingName || '\0' == _MappingName[0])
+    if (_MappingName.IsEmpty())
         return false;
 
 	if (ProjectPlayerInput)
@@ -362,9 +407,9 @@ bool SetProjectActionMapping(const char* _MappingName, EKey _Key)
 	return SaveInputSettings();
 }
 
-bool SetProjectAxisMapping(const char* _MappingName, EKey _Key, float _Scale)
+bool SetProjectAxisMapping(const FString& _MappingName, EKey _Key, float _Scale)
 {
-    if (nullptr == _MappingName || '\0' == _MappingName[0])
+    if (_MappingName.IsEmpty())
         return false;
 
 	if (ProjectPlayerInput)

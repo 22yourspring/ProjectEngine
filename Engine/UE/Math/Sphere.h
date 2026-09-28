@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include "UE/CoreTypes.h"
 #include "UE/Math/MathFwd.h" // IWYU pragma: export
 #include "UE/Math/Matrix.h"
@@ -213,9 +215,9 @@ public:
 	*
 	* @return Text describing the sphere.
 	*/
-	[[nodiscard]] std::string ToString() const
+	[[nodiscard]] FString ToString() const
 	{
-		return StringFormat("Center=(%s), Radius=(%g)", Center.ToString().c_str(), static_cast<double>(W));
+		return StringFormat("Center=(%s), Radius=(%g)", Center.ToString().ToUtf8().c_str(), static_cast<double>(W));
 	}
 
 };

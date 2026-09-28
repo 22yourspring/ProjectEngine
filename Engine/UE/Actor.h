@@ -4,6 +4,8 @@
 #include "Tickable.h"
 #include "ActorComponent.h"
 #include "Math/Vector.h"
+#include "CollisionQueryParams.h"
+#include "MulticastDelegate.h"
 
 #include <memory>
 #include <type_traits>
@@ -24,6 +26,13 @@ class ENGINE_API AActor : public UObject, public FTickableGameObject
 
 public:
 	AActor() = default;
+    static UClass* StaticClass() { return UClass::For<AActor>(); }
+    virtual void NotifyActorBeginOverlap(AActor* _OtherActor) {}
+    virtual void NotifyActorEndOverlap(AActor* _OtherActor) {}
+    virtual void NotifyHit(UPrimitiveComponent* _MyComp, AActor* _Other, UPrimitiveComponent* _OtherComp, bool _bSelfMoved, FVector _HitLocation, FVector _HitNormal, FVector _NormalImpulse, const FHitResult& _Hit) {}
+    TMulticastDelegate<void(AActor*, AActor*)> OnActorBeginOverlap;
+    TMulticastDelegate<void(AActor*, AActor*)> OnActorEndOverlap;
+    TMulticastDelegate<void(AActor*, AActor*, FVector, const FHitResult&)> OnActorHit;
 	virtual ~AActor() = default;
 	AActor(const AActor&) = delete;
 	AActor& operator=(const AActor&) = delete;
@@ -33,7 +42,7 @@ public:
 	virtual bool IsTickable() const override { return PrimaryActorTick.bCanEverTick; }
 
 	virtual void TickActor(float _DeltaTime);
-	UWorld* GetWorld() const;
+	UWorld* GetWorld() const override;
 
 	ULevel* GetLevel() const { return __Level; }
 
@@ -41,6 +50,7 @@ public:
 
 	const std::unordered_set<UActorComponent*>& GetComponents() const { return __OwnedComponents; }
 	const std::vector<UActorComponent*>& GetInstanceComponents() const { return __InstanceComponents; }
+    const std::vector<std::unique_ptr<UActorComponent>>& GetComponentStorage() const { return __ComponentStorage; }
 	bool OwnsComponent(UActorComponent* _Component) const;
 
 	bool SetRootComponent(USceneComponent* _RootComponent);

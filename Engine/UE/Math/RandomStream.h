@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include <chrono>
 #include <functional>
 
@@ -353,7 +355,7 @@ public:
 	 *
 	 * @return Text describing the RandomStream.
 	 */
-	std::string ToString() const
+	FString ToString() const
 	{
 		return StringFormat("FRandomStream(InitialSeed=%i, Seed=%u)", InitialSeed, Seed);
 	}

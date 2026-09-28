@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include <functional>
 
 #include "UE/StringUtility.h"
@@ -459,9 +461,9 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 	 *
 	 * @return A string describing the rectangle.
 	 */
-	[[nodiscard]] std::string ToString() const
+	[[nodiscard]] FString ToString() const
 	{
-		return StringFormat("Min=(%s) Max=(%s)", Min.ToString().c_str(), Max.ToString().c_str());
+		return StringFormat("Min=(%s) Max=(%s)", Min.ToString().ToUtf8().c_str(), Max.ToString().ToUtf8().c_str());
 	}
 
 	/**

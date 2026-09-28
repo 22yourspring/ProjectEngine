@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
+#include "UnrealString.h"
 #include <string_view>
 
 
@@ -116,7 +116,7 @@ struct ENGINE_API FInputActionKeyMapping
 	GENERATED_BODY()
 
 	UPROPERTY()
-	std::string __ActionName;
+	FString __ActionName;
 
 	UPROPERTY()
 	EKey __Key = EKey::Invalid;
@@ -129,7 +129,7 @@ struct ENGINE_API FInputAxisKeyMapping
 	GENERATED_BODY()
 
 	UPROPERTY()
-	std::string __AxisName;
+	FString __AxisName;
 
 	UPROPERTY()
 	EKey __Key = EKey::Invalid;
@@ -161,12 +161,12 @@ struct ENGINE_API FAnalogInputEvent
 struct FKeyNameEntry
 {
 	EKey __Key;
-	std::string_view __Name;
+	FString __Name;
 };
 
-#define KEY_NAME_ENTRY(KeyName) { EKey::KeyName, #KeyName }
+#define KEY_NAME_ENTRY(KeyName) { EKey::KeyName, TEXT(#KeyName) }
 
-inline constexpr FKeyNameEntry KeyNameEntries[] =
+inline const FKeyNameEntry KeyNameEntries[] =
 {
 	KEY_NAME_ENTRY(Invalid),
 	KEY_NAME_ENTRY(Escape),
@@ -224,16 +224,16 @@ static_assert(
 	std::size(KeyNameEntries) == static_cast<size_t>(EKey::MouseWheelAxis) + 1,
 	"Every EKey must have a serialized name.");
 
-inline std::string_view GetKeyName(EKey _Key)
+inline FString GetKeyName(EKey _Key)
 {
 	const size_t Index = static_cast<size_t>(_Key);
 	if (Index < std::size(KeyNameEntries) && KeyNameEntries[Index].__Key == _Key)
 		return KeyNameEntries[Index].__Name;
 
-	return "Invalid";
+	return TEXT("Invalid");
 }
 
-inline bool TryParseKey(std::string_view _Name, EKey& _OutKey)
+inline bool TryParseKey(const FString& _Name, EKey& _OutKey)
 {
 	for (const FKeyNameEntry& Entry : KeyNameEntries)
 	{
@@ -244,12 +244,12 @@ inline bool TryParseKey(std::string_view _Name, EKey& _OutKey)
 		}
 	}
 
-	constexpr FKeyNameEntry LegacyNumberKeyNames[] =
+	const FKeyNameEntry LegacyNumberKeyNames[] =
 	{
-		{ EKey::Num0, "Zero" }, { EKey::Num1, "One" }, { EKey::Num2, "Two" },
-		{ EKey::Num3, "Three" }, { EKey::Num4, "Four" }, { EKey::Num5, "Five" },
-		{ EKey::Num6, "Six" }, { EKey::Num7, "Seven" }, { EKey::Num8, "Eight" },
-		{ EKey::Num9, "Nine" }
+		{ EKey::Num0, TEXT("Zero") }, { EKey::Num1, TEXT("One") }, { EKey::Num2, TEXT("Two") },
+		{ EKey::Num3, TEXT("Three") }, { EKey::Num4, TEXT("Four") }, { EKey::Num5, TEXT("Five") },
+		{ EKey::Num6, TEXT("Six") }, { EKey::Num7, TEXT("Seven") }, { EKey::Num8, TEXT("Eight") },
+		{ EKey::Num9, TEXT("Nine") }
 	};
 
 	for (const FKeyNameEntry& Entry : LegacyNumberKeyNames)

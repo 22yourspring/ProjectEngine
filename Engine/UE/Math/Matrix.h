@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include "UE/StringUtility.h"
 
 #include "UE/CoreTypes.h"
@@ -350,9 +352,9 @@ public:
 	 *
 	 * @return Text describing the vector.
 	 */
-	[[nodiscard]] std::string ToString() const
+	[[nodiscard]] FString ToString() const
 	{
-		std::string Output;
+		FString Output;
 
 		Output += StringFormat("[%g %g %g %g] ", M[0][0], M[0][1], M[0][2], M[0][3]);
 		Output += StringFormat("[%g %g %g %g] ", M[1][0], M[1][1], M[1][2], M[1][3]);

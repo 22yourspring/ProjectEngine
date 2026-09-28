@@ -18,10 +18,10 @@ namespace
 		if (nullptr == _Switch)
 			return false;
 
-		std::wstring CommandLine = GetCommandLineW();
+		FString CommandLine = GetCommandLineW();
 		std::transform(CommandLine.begin(), CommandLine.end(), CommandLine.begin(),
 			[](wchar_t Character) { return static_cast<wchar_t>(std::towlower(Character)); });
-		return std::wstring::npos != CommandLine.find(_Switch);
+		return CommandLine.Contains(_Switch, ESearchCase::CaseSensitive);
 	}
 }
 
@@ -34,9 +34,9 @@ std::unique_ptr<FDynamicRHI> PlatformCreateDynamicRHI()
 {
 #if defined(_WIN32)
 	std::unique_ptr<IDynamicRHIModule> DynamicRHIModule;
-	const bool bForceGDI = HasCommandLineSwitch(L"-gdi");
+	const bool bForceGDI = HasCommandLineSwitch(TEXT("-gdi"));
 	const bool bUseD3D11 = false == bForceGDI &&
-		(HasCommandLineSwitch(L"-d3d11") ||
+		(HasCommandLineSwitch(TEXT("-d3d11")) ||
 		 ERHIInterfaceType::D3D11 == GPreferredRHIInterface);
 	if (bUseD3D11)
 		DynamicRHIModule = std::make_unique<FD3D11DynamicRHIModule>();

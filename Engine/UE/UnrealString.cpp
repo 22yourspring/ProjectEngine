@@ -30,7 +30,7 @@ namespace
 }
 
 FString::FString(const TCHAR* _Text)
-    : __Data(_Text != nullptr ? _Text : L"")
+    : __Data(_Text != nullptr ? _Text : TEXT(""))
 {
 }
 
@@ -270,7 +270,7 @@ int32 FString::ReplaceInline(
     }
 
     const std::wstring Replacement =
-        _ReplacementText != nullptr ? _ReplacementText : L"";
+        _ReplacementText != nullptr ? _ReplacementText : TEXT("");
     const std::size_t SearchLength = std::wcslen(_SearchText);
     int32 ReplacementCount = 0;
     int32 SearchStart = 0;

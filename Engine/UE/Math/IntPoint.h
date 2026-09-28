@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include "UE/StringUtility.h"
 
 #include "UE/CoreTypes.h"
@@ -393,19 +395,19 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 	 *
 	 * @return A string describing the point.
 	 */
-	[[nodiscard]] std::string ToString() const
+	[[nodiscard]] FString ToString() const
 	{
 		return StringFormat("X=%s Y=%s", std::to_string(X).c_str(), std::to_string(Y).c_str());
 	}
 
 	/**
-	 * Initialize this FIntPoint based on an std::string. The String is expected to contain X=, Y=
+	 * Initialize this FIntPoint based on an FString. The String is expected to contain X=, Y=
 	 * The FIntPoint will be bogus when InitFromString returns false.
 	 *
-	 * @param	InSourceString	std::string containing the color values.
+	 * @param	InSourceString	FString containing the color values.
 	 * @return true if the X,Y values were read successfully; false otherwise.
 	 */
-	bool InitFromString(const std::string& InSourceString)
+	bool InitFromString(const FString& InSourceString)
 	{
 		X = Y = 0;
 
@@ -500,49 +502,49 @@ uint32 GetTypeHash(const TIntPoint<IntType>& InPoint)
 }
 
 template <>
-inline std::string TIntPoint<int64>::ToString() const
+inline FString TIntPoint<int64>::ToString() const
 {
 	return StringFormat("X=%lld Y=%lld", X, Y);
 }
 
 template <>
-inline std::string TIntPoint<int32>::ToString() const
+inline FString TIntPoint<int32>::ToString() const
 {
 	return StringFormat("X=%d Y=%d", X, Y);
 }
 
 template <>
-inline std::string TIntPoint<int16>::ToString() const
+inline FString TIntPoint<int16>::ToString() const
 {
 	return StringFormat("X=%d Y=%d", X, Y);
 }
 
 template <>
-inline std::string TIntPoint<int8>::ToString() const
+inline FString TIntPoint<int8>::ToString() const
 {
 	return StringFormat("X=%d Y=%d", X, Y);
 }
 
 template <>
-inline std::string TIntPoint<uint64>::ToString() const
+inline FString TIntPoint<uint64>::ToString() const
 {
 	return StringFormat("X=%llu Y=%llu", X, Y);
 }
 
 template <>
-inline std::string TIntPoint<uint32>::ToString() const
+inline FString TIntPoint<uint32>::ToString() const
 {
 	return StringFormat("X=%u Y=%u", X, Y);
 }
 
 template <>
-inline std::string TIntPoint<uint16>::ToString() const
+inline FString TIntPoint<uint16>::ToString() const
 {
 	return StringFormat("X=%u Y=%u", X, Y);
 }
 
 template <>
-inline std::string TIntPoint<uint8>::ToString() const
+inline FString TIntPoint<uint8>::ToString() const
 {
 	return StringFormat("X=%u Y=%u", X, Y);
 }

@@ -54,6 +54,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="..\ThirdParty\PhysX\PhysX.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
@@ -72,7 +73,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)Engine\Binaries\Win64\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Engine\Intermediate\$(MSBuildProjectName)\Win64\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Engine\;$(IncludePath)</IncludePath>
@@ -101,6 +103,7 @@
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -122,6 +125,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -140,10 +144,12 @@
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -161,6 +167,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -225,6 +232,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="RenderEngineSystem.h" />
     <ClInclude Include="ResourceEngineSystem.h" />
+    <ClInclude Include="PathEngineSystem.h" />
     <ClInclude Include="T_Singleton.h" />
     <ClInclude Include="Template.h" />
     <ClInclude Include="Tickable.h" />
@@ -312,6 +320,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="RenderEngineSystem.cpp" />
     <ClCompile Include="ResourceEngineSystem.cpp" />
+    <ClCompile Include="PathEngineSystem.cpp" />
     <ClCompile Include="Math\UnrealMath.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -329,4 +338,79 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ItemGroup>
+    <ClInclude Include="ModuleInterface.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ModuleManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ModuleManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Archive.h" />
+    <ClInclude Include="StreamableRenderAsset.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="Texture2D.h" />
+    <ClInclude Include="SoundBase.h" />
+    <ClInclude Include="SoundWave.h" />
+    <ClInclude Include="Package.h" />
+    <ClInclude Include="PackageStore.h" />
+    <ClInclude Include="UObjectGlobals.h" />
+    <ClInclude Include="UObjectGlobals.inl" />
+    <ClInclude Include="AudioComponent.h" />
+    <ClInclude Include="BillboardComponent.h" />
+    <ClCompile Include="Archive.cpp" />
+    <ClCompile Include="Texture2D.cpp" />
+    <ClCompile Include="SoundWave.cpp" />
+    <ClCompile Include="PackageStore.cpp" />
+    <ClCompile Include="UObjectGlobals.cpp" />
+    <ClCompile Include="AudioComponent.cpp" />
+    <ClCompile Include="BillboardComponent.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AssetImportData.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="WorldPersistence.h"></ClInclude>
+    <ClInclude Include="PlayerStart.h" />
+    <ClCompile Include="PlayerStart.cpp" />
+    <ClCompile Include="WorldPersistence.cpp"></ClCompile>
+    <ClInclude Include="GameMapsSettings.h"></ClInclude>
+    <ClCompile Include="GameMapsSettings.cpp"></ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MaterialInterface.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="MaterialInstance.h" />
+    <ClInclude Include="MaterialInstanceConstant.h" />
+    <ClInclude Include="MaterialInstanceDynamic.h" />
+    <ClInclude Include="MeshComponent.h" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="MeshComponent.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EngineTypes.h" />
+    <ClInclude Include="CollisionShape.h" />
+    <ClInclude Include="CollisionQueryParams.h" />
+    <ClInclude Include="PhysicsInterface.h" />
+    <ClInclude Include="PhysScene_Chaos.h" />
+    <ClInclude Include="BodyInstance.h" />
+    <ClInclude Include="CollisionProfile.h" />
+    <ClInclude Include="ShapeComponent.h" />
+    <ClInclude Include="BoxComponent.h" />
+    <ClInclude Include="SphereComponent.h" />
+    <ClInclude Include="CapsuleComponent.h" />
+    <ClCompile Include="PhysicsInterface.cpp" />
+    <ClCompile Include="CollisionProfile.cpp" />
+    <ClCompile Include="ShapeComponent.cpp" />
+    <ClInclude Include="Class.h"></ClInclude>
+    <ClInclude Include="Class.inl"></ClInclude>
+    <ClInclude Include="NativeClassRegistration.h" />
+    <ClInclude Include="NativeClassRegistration.inl" />
+    <ClInclude Include="KismetSystemLibrary.h"></ClInclude>
+    <ClCompile Include="KismetSystemLibrary.cpp"></ClCompile>
+    <ClCompile Include="WorldCollision.cpp"></ClCompile>
+  </ItemGroup>
+  <ItemGroup><None Include="..\Build\GenerateNativeClasses.ps1" /></ItemGroup>
 </Project>

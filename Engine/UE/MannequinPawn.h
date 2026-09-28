@@ -16,6 +16,7 @@ class ENGINE_API AMannequinPawn final : public ACharacter
 public:
 	AMannequinPawn();
 	~AMannequinPawn() override;
+    void Serialize(FArchive& _Archive) override;
 
 protected:
 	void Tick(float _DeltaTime) override;

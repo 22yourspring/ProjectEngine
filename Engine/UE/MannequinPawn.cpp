@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "Archive.h"
+#include <cmath>
+#include "PrimitiveComponent.h"
 #include "MannequinPawn.h"
 #include "SceneComponent.h"
 #include "StaticMesh.h"
@@ -7,6 +10,13 @@
 #include "GameplayStatics.h"
 #include "World.h"
 #include "Level.h"
+
+void AMannequinPawn::Serialize(FArchive& _Archive)
+{
+    ACharacter::Serialize(_Archive);
+    _Archive.Serialize(&__MoveSpeed, sizeof(__MoveSpeed));
+    if (!std::isfinite(__MoveSpeed) || __MoveSpeed < 0) _Archive.SetError();
+}
 
 AMannequinPawn::AMannequinPawn()
 {
@@ -30,6 +40,13 @@ AMannequinPawn::~AMannequinPawn() = default;
 void AMannequinPawn::Tick(float _DeltaTime)
 {
 	Super::Tick(_DeltaTime);
+    if (auto* Body = dynamic_cast<UPrimitiveComponent*>(GetRootComponent()); Body && Body->IsSimulatingPhysics())
+    {
+        FVector Input(__HorizontalInput, __VerticalInput, 0);
+        if (Input.SizeSquared() > 1) Input.Normalize();
+        Body->SetPhysicsLinearVelocity(Input * __MoveSpeed);
+        return;
+    }
 
 	const float MoveDistance = __MoveSpeed * _DeltaTime;
 	FVector NewLocation = GetActorLocation();

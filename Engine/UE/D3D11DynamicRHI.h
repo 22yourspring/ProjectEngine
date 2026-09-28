@@ -54,6 +54,9 @@ public:
 
 	virtual bool Init() override;
 	virtual void Shutdown() override;
+	FTextureRHIRef RHICreateTexture2D(uint32 _Width, uint32 _Height, const std::vector<uint8>& _Pixels) override;
+	void RHIDrawTexture(FRHITexture* _Texture, int32 _X, int32 _Y, int32 _Width, int32 _Height) override;
+    void RHIDrawQuad(const FVector* _Corners, const FColor& _Color, FRHITexture* _Texture = nullptr) override;
 
 	virtual FViewportRHIRef RHICreateViewport(
 		const FRHIViewportDesc& _Desc) override;
@@ -90,13 +93,14 @@ private:
 	{
 		float Position[2];
 		float Color[4];
+		float UV[2] = {};
 	};
 
 	bool CreateRenderingPipeline();
 	void DrawVertices(
 		const FD3D11SimpleVertex* _Vertices,
 		uint32 _VertexCount,
-		D3D11_PRIMITIVE_TOPOLOGY _Topology);
+		D3D11_PRIMITIVE_TOPOLOGY _Topology, ID3D11ShaderResourceView* _Texture = nullptr);
 	FD3D11SimpleVertex MakeVertex(float _X, float _Y, const FColor& _Color) const;
 
 private:
@@ -105,6 +109,8 @@ private:
 	Microsoft::WRL::ComPtr<IDXGIFactory> __DXGIFactory;
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> __VertexShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> __PixelShader;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> __WhiteTexture;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> __TextureSampler;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> __InputLayout;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> __DynamicVertexBuffer;
 	Microsoft::WRL::ComPtr<ID3D11BlendState> __BlendState;

@@ -3,7 +3,7 @@
 #include "SceneViewExtension.h"
 
 #include <mutex>
-#include <string>
+#include "UnrealString.h"
 
 class FAppTimeRenderProxy final : public ISceneViewExtension
 {
@@ -14,7 +14,7 @@ public:
 private:
 	struct FSnapshot
 	{
-		std::string ClockName;
+		FString ClockName;
 		double FramesPerSecond = 0.0;
 		double CurrentTime = 0.0;
 	};

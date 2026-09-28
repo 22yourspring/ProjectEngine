@@ -4,7 +4,8 @@
 #include "framework.h"
 #include "Client.h"
 #include "EngineLibraries.h"
-#include "Game/Project/Project.h"
+#include "GameModuleAccess.h"
+#include "UE/PathEngineSystem.h"
 
 #define MAX_LOADSTRING 100
 
@@ -44,6 +45,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
+    FModuleManager ModuleManager;
+
     TRAIIPattern_ThreadGuard EngineLoopGuard
     (
         []
@@ -58,6 +61,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     if (EngineLoopGuard.Failed())
         return FALSE;
+
+    PathEngineSystem* Paths = GEngine->GetEngineSystem<PathEngineSystem>();
+    if (!Paths || !ModuleManager.LoadGameModule(Paths->GetProjectModuleFile(TEXT("Client"))))
+    {
+        MessageBoxW(nullptr, TEXT("Failed to load the selected project's game module."),
+            TEXT("UnrealEngine"), MB_OK | MB_ICONERROR);
+        return FALSE;
+    }
+    LoadProjectInputMappings();
 
     if (false == InitializeProject())
         return FALSE;

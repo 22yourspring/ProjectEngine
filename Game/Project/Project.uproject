@@ -1,0 +1,8 @@
+{
+    "FileVersion": 1,
+    "ProjectName": "Project",
+    "EngineAssociation": "UnrealEngine",
+    "RootDirectory": "../..",
+    "EngineDirectory": "../../Engine",
+    "ContentDirectory": "Content"
+}

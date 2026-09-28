@@ -72,7 +72,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <GameModuleTarget Condition="'$(GameModuleTarget)'==''">Client</GameModuleTarget>
+    <TargetName>$(GameModuleTarget)-$(MSBuildProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir);$(SolutionDir)Engine\;$(SolutionDir)Game\;$(IncludePath)</IncludePath>
@@ -100,6 +101,7 @@
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,6 +120,7 @@
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -135,10 +138,12 @@
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -153,6 +158,7 @@
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -160,6 +166,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PhysicsBoxActor.h" />
     <ClInclude Include="ProjectGameInstanceSubsystem.h" />
     <ClInclude Include="ProjectGameMode.h" />
   </ItemGroup>
@@ -173,15 +180,38 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Project.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PhysicsBoxActor.cpp" />
     <ClCompile Include="ProjectGameInstanceSubsystem.cpp" />
     <ClCompile Include="ProjectGameMode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Engine\UE\UE.vcxproj">
+      <GlobalPropertiesToRemove>GameModuleTarget</GlobalPropertiesToRemove>
       <Project>{e355b0d7-ab45-481d-9747-6e4e5a9142a4}</Project>
     </ProjectReference>
   </ItemGroup>
+  <PropertyGroup>
+    <GameProjectName>$(MSBuildProjectName)</GameProjectName>
+  </PropertyGroup>
+  <Import Project="..\GameOutput.props" />
+  <PropertyGroup>
+    <IntDir>$(GameOutputRoot)Intermediate\$(MSBuildProjectName)\$(GameModuleTarget)\Win64\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ItemGroup>
+    <None Include="Project.uproject" />
+  </ItemGroup>
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ItemGroup>
+    <ClCompile Include="ProjectModule.cpp" />
+  </ItemGroup>
+  <Target Name="GenerateNativeClasses" BeforeTargets="ClCompile">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\..\..\Engine\Build\GenerateNativeClasses.ps1&quot; -ProjectFile &quot;$(MSBuildProjectFullPath)&quot; -OutputFile &quot;$(IntDir)NativeClasses.generated.cpp&quot; -Module &quot;$(MSBuildProjectName)&quot;" />
+    <ItemGroup>
+      <ClCompile Include="$(IntDir)NativeClasses.generated.cpp">
+        <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      </ClCompile>
+    </ItemGroup>
+  </Target>
 </Project>

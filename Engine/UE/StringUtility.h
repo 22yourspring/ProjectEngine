@@ -2,13 +2,13 @@
 
 #include <charconv>
 #include <cstdio>
-#include <string>
+#include "UnrealString.h"
 #include <string_view>
 #include <type_traits>
 #include <vector>
 
 template <typename... Args>
-std::string StringFormat(const char* Format, Args... Values)
+FString StringFormat(const char* Format, Args... Values)
 {
     const int Required = std::snprintf(nullptr, 0, Format, Values...);
     if (Required <= 0)
@@ -18,12 +18,14 @@ std::string StringFormat(const char* Format, Args... Values)
 
     std::vector<char> Buffer(static_cast<std::size_t>(Required) + 1);
     std::snprintf(Buffer.data(), Buffer.size(), Format, Values...);
-    return std::string(Buffer.data(), static_cast<std::size_t>(Required));
+    return FString::FromUtf8(std::string_view(Buffer.data(), static_cast<std::size_t>(Required)));
 }
 
 template <typename T>
-bool ParseValue(std::string_view Source, std::string_view Label, T& OutValue)
+bool ParseValue(const FString& _Source, const FString& _Label, T& OutValue)
 {
+    const auto Source = _Source.ToUtf8();
+    const auto Label = _Label.ToUtf8();
     const std::size_t LabelPosition = Source.find(Label);
     if (LabelPosition == std::string_view::npos)
     {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include "UE/CoreTypes.h"
 #include "UE/Math/MathFwd.h"
 
@@ -398,8 +400,8 @@ namespace FMath
 	double RoundHalfFromZero(double Value);
 	float RoundHalfToZero(float Value);
 	double RoundHalfToZero(double Value);
-	std::string FormatIntToHumanReadable(int32 Value);
-	bool Eval(std::string Expression, float& OutValue);
+	CORE_API FString FormatIntToHumanReadable(int32 Value);
+	CORE_API bool Eval(FString Expression, float& OutValue);
 	void WindRelativeAnglesDegrees(float Angle0, float& InOutAngle1);
 	void WindRelativeAnglesDegrees(double Angle0, double& InOutAngle1);
 	float FixedTurn(float Current, float Desired, float DeltaRate);

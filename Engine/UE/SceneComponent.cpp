@@ -51,9 +51,7 @@ void USceneComponent::SetWorldLocation(const FVector& _Location)
 
 	if (nullptr != __AttachParent)
 	{
-		__RelativeLocation = SubtractLocation(
-			__WorldLocation,
-			__AttachParent->GetWorldLocation());
+		__RelativeLocation = __AttachParent->GetComponentTransform().InverseTransformPosition(__WorldLocation);
 	}
 	else
 	{
@@ -98,6 +96,8 @@ void USceneComponent::DetachFromComponent()
 
 	__AttachParent = nullptr;
 	__RelativeLocation = PreviousWorldLocation;
+	__RelativeRotation = __WorldRotation;
+	__RelativeScale = __WorldScale;
 	__WorldLocation = PreviousWorldLocation;
 	PropagateTransformToChildren();
 	OnUpdateTransform();
@@ -118,9 +118,28 @@ bool USceneComponent::IsAttachedTo(const USceneComponent* _Component) const
 
 void USceneComponent::UpdateComponentToWorld()
 {
-	__WorldLocation = nullptr != __AttachParent
-		? AddLocation(__AttachParent->GetWorldLocation(), __RelativeLocation)
-		: __RelativeLocation;
+	__WorldLocation = __AttachParent ? __AttachParent->GetComponentTransform().TransformPosition(__RelativeLocation) : __RelativeLocation;
+	__WorldRotation = __AttachParent ? (__AttachParent->__WorldRotation * __RelativeRotation).GetNormalized() : __RelativeRotation;
+	__WorldScale = __AttachParent ? __AttachParent->__WorldScale * __RelativeScale : __RelativeScale;
+}
+
+void USceneComponent::SetWorldRotation(const FQuat& _NewRotation)
+{
+    if (_NewRotation.ContainsNaN() || _NewRotation.SizeSquared() < 1.e-12) return;
+    __RelativeRotation = __AttachParent ? __AttachParent->__WorldRotation.Inverse() * _NewRotation.GetNormalized() : _NewRotation.GetNormalized();
+    UpdateComponentToWorld(); PropagateTransformToChildren(); OnUpdateTransform();
+}
+void USceneComponent::SetRelativeRotation(const FQuat& _NewRotation)
+{
+    if (_NewRotation.ContainsNaN() || _NewRotation.SizeSquared() < 1.e-12) return;
+    __RelativeRotation = _NewRotation.IsNormalized() ? _NewRotation : _NewRotation.GetNormalized();
+    UpdateComponentToWorld(); PropagateTransformToChildren(); OnUpdateTransform();
+}
+void USceneComponent::SetRelativeScale3D(FVector _NewScale3D)
+{
+    if (_NewScale3D.ContainsNaN()) return;
+    __RelativeScale = _NewScale3D;
+    UpdateComponentToWorld(); PropagateTransformToChildren(); OnUpdateTransform();
 }
 
 void USceneComponent::PropagateTransformToChildren()

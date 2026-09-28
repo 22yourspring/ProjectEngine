@@ -4,13 +4,19 @@
 #include "framework.h"
 #include "Editor.h"
 #include "EngineLibraries.h"
-#include "Game/Project/Project.h"
+#include "GameModuleAccess.h"
+#include "UE/PathEngineSystem.h"
 #include "UE/DynamicRHI.h"
+#include "UE/GameEngine.h"
 #include "EditorImGui.h"
+#include "ThirdParty/ImGui/backends/imgui_impl_win32.h"
 
 #include <dwmapi.h>
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <shellapi.h>
+#include "ThirdParty/WIL/include/wil/resource.h"
 
 #pragma comment(lib, "Dwmapi.lib")
 
@@ -34,7 +40,7 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 namespace
 {
-    constexpr wchar_t EditorViewportWindowClass[] = L"ProjectEngineEditorViewport";
+    constexpr wchar_t EditorViewportWindowClass[] = TEXT("UnrealEngineEditorViewport");
 
     LRESULT CALLBACK EditorViewportWndProc(
         HWND _Window,
@@ -44,8 +50,14 @@ namespace
     {
         switch (_Message)
         {
+        case WM_KEYDOWN:
+            if (_WParam == VK_F11 && GEditorImGui.HandleWindowMessage(_Window, _Message, _WParam, _LParam))
+                return 0;
+            break;
+        case WM_DROPFILES:
+            GEditorImGui.HandleFileDrop(reinterpret_cast<void*>(_WParam));
+            return 0;
         case WM_ERASEBKGND:
-            // The active RHI owns every pixel in this window.
             return TRUE;
         case WM_PAINT:
             {
@@ -57,6 +69,7 @@ namespace
         default:
             return DefWindowProcW(_Window, _Message, _WParam, _LParam);
         }
+        return DefWindowProcW(_Window, _Message, _WParam, _LParam);
     }
 
 }
@@ -64,12 +77,14 @@ namespace
 
 void SaveGameModeSelection(const char* _GameModeName)
 {
-    const std::filesystem::path RelativePath =
-        std::filesystem::path("Saved") / "Config" / "EditorDefaultPawn.cfg";
+    if (!GEngine)
+        return;
+    const auto* ProjectPaths = GEngine->GetEngineSystem<PathEngineSystem>();
+    if (!ProjectPaths)
+        return;
     const std::filesystem::path Paths[] =
     {
-        RelativePath,
-        std::filesystem::path("..") / "Client" / RelativePath
+        ProjectPaths->GetProjectSavedDirectory() / TEXT("Config") / TEXT("EditorDefaultPawn.cfg")
     };
 
     for (const std::filesystem::path& Path : Paths)
@@ -85,10 +100,15 @@ void SaveGameModeSelection(const char* _GameModeName)
     }
 }
 
-std::string ReadGameModeSelection()
+FString ReadGameModeSelection()
 {
-    std::ifstream Input(std::filesystem::path("Saved") / "Config" /
-        "EditorDefaultPawn.cfg");
+    if (!GEngine)
+        return {};
+    const auto* ProjectPaths = GEngine->GetEngineSystem<PathEngineSystem>();
+    if (!ProjectPaths)
+        return {};
+    std::ifstream Input(ProjectPaths->GetProjectSavedDirectory() / TEXT("Config") /
+        TEXT("EditorDefaultPawn.cfg"));
     std::string Selection;
     if (Input.is_open())
         Input >> Selection;
@@ -101,6 +121,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+    ImGui_ImplWin32_EnableDpiAwareness();
+
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
@@ -140,6 +162,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
+    FModuleManager ModuleManager;
+
     TRAIIPattern_ThreadGuard EngineLoopGuard
     (
         []
@@ -166,6 +190,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     
+    PathEngineSystem* Paths = GEngine->GetEngineSystem<PathEngineSystem>();
+    if (!Paths || !ModuleManager.LoadGameModule(Paths->GetProjectModuleFile(TEXT("Editor"))))
+    {
+        KillTimer(gEditorWindow, 1);
+        GEditorImGui.Shutdown();
+        MessageBoxW(nullptr, TEXT("Failed to load the selected project's game module."),
+            TEXT("UnrealEngine"), MB_OK | MB_ICONERROR);
+        return FALSE;
+    }
+    LoadProjectInputMappings();
+
+    bUseEngineGameMode = ReadGameModeSelection() == "EngineGameMode";
+    GEditorImGui.SetEditorState(bIsPlaying, bIsPaused, bUseEngineGameMode);
+    GEditorImGui.InitializeProjectSession();
+
     while (GetMessage(&msg, nullptr, 0, 0))
     {
         TranslateMessage(&msg);
@@ -276,7 +315,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    if (nullptr == gViewportWindow)
        return FALSE;
 
-   bUseEngineGameMode = ReadGameModeSelection() == "EngineGameMode";
+   DragAcceptFiles(hWnd, TRUE);
+   DragAcceptFiles(gViewportWindow, TRUE);
+
    ShowWindow(hWnd, SW_MAXIMIZE);
    UpdateWindow(hWnd);
 
@@ -310,9 +351,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return TRUE;
     }
 
-    // The embedded engine input application is attached to the child Viewport HWND.
-    // Forward editor-window keyboard input while PIE is active so toolbar focus does
-    // not prevent the possessed pawn from receiving movement keys.
     if (bIsPlaying && nullptr != gViewportWindow &&
         (WM_KEYDOWN == message || WM_KEYUP == message ||
             WM_SYSKEYDOWN == message || WM_SYSKEYUP == message))
@@ -322,6 +360,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     switch (message)
     {
+    case WM_DROPFILES:
+        GEditorImGui.HandleFileDrop(reinterpret_cast<void*>(wParam));
+        return 0;
     case WM_GETMINMAXINFO:
         {
             MONITORINFO MonitorInfo = {};
@@ -336,10 +377,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 MinMaxInfo->ptMaxPosition.y = WorkArea.top - MonitorArea.top;
                 MinMaxInfo->ptMaxSize.x = WorkArea.right - WorkArea.left;
                 MinMaxInfo->ptMaxSize.y = WorkArea.bottom - WorkArea.top;
+                MinMaxInfo->ptMaxTrackSize = MinMaxInfo->ptMaxSize;
                 return 0;
             }
         }
         break;
+    case WM_NCCALCSIZE:
+        if (wParam && IsZoomed(hWnd))
+            return 0;
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    case WM_DPICHANGED:
+        {
+            const RECT& SuggestedRect = *reinterpret_cast<const RECT*>(lParam);
+            SetWindowPos(
+                hWnd, nullptr,
+                SuggestedRect.left, SuggestedRect.top,
+                SuggestedRect.right - SuggestedRect.left,
+                SuggestedRect.bottom - SuggestedRect.top,
+                SWP_NOZORDER | SWP_NOACTIVATE);
+        }
+        return 0;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -347,7 +404,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             switch (wmId)
             {
             case IDM_EXIT:
-                DestroyWindow(hWnd);
+                GEditorImGui.RequestClose();
                 break;
             case IDM_DEFAULTPAWN_MANNEQUIN:
                 if (!bIsPlaying)
@@ -366,8 +423,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
                 break;
             case IDM_PLAY:
-                if (!bIsPlaying && InitializeProjectWithGameMode(bUseEngineGameMode))
+                bUseEngineGameMode = GEditorImGui.UseEngineGameMode();
+                if (!bIsPlaying)
                 {
+                    bool Started = false;
+                    if (auto* EditorEngine = dynamic_cast<UGameEngine*>(GEngine))
+                        EditorEngine->WithWorld([&](UWorld*) { if (InitializeProjectWithGameMode(bUseEngineGameMode)) Started = EditorEngine->PlayEditorMap(); });
+                    if (!Started) break;
                     bIsPlaying = true;
                     bIsPaused = false;
                     GEditorImGui.SetEditorState(bIsPlaying, bIsPaused, bUseEngineGameMode);
@@ -408,16 +470,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
         if (nullptr != gViewportWindow && SIZE_MINIMIZED != wParam)
         {
-            // Defer layout, child-window movement and swap-chain resizing
-            // until the interactive resize loop has finished.  Updating all
-            // three while WM_SIZE is streaming produces a sequence of
-            // visibly different dock layouts and viewport positions.
             if (gIsInteractiveResize)
             {
-                // Let ImGui redraw at the new size, but keep the native child
-                // at its last committed rectangle. Expanding it to the whole
-                // client area would cover the Outliner/Details/Dock UI while
-                // the interactive resize loop is still in progress.
                 GEditorImGui.Resize(LOWORD(lParam), HIWORD(lParam));
                 GEditorImGui.Render();
             }
@@ -426,22 +480,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 MoveWindow(gViewportWindow, 0, 0, LOWORD(lParam), HIWORD(lParam), FALSE);
                 GEditorImGui.Resize(LOWORD(lParam), HIWORD(lParam));
             }
-            // WM_SIZE exposes the newly sized swap-chain immediately. Draw a
-            // fresh frame on the next timer tick. Rendering synchronously from
-            // WM_SIZE re-enters the Dock/Viewport layout while Windows is
-            // still reporting resize messages and causes visible jitter.
             InvalidateRect(hWnd, nullptr, FALSE);
         }
         break;
     case WM_ERASEBKGND:
-        // Never expose the system COLOR_WINDOW (white) brush during a live
-        // resize while the D3D back buffer is being committed.
         {
             RECT ClientRect = {};
             GetClientRect(hWnd, &ClientRect);
-            HBRUSH Background = CreateSolidBrush(RGB(21, 21, 21));
-            FillRect(reinterpret_cast<HDC>(wParam), &ClientRect, Background);
-            DeleteObject(Background);
+            wil::unique_hbrush Background(CreateSolidBrush(RGB(21, 21, 21)));
+            FillRect(reinterpret_cast<HDC>(wParam), &ClientRect, Background.get());
         }
         return 1;
     case WM_ENTERSIZEMOVE:
@@ -449,11 +496,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_EXITSIZEMOVE:
         gIsInteractiveResize = false;
-        // WM_SIZE has already delivered the final client dimensions. Let the
-        // next regular frame settle the ImGui dock layout first, then place
-        // the native viewport from that same layout exactly once.
         InvalidateRect(hWnd, nullptr, FALSE);
         break;
+    case WM_CLOSE:
+        GEditorImGui.RequestClose();
+        return 0;
     case WM_DESTROY:
         KillTimer(hWnd, 1);
         PostQuitMessage(0);

@@ -6,12 +6,25 @@
 #include <algorithm>
 
 UWorld::UWorld(const FName& _PersistentLevelName)
-	: __Scene(std::make_unique<FScene>()),
+	: __PhysicsScene(std::make_unique<FPhysScene>()), __Scene(std::make_unique<FScene>()),
 	  __PersistentLevel(std::make_unique<ULevel>(this, _PersistentLevelName))
 {
 }
 
 UWorld::~UWorld() = default;
+
+bool UWorld::LineTraceSingleByChannel(FHitResult& _OutHit, const FVector& _Start, const FVector& _End, ECollisionChannel _TraceChannel, const FCollisionQueryParams& _Params, const FCollisionResponseParams& _ResponseParam) const
+{
+    return __PhysicsScene->LineTraceSingleByChannel(_OutHit, _Start, _End, _TraceChannel, _Params, _ResponseParam);
+}
+bool UWorld::SweepSingleByChannel(FHitResult& _OutHit, const FVector& _Start, const FVector& _End, const FQuat& _Rot, ECollisionChannel _TraceChannel, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params, const FCollisionResponseParams& _ResponseParam) const
+{
+    return __PhysicsScene->SweepSingleByChannel(_OutHit, _Start, _End, _Rot, _TraceChannel, _CollisionShape, _Params, _ResponseParam);
+}
+bool UWorld::OverlapMultiByChannel(std::vector<FOverlapResult>& _OutOverlaps, const FVector& _Pos, const FQuat& _Rot, ECollisionChannel _TraceChannel, const FCollisionShape& _CollisionShape, const FCollisionQueryParams& _Params, const FCollisionResponseParams& _ResponseParam) const
+{
+    return __PhysicsScene->OverlapMultiByChannel(_OutOverlaps, _Pos, _Rot, _TraceChannel, _CollisionShape, _Params, _ResponseParam);
+}
 
 bool UWorld::IsPersistentLevel(const TCHAR* _LevelName) const
 {
@@ -78,6 +91,7 @@ bool UWorld::RemoveStreamingLevel(ULevelStreaming* _StreamingLevel)
 
 void UWorld::Tick(float _DeltaTime)
 {
+    if (IsDebugPauseExecution()) return;
 	UpdateLevelStreaming();
 
 	if (__PersistentLevel)
@@ -90,6 +104,10 @@ void UWorld::Tick(float _DeltaTime)
 	}
 
 	RunTickGroup(ETickingGroup::TG_PrePhysics, _DeltaTime);
+	RunTickGroup(ETickingGroup::TG_StartPhysics, _DeltaTime);
+	RunTickGroup(ETickingGroup::TG_DuringPhysics, _DeltaTime);
+	RunTickGroup(ETickingGroup::TG_EndPhysics, _DeltaTime);
+	RunTickGroup(ETickingGroup::TG_PostPhysics, _DeltaTime);
 }
 
 void UWorld::UpdateLevelStreaming()
@@ -121,7 +139,14 @@ void UWorld::UpdateLevelStreaming()
 void UWorld::RunTickGroup(ETickingGroup _TickGroup, float _DeltaTime)
 {
 	std::lock_guard<std::recursive_mutex> Lock(__WorldMutex);
+    if (IsDebugPauseExecution()) return;
 	__bIsTicking = true;
+    if (_TickGroup == ETickingGroup::TG_StartPhysics)
+    {
+        __PhysicsScene->SetUpForFrame(nullptr, _DeltaTime, 0, .25f, 1.f / 120.f, 32, true);
+        __PhysicsScene->StartFrame();
+    }
+    if (_TickGroup == ETickingGroup::TG_EndPhysics) __PhysicsScene->EndFrame();
 
 	__TickTaskManager.RunTickGroup(_TickGroup, _DeltaTime);
 

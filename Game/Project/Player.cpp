@@ -1,13 +1,23 @@
 #include "pch.h"
 #include "Player.h"
-
+#include "UE/Archive.h"
+#include <cmath>
+#include "UE/PrimitiveComponent.h"
 #include "UE/StaticMesh.h"
 #include "UE/StaticMeshComponent.h"
-#include "UE/SceneComponent.h"
+#include "UE/BoxComponent.h"
 #include "UE/InputComponent.h"
 #include "UE/GameplayStatics.h"
 #include "UE/World.h"
 #include "UE/Level.h"
+
+void APlayer::Serialize(FArchive& _Archive)
+{
+    ACharacter::Serialize(_Archive);
+    _Archive.Serialize(&__MoveSpeed, sizeof(__MoveSpeed));
+    if (!std::isfinite(__MoveSpeed) || __MoveSpeed < 0) _Archive.SetError();
+}
+
 
 APlayer::APlayer()
 {
@@ -16,15 +26,29 @@ APlayer::APlayer()
 	__PlayerMesh->SetSize(100, 100);
 	__PlayerMesh->SetColor({ 220, 60, 60, 255 });
 
-	__RootSceneComponent = CreateDefaultSubobject<USceneComponent>();
-	SetRootComponent(__RootSceneComponent);
+	__CollisionComponent = CreateDefaultSubobject<UBoxComponent>();
+    SetRootComponent(__CollisionComponent);
+    __CollisionComponent->SetBoxExtent(FVector(50, 50, 20));
+    __CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    __CollisionComponent->SetCollisionObjectType(ECC_Pawn);
+    __CollisionComponent->SetCollisionResponseToAllChannels(ECR_Block);
+    __CollisionComponent->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+    __CollisionComponent->SetEnableGravity(false);
+    __CollisionComponent->BodyInstance.bUseCCD = true;
+    __CollisionComponent->BodyInstance.bLockZTranslation = true;
+    __CollisionComponent->BodyInstance.bLockXRotation = true;
+    __CollisionComponent->BodyInstance.bLockYRotation = true;
+    __CollisionComponent->BodyInstance.bLockZRotation = true;
+    __CollisionComponent->BodyInstance.SetDOFLock(EDOFMode::SixDOF);
+    __CollisionComponent->SetNotifyRigidBodyCollision(true);
+    __CollisionComponent->SetSimulatePhysics(true);
 
 	__MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>();
 	__MeshComponent->SetStaticMesh(__PlayerMesh.get());
-	__MeshComponent->SetupAttachment(__RootSceneComponent);
-	__MeshComponent->SetRelativeLocation({ 0.0, 0.0, 0.0 });
+	__MeshComponent->SetupAttachment(__CollisionComponent);
+	__MeshComponent->SetRelativeLocation({ -50.0, -50.0, 0.0 });
 
-	SetActorLocation({ 100.0f, 100.0f, 0.0f });
+	SetActorLocation({ 150.0f, 150.0f, 0.0f });
 
 }
 
@@ -33,6 +57,13 @@ APlayer::~APlayer() = default;
 void APlayer::Tick(float _DeltaTime)
 {
 	Super::Tick(_DeltaTime);
+    if (auto* Body = dynamic_cast<UPrimitiveComponent*>(GetRootComponent()); Body && Body->IsSimulatingPhysics())
+    {
+        FVector Input(__HorizontalInput, __VerticalInput, 0);
+        if (Input.SizeSquared() > 1) Input.Normalize();
+        Body->SetPhysicsLinearVelocity(Input * __MoveSpeed);
+        return;
+    }
 
 	const float MoveDistance = __MoveSpeed * _DeltaTime;
 	FVector NewLocation = GetActorLocation();

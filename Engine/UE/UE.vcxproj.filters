@@ -3,37 +3,37 @@
   <!-- Filters for UE. -->
   <ItemGroup>
     <ClInclude Include="Delegate.h">
-      <Filter>Source Files\Runtime\Core\Delegate</Filter>
+      <Filter>Source Files\Runtime\Core\Delegates</Filter>
     </ClInclude>
     <ClInclude Include="MulticastDelegate.h">
-      <Filter>Source Files\Runtime\Core\Delegate</Filter>
+      <Filter>Source Files\Runtime\Core\Delegates</Filter>
     </ClInclude>
     <ClInclude Include="DelegatesMacros.h">
-      <Filter>Source Files\Runtime\Core\Delegate</Filter>
+      <Filter>Source Files\Runtime\Core\Delegates</Filter>
     </ClInclude>
     <ClInclude Include="InputTypes.h">
       <Filter>Source Files\Runtime\Engine\Input</Filter>
     </ClInclude>
     <ClInclude Include="InputEngineSystem.h">
-      <Filter>Source Files\System</Filter>
+      <Filter>Source Files\Runtime\Engine\Systems</Filter>
     </ClInclude>
     <ClInclude Include="WindowsInputApplication.h">
       <Filter>Source Files\Runtime\ApplicationCore\Windows</Filter>
     </ClInclude>
     <ClInclude Include="PlayerController.h">
-      <Filter>Source Files\Entity\Object\Controller\PlayerController</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\GameFramework\Controller\PlayerController</Filter>
     </ClInclude>
     <ClInclude Include="PlayerInput.h">
-      <Filter>Source Files\Runtime\Engine\Input</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\GameFramework\PlayerInput</Filter>
     </ClInclude>
     <ClInclude Include="AppTimeEngineSystem.h">
-      <Filter>Source Files\System</Filter>
+      <Filter>Source Files\Runtime\Engine\Systems</Filter>
     </ClInclude>
     <ClInclude Include="AppTimeRenderProxy.h">
-      <Filter>Source Files\Entity\World\Scene\SceneProxy</Filter>
+      <Filter>Source Files\Runtime\Renderer\Scene\SceneProxy</Filter>
     </ClInclude>
     <ClInclude Include="SceneViewExtension.h">
-      <Filter>Source Files\Entity\Interface</Filter>
+      <Filter>Source Files\Runtime\Engine</Filter>
     </ClInclude>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
@@ -57,76 +57,70 @@
     <Filter Include="Source Files\Runtime\Launch">
       <UniqueIdentifier>{05e89f18-dd72-45b9-921c-d95d876913f5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\RHI">
+    <Filter Include="Source Files\Runtime\RHI">
       <UniqueIdentifier>{78d09466-498e-489e-9e97-06ae2efb162a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\RHI\Windows">
+    <Filter Include="Source Files\Runtime\RHI\Windows">
       <UniqueIdentifier>{d854ba73-e932-4ab7-87e8-f6b7b37cb7ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\RHI\Windows\D3D11RHI">
+    <Filter Include="Source Files\Runtime\RHI\Windows\D3D11RHI">
       <UniqueIdentifier>{98B52912-1647-4D1A-845D-D6731312A6C2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity">
-      <UniqueIdentifier>{b32a4a02-5131-4152-b895-eb20e42681be}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Entity\Engine">
+
+    <Filter Include="Source Files\Runtime\Engine\Classes\Engine">
       <UniqueIdentifier>{6bd4b8e0-31a4-4b8d-8047-55a6b24b0c9d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\GameInstance">
+    <Filter Include="Source Files\Runtime\Engine\Classes\Engine\GameInstance">
       <UniqueIdentifier>{a4f74f9a-5e0e-4aa0-9af4-6fb77bb7de1b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Component">
+    <Filter Include="Source Files\Runtime\Engine\Classes\Components">
       <UniqueIdentifier>{1d20a7ad-c038-4312-91a1-b37987337f50}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\World">
+    <Filter Include="Source Files\Runtime\Engine\Classes\Engine\World">
       <UniqueIdentifier>{8250d4dd-ba0f-4c33-8a22-6ce610fed0ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Interface">
-      <UniqueIdentifier>{5eff22d8-039a-4a3c-ab86-e7be873b8461}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Entity\Object">
+
+    <Filter Include="Source Files\Runtime\CoreUObject\UObject">
       <UniqueIdentifier>{3cb577c0-94bc-4a67-a8c2-13ad3096d66f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Object\Actor">
+    <Filter Include="Source Files\Runtime\Engine\Classes\GameFramework\Actor">
       <UniqueIdentifier>{43235b26-bc0b-4481-9926-d7ba302b5ebd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Object\Actor\Pawn">
+    <Filter Include="Source Files\Runtime\Engine\Classes\GameFramework\Actor\Pawn">
       <UniqueIdentifier>{3c0898f4-ad01-48a8-8dc5-b516ba944782}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Object\Actor\Pawn\Character">
+    <Filter Include="Source Files\Runtime\Engine\Classes\GameFramework\Actor\Pawn\Character">
       <UniqueIdentifier>{d30fb062-e807-4b99-9bd8-ca8fa11b0e25}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Runtime\Math">
+    <Filter Include="Source Files\Runtime\Core\Math">
       <UniqueIdentifier>{8ee487a9-085e-43dd-bae5-e693ca21ca64}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Component\ActorComponent">
+    <Filter Include="Source Files\Runtime\Engine\Classes\Components\ActorComponent">
       <UniqueIdentifier>{f0cf8d03-d44b-47f8-8d73-f77aa5f74139}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Object\Controller">
+    <Filter Include="Source Files\Runtime\Engine\Classes\GameFramework\Controller">
       <UniqueIdentifier>{69629040-2c45-42eb-8939-761e1dac0390}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Object\Controller\PlayerController">
+    <Filter Include="Source Files\Runtime\Engine\Classes\GameFramework\Controller\PlayerController">
       <UniqueIdentifier>{5198d885-5166-40a5-b4e7-cb07c8794769}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Object\Controller\AIController">
+    <Filter Include="Source Files\Runtime\Engine\Classes\GameFramework\Controller\AIController">
       <UniqueIdentifier>{4dfc8c42-1895-4100-b9c9-8cb7b180379c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Runtime\Core">
       <UniqueIdentifier>{10961331-6cf1-4f30-a683-28f021008746}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Runtime\UnrealStringTypes">
-      <UniqueIdentifier>{48bb3ea8-5195-4e41-91b7-02092993a19a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Runtime\UnrealStringTypes\String">
+
+    <Filter Include="Source Files\Runtime\Core\Containers\String">
       <UniqueIdentifier>{e284518a-f2a5-4b59-8fb8-27e47122ad20}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Runtime\UnrealStringTypes\Name">
+    <Filter Include="Source Files\Runtime\Core\UObject\Name">
       <UniqueIdentifier>{607e0d1f-f965-446b-8f5a-d4e0a5b30c77}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Runtime\UnrealStringTypes\Text">
+    <Filter Include="Source Files\Runtime\Core\Internationalization\Text">
       <UniqueIdentifier>{7ce6f98c-b0ca-4f37-a0ac-c7c89dbc8980}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Runtime\Core\Delegate">
+    <Filter Include="Source Files\Runtime\Core\Delegates">
       <UniqueIdentifier>{cbd1a3a0-a330-4825-bba8-58234238c6a3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Runtime\Engine\Input">
@@ -138,70 +132,106 @@
     <Filter Include="Source Files\Runtime\ApplicationCore\Windows">
       <UniqueIdentifier>{97657FC7-110D-4D2A-9497-359DB120D2F5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\World\Level">
+    <Filter Include="Source Files\Runtime\Engine\Classes\Engine\World\Level">
       <UniqueIdentifier>{cd4f2db7-a8b7-47d1-8800-1126dfecc1d5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\World\Scene">
+    <Filter Include="Source Files\Runtime\Renderer\Scene">
       <UniqueIdentifier>{ECC22B0C-6EC9-4FD7-9784-FB9EB076A27E}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\World\Scene\SceneProxy">
+    <Filter Include="Source Files\Runtime\Renderer\Scene\SceneProxy">
       <UniqueIdentifier>{42CC1E2D-401C-48A6-992D-A984411510F8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Component\ActorComponent\SceneComponent">
+    <Filter Include="Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent">
       <UniqueIdentifier>{BA1EC85B-E0D6-414C-B232-241D2030FB72}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Component\ActorComponent\SceneComponent\PrimitiveComponent">
+    <Filter Include="Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent">
       <UniqueIdentifier>{71A97A82-D565-40D4-B374-12BB8654082E}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Component\ActorComponent\SceneComponent\PrimitiveComponent\StaticMeshComponent">
+    <Filter Include="Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\MeshComponent\StaticMeshComponent">
       <UniqueIdentifier>{F37E0F1D-6BC1-4850-B176-4D4910981EAA}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Object\Mesh">
+    <Filter Include="Source Files\Runtime\Engine\Classes\Engine\Mesh">
       <UniqueIdentifier>{df5532d7-2356-49ad-afaf-512fcd7d2790}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="InputComponent.h">
-      <Filter>Source Files\Entity\Component\ActorComponent\InputComponent</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Components\ActorComponent\InputComponent</Filter>
     </ClInclude>
     <ClInclude Include="LevelStreaming.h">
-      <Filter>Source Files\Entity\World\Level\LevelStreaming</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Engine\World\Level\LevelStreaming</Filter>
     </ClInclude>
     <ClInclude Include="GameInstanceSubsystem.h">
-      <Filter>Source Files\Entity\GameInstance\GameInstanceSubsystem</Filter>
+      <Filter>Source Files\Runtime\Engine\Subsystems\GameInstanceSubsystem</Filter>
     </ClInclude>
     <ClInclude Include="GameplayStatics.h">
-      <Filter>Source Files\Entity\Engine\GameplayStatics</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Kismet\GameplayStatics</Filter>
     </ClInclude>
     <ClInclude Include="GameEngine.h">
-      <Filter>Source Files\Entity\Engine\GameEngine</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Engine\GameEngine</Filter>
     </ClInclude>
     <ClInclude Include="GameModeBase.h">
-      <Filter>Source Files\Entity\World\GameModeBase</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\GameFramework\GameModeBase</Filter>
     </ClInclude>
     <ClInclude Include="Info.h">
-      <Filter>Source Files\Entity\Object\Actor\Info</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\GameFramework\Actor\Info</Filter>
     </ClInclude>
     <ClInclude Include="MannequinPawn.h">
-      <Filter>Source Files\Entity\Object\Actor\Pawn\MannequinPawn</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\GameFramework\Actor\Pawn\MannequinPawn</Filter>
+    </ClInclude>
+    <Filter Include="Source Files\Runtime\Core\Serialization">
+      <UniqueIdentifier>{E204603B-27C5-4680-9AFB-2460E5EE123E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\CoreUObject">
+      <UniqueIdentifier>{A15AAAD2-905D-417B-B20D-2EEC590FF700}</UniqueIdentifier>
+    </Filter>
+
+
+    <Filter Include="Source Files\Runtime\Engine\Classes\EditorFramework">
+      <UniqueIdentifier>{53CD38BE-3B56-4B66-87A6-6EDA86DCFF22}</UniqueIdentifier>
+    </Filter>
+
+    <Filter Include="Source Files\Runtime\Engine\Classes\GameFramework">
+      <UniqueIdentifier>{6A18018B-75EA-40F4-A535-713F0C4C6CBA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Engine\Classes\Materials">
+      <UniqueIdentifier>{8B7B0D7D-C178-4C79-B59E-75F3D909C56D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Engine\Serialization">
+      <UniqueIdentifier>{711344E8-7070-42EB-80B3-7B863D523F88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Engine\Classes\Sound">
+      <UniqueIdentifier>{AF5A8D69-E3B5-4FEE-88E9-BC990560A331}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\EngineSettings\Classes">
+      <UniqueIdentifier>{4E7F0B4E-F2AD-4A9F-BE64-45AF039A4699}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="MaterialInstanceDynamic.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Materials\MaterialInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialInstance.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Materials\MaterialInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialInstanceConstant.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Materials\MaterialInstance</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="InputEngineSystem.cpp">
-      <Filter>Source Files\System</Filter>
+      <Filter>Source Files\Runtime\Engine\Systems</Filter>
     </ClCompile>
     <ClCompile Include="WindowsInputApplication.cpp">
       <Filter>Source Files\Runtime\ApplicationCore\Windows</Filter>
     </ClCompile>
     <ClCompile Include="PlayerController.cpp">
-      <Filter>Source Files\Entity\Object\Controller\PlayerController</Filter>
+      <Filter>Source Files\Runtime\Engine\GameFramework\Controller\PlayerController</Filter>
     </ClCompile>
     <ClCompile Include="PlayerInput.cpp">
-      <Filter>Source Files\Runtime\Engine\Input</Filter>
+      <Filter>Source Files\Runtime\Engine\UserInterface\PlayerInput</Filter>
     </ClCompile>
     <ClCompile Include="AppTimeEngineSystem.cpp">
-      <Filter>Source Files\System</Filter>
+      <Filter>Source Files\Runtime\Engine\Systems</Filter>
     </ClCompile>
     <ClCompile Include="AppTimeRenderProxy.cpp">
-      <Filter>Source Files\Entity\World\Scene\SceneProxy</Filter>
+      <Filter>Source Files\Runtime\Renderer\Scene\SceneProxy</Filter>
     </ClCompile>
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
@@ -213,256 +243,259 @@
       <Filter>Source Files\Runtime\Launch</Filter>
     </ClInclude>
     <ClInclude Include="define.h">
-      <Filter>EngineTypes</Filter>
+      <Filter>Source Files\Runtime\Core</Filter>
     </ClInclude>
     <ClInclude Include="CoreMinimal.h">
-      <Filter>EngineTypes</Filter>
+      <Filter>Source Files\Runtime\Core</Filter>
     </ClInclude>
     <ClInclude Include="EngineMinimal.h">
-      <Filter>EngineTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="CoreTypes.h">
-      <Filter>EngineTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="NameTypes.h">
-      <Filter>Source Files\Runtime\UnrealStringTypes\Name</Filter>
-    </ClInclude>
-    <ClInclude Include="UnrealString.h">
-      <Filter>Source Files\Runtime\UnrealStringTypes\String</Filter>
-    </ClInclude>
-    <ClInclude Include="Text.h">
-      <Filter>Source Files\Runtime\UnrealStringTypes\Text</Filter>
-    </ClInclude>
-    <ClInclude Include="StringUtility.h">
-      <Filter>Source Files\Runtime\UnrealStringTypes\String</Filter>
-    </ClInclude>
-    <ClInclude Include="Tickable.h">
-      <Filter>Source Files\Entity\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine.h">
-      <Filter>Source Files\Entity\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Actor.h">
-      <Filter>Source Files\Entity\Object\Actor</Filter>
-    </ClInclude>
-    <ClInclude Include="Actor.inl">
-      <Filter>Source Files\Entity\Object\Actor</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>Source Files\Entity\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Pawn.h">
-      <Filter>Source Files\Entity\Object\Actor\Pawn</Filter>
-    </ClInclude>
-    <ClInclude Include="Character.h">
-      <Filter>Source Files\Entity\Object\Actor\Pawn\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Axis.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Box.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Color.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\InterpCurve.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\InterpCurvePoint.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Interval.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\IntPoint.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\IntRect.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\MathFwd.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Matrix.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Plane.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\PolynomialRootSolver.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Quat.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\QuatRotationTranslationMatrix.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\RandomStream.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\RotationMatrix.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\RotationTranslationMatrix.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Rotator.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\ScalarRegister.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Sphere.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Transform.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\TransformNonVectorized.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\TransformVectorized.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\TwoVectors.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\UnrealMath.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\UnrealMathFPU.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\UnrealMathSSE.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\UnrealMathUtility.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\UnrealMemory.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector2D.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector4.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\VectorRegister.h">
-      <Filter>Source Files\Runtime\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="ActorComponent.h">
-      <Filter>Source Files\Entity\Component\ActorComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="Controller.h">
-      <Filter>Source Files\Entity\Object\Controller</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineBaseTypes.h">
       <Filter>Source Files\Runtime\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="CoreTypes.h">
+      <Filter>Source Files\Runtime\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="NameTypes.h">
+      <Filter>Source Files\Runtime\Core\UObject\Name</Filter>
+    </ClInclude>
+    <ClInclude Include="UnrealString.h">
+      <Filter>Source Files\Runtime\Core\Containers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>Source Files\Runtime\Core\Internationalization\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="StringUtility.h">
+      <Filter>Source Files\Runtime\Core\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Tickable.h">
+      <Filter>Source Files\Runtime\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>Source Files\Runtime\Engine\Classes\GameFramework\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.inl">
+      <Filter>Source Files\Runtime\Engine\Classes\GameFramework\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Source Files\Runtime\CoreUObject\UObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Pawn.h">
+      <Filter>Source Files\Runtime\Engine\Classes\GameFramework\Actor\Pawn</Filter>
+    </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>Source Files\Runtime\Engine\Classes\GameFramework\Actor\Pawn\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Axis.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Box.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Color.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\InterpCurve.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\InterpCurvePoint.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Interval.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\IntPoint.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\IntRect.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\MathFwd.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Matrix.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Plane.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\PolynomialRootSolver.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Quat.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\QuatRotationTranslationMatrix.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\RandomStream.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\RotationMatrix.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\RotationTranslationMatrix.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Rotator.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\ScalarRegister.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Sphere.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Transform.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\TransformNonVectorized.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\TransformVectorized.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\TwoVectors.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\UnrealMath.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\UnrealMathFPU.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\UnrealMathSSE.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\UnrealMathUtility.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\UnrealMemory.h">
+      <Filter>Source Files\Runtime\Core\HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector2D.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector4.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\VectorRegister.h">
+      <Filter>Source Files\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="ActorComponent.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Components\ActorComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller.h">
+      <Filter>Source Files\Runtime\Engine\Classes\GameFramework\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineBaseTypes.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Engine</Filter>
+    </ClInclude>
     <ClInclude Include="Template.h">
-      <Filter>EngineTypes</Filter>
+      <Filter>Source Files\Runtime\Core\Templates</Filter>
     </ClInclude>
     <ClInclude Include="EngineLoop.h">
-      <Filter>Source Files\Entity\Interface</Filter>
+      <Filter>Source Files\Runtime\Launch</Filter>
     </ClInclude>
     <ClInclude Include="T_Singleton.h">
-      <Filter>EngineTypes\Template</Filter>
+      <Filter>Source Files\Runtime\Core\Templates</Filter>
     </ClInclude>
     <ClInclude Include="EngineSystem.h">
-      <Filter>Source Files\Entity\Interface</Filter>
+      <Filter>Source Files\Runtime\Engine\Systems</Filter>
     </ClInclude>
     <ClInclude Include="RenderEngineSystem.h">
-      <Filter>Source Files\System</Filter>
+      <Filter>Source Files\Runtime\Engine\Systems</Filter>
     </ClInclude>
     <ClInclude Include="ResourceEngineSystem.h">
-      <Filter>Source Files\System</Filter>
+      <Filter>Source Files\Runtime\Engine\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="PathEngineSystem.h">
+      <Filter>Source Files\Runtime\Engine\Systems</Filter>
     </ClInclude>
     <ClInclude Include="DynamicRHI.h">
-      <Filter>Source Files\RHI</Filter>
+      <Filter>Source Files\Runtime\RHI</Filter>
     </ClInclude>
     <ClInclude Include="D3D11DynamicRHI.h">
-      <Filter>Source Files\RHI\Windows\D3D11RHI</Filter>
+      <Filter>Source Files\Runtime\RHI\Windows\D3D11RHI</Filter>
     </ClInclude>
     <ClInclude Include="Windows\WindowsGDIRHI.h">
-      <Filter>Source Files\RHI\Windows\WindowsRHI</Filter>
+      <Filter>Source Files\Runtime\RHI\Windows\WindowsRHI</Filter>
     </ClInclude>
     <ClInclude Include="Viewport.h">
       <Filter>Source Files\Runtime\Engine\Viewport</Filter>
     </ClInclude>
     <ClInclude Include="GameViewportClient.h">
-      <Filter>Source Files\Runtime\Engine\Viewport</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Engine\Viewport</Filter>
     </ClInclude>
     <ClInclude Include="T_RAIIPattern_ThreadGuard.h">
-      <Filter>EngineTypes\Template</Filter>
+      <Filter>Source Files\Runtime\Core\Templates</Filter>
     </ClInclude>
     <ClInclude Include="World.h">
-      <Filter>Source Files\Entity\World</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Engine\World</Filter>
     </ClInclude>
     <ClInclude Include="World.inl">
-      <Filter>Source Files\Entity\World</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Engine\World</Filter>
     </ClInclude>
     <ClInclude Include="TickTaskManager.h">
-      <Filter>Source Files\Entity\World\TickTaskManager</Filter>
+      <Filter>Source Files\Runtime\Engine\World\TickTaskManager</Filter>
     </ClInclude>
     <ClInclude Include="Level.h">
-      <Filter>Source Files\Entity\World\Level</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Engine\World\Level</Filter>
     </ClInclude>
     <ClInclude Include="Level.inl">
-      <Filter>Source Files\Entity\World\Level</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Engine\World\Level</Filter>
     </ClInclude>
     <ClInclude Include="GameInstance.h">
-      <Filter>Source Files\Entity\GameInstance</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Engine\GameInstance</Filter>
     </ClInclude>
     <ClInclude Include="SceneComponent.h">
-      <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent</Filter>
     </ClInclude>
     <ClInclude Include="PrimitiveComponent.h">
-      <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent\PrimitiveComponent</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent</Filter>
     </ClInclude>
     <ClInclude Include="PrimitiveSceneProxy.h">
-      <Filter>Source Files\Entity\World\Scene\SceneProxy</Filter>
+      <Filter>Source Files\Runtime\Renderer\Scene\SceneProxy</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
-      <Filter>Source Files\Entity\World\Scene</Filter>
+      <Filter>Source Files\Runtime\Renderer\Scene</Filter>
     </ClInclude>
     <ClInclude Include="StaticMeshComponent.h">
-      <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent\PrimitiveComponent\StaticMeshComponent</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\MeshComponent\StaticMeshComponent</Filter>
     </ClInclude>
     <ClInclude Include="StaticMeshSceneProxy.h">
-      <Filter>Source Files\Entity\World\Scene\SceneProxy</Filter>
+      <Filter>Source Files\Runtime\Renderer\Scene\SceneProxy</Filter>
     </ClInclude>
     <ClInclude Include="StaticMesh.h">
-      <Filter>Source Files\Entity\Object\Mesh</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Engine\Mesh</Filter>
     </ClInclude>
     <ClCompile Include="InputComponent.cpp">
-      <Filter>Source Files\Entity\Component\ActorComponent\InputComponent</Filter>
+      <Filter>Source Files\Runtime\Engine\Components\ActorComponent\InputComponent</Filter>
     </ClCompile>
     <ClCompile Include="LevelStreaming.cpp">
-      <Filter>Source Files\Entity\World\Level\LevelStreaming</Filter>
+      <Filter>Source Files\Runtime\Engine\World\Level\LevelStreaming</Filter>
     </ClCompile>
     <ClCompile Include="GameInstanceSubsystem.cpp">
-      <Filter>Source Files\Entity\GameInstance\GameInstanceSubsystem</Filter>
+      <Filter>Source Files\Runtime\Engine\Subsystems\GameInstanceSubsystem</Filter>
     </ClCompile>
     <ClCompile Include="GameplayStatics.cpp">
-      <Filter>Source Files\Entity\Engine\GameplayStatics</Filter>
+      <Filter>Source Files\Runtime\Engine\Kismet\GameplayStatics</Filter>
     </ClCompile>
     <ClCompile Include="GameEngine.cpp">
-      <Filter>Source Files\Entity\Engine\GameEngine</Filter>
+      <Filter>Source Files\Runtime\Engine\GameEngine</Filter>
     </ClCompile>
     <ClCompile Include="GameModeBase.cpp">
-      <Filter>Source Files\Entity\World\GameModeBase</Filter>
+      <Filter>Source Files\Runtime\Engine\GameFramework\GameModeBase</Filter>
     </ClCompile>
     <ClCompile Include="Info.cpp">
-      <Filter>Source Files\Entity\Object\Actor\Info</Filter>
+      <Filter>Source Files\Runtime\Engine\GameFramework\Actor\Info</Filter>
     </ClCompile>
     <ClCompile Include="MannequinPawn.cpp">
-      <Filter>Source Files\Entity\Object\Actor\Pawn\MannequinPawn</Filter>
+      <Filter>Source Files\Runtime\Engine\GameFramework\Actor\Pawn\MannequinPawn</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -476,49 +509,52 @@
       <Filter>Source Files\Runtime\Launch</Filter>
     </ClCompile>
     <ClCompile Include="Engine.cpp">
-      <Filter>Source Files\Entity\Engine</Filter>
+      <Filter>Source Files\Runtime\Engine</Filter>
     </ClCompile>
     <ClCompile Include="NameTypes.cpp">
-      <Filter>Source Files\Runtime\UnrealStringTypes\Name</Filter>
+      <Filter>Source Files\Runtime\Core\UObject\Name</Filter>
     </ClCompile>
     <ClCompile Include="UnrealString.cpp">
-      <Filter>Source Files\Runtime\UnrealStringTypes\String</Filter>
+      <Filter>Source Files\Runtime\Core\Containers\String</Filter>
     </ClCompile>
     <ClCompile Include="Text.cpp">
-      <Filter>Source Files\Runtime\UnrealStringTypes\Text</Filter>
+      <Filter>Source Files\Runtime\Core\Internationalization\Text</Filter>
     </ClCompile>
     <ClCompile Include="Actor.cpp">
-      <Filter>Source Files\Entity\Object\Actor</Filter>
+      <Filter>Source Files\Runtime\Engine\GameFramework\Actor</Filter>
     </ClCompile>
     <ClCompile Include="Pawn.cpp">
-      <Filter>Source Files\Entity\Object\Actor\Pawn</Filter>
+      <Filter>Source Files\Runtime\Engine\GameFramework\Actor\Pawn</Filter>
     </ClCompile>
     <ClCompile Include="Character.cpp">
-      <Filter>Source Files\Entity\Object\Actor\Pawn\Character</Filter>
+      <Filter>Source Files\Runtime\Engine\GameFramework\Actor\Pawn\Character</Filter>
     </ClCompile>
     <ClCompile Include="Object.cpp">
-      <Filter>Source Files\Entity\Object</Filter>
+      <Filter>Source Files\Runtime\CoreUObject\UObject</Filter>
     </ClCompile>
     <ClCompile Include="ActorComponent.cpp">
-      <Filter>Source Files\Entity\Component\ActorComponent</Filter>
+      <Filter>Source Files\Runtime\Engine\Components\ActorComponent</Filter>
     </ClCompile>
     <ClCompile Include="Controller.cpp">
-      <Filter>Source Files\Entity\Object\Controller</Filter>
+      <Filter>Source Files\Runtime\Engine\GameFramework\Controller</Filter>
     </ClCompile>
     <ClCompile Include="RenderEngineSystem.cpp">
-      <Filter>Source Files\System</Filter>
+      <Filter>Source Files\Runtime\Engine\Systems</Filter>
     </ClCompile>
     <ClCompile Include="ResourceEngineSystem.cpp">
-      <Filter>Source Files\System</Filter>
+      <Filter>Source Files\Runtime\Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="PathEngineSystem.cpp">
+      <Filter>Source Files\Runtime\Engine\Systems</Filter>
     </ClCompile>
     <ClCompile Include="DynamicRHI.cpp">
-      <Filter>Source Files\RHI</Filter>
+      <Filter>Source Files\Runtime\RHI</Filter>
     </ClCompile>
     <ClCompile Include="D3D11DynamicRHI.cpp">
-      <Filter>Source Files\RHI\Windows\D3D11RHI</Filter>
+      <Filter>Source Files\Runtime\RHI\Windows\D3D11RHI</Filter>
     </ClCompile>
     <ClCompile Include="Windows\WindowsGDIRHI.cpp">
-      <Filter>Source Files\RHI\Windows\WindowsRHI</Filter>
+      <Filter>Source Files\Runtime\RHI\Windows\WindowsRHI</Filter>
     </ClCompile>
     <ClCompile Include="Viewport.cpp">
       <Filter>Source Files\Runtime\Engine\Viewport</Filter>
@@ -527,107 +563,318 @@
       <Filter>Source Files\Runtime\Engine\Viewport</Filter>
     </ClCompile>
     <ClCompile Include="World.cpp">
-      <Filter>Source Files\Entity\World</Filter>
+      <Filter>Source Files\Runtime\Engine\World</Filter>
     </ClCompile>
     <ClCompile Include="TickTaskManager.cpp">
-      <Filter>Source Files\Entity\World\TickTaskManager</Filter>
+      <Filter>Source Files\Runtime\Engine\World\TickTaskManager</Filter>
     </ClCompile>
     <ClCompile Include="Level.cpp">
-      <Filter>Source Files\Entity\World\Level</Filter>
+      <Filter>Source Files\Runtime\Engine\World\Level</Filter>
     </ClCompile>
     <ClCompile Include="GameInstance.cpp">
-      <Filter>Source Files\Entity\GameInstance</Filter>
+      <Filter>Source Files\Runtime\Engine\GameInstance</Filter>
     </ClCompile>
     <ClCompile Include="SceneComponent.cpp">
-      <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent</Filter>
+      <Filter>Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent</Filter>
     </ClCompile>
     <ClCompile Include="PrimitiveComponent.cpp">
-      <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent\PrimitiveComponent</Filter>
+      <Filter>Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent\PrimitiveComponent</Filter>
     </ClCompile>
     <ClCompile Include="Scene.cpp">
-      <Filter>Source Files\Entity\World\Scene</Filter>
+      <Filter>Source Files\Runtime\Renderer\Scene</Filter>
     </ClCompile>
     <ClCompile Include="StaticMeshComponent.cpp">
-      <Filter>Source Files\Entity\Component\ActorComponent\SceneComponent\PrimitiveComponent\StaticMeshComponent</Filter>
+      <Filter>Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent\PrimitiveComponent\MeshComponent\StaticMeshComponent</Filter>
     </ClCompile>
     <ClCompile Include="StaticMeshSceneProxy.cpp">
-      <Filter>Source Files\Entity\World\Scene\SceneProxy</Filter>
+      <Filter>Source Files\Runtime\Renderer\Scene\SceneProxy</Filter>
     </ClCompile>
     <ClCompile Include="Math\UnrealMath.cpp">
-      <Filter>Source Files\Runtime\Math</Filter>
+      <Filter>Source Files\Runtime\Core\Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Delegate.inl">
-      <Filter>Source Files\Runtime\Core\Delegate</Filter>
+      <Filter>Source Files\Runtime\Core\Delegates</Filter>
     </None>
     <None Include="MulticastDelegate.inl">
-      <Filter>Source Files\Runtime\Core\Delegate</Filter>
+      <Filter>Source Files\Runtime\Core\Delegates</Filter>
     </None>
     <None Include="T_Singleton.inl">
-      <Filter>EngineTypes\Template</Filter>
+      <Filter>Source Files\Runtime\Core\Templates</Filter>
     </None>
     <None Include="T_RAIIPattern_ThreadGuard.inl">
-      <Filter>EngineTypes\Template</Filter>
+      <Filter>Source Files\Runtime\Core\Templates</Filter>
     </None>
     <None Include="Engine.inl">
-      <Filter>Source Files\Entity\Engine</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Engine</Filter>
     </None>
     <None Include="UnrealString.inl">
-      <Filter>Source Files\Runtime\UnrealStringTypes\String</Filter>
+      <Filter>Source Files\Runtime\Core\Containers\String</Filter>
     </None>
     <None Include="Math\Matrix.inl">
-      <Filter>Source Files\Runtime\Math</Filter>
+      <Filter>Source Files\Runtime\Core\Math</Filter>
     </None>
     <None Include="Math\UnrealMathVectorCommon.h.inl">
-      <Filter>Source Files\Runtime\Math</Filter>
+      <Filter>Source Files\Runtime\Core\Math</Filter>
     </None>
     <None Include="Math\UnrealMathVectorConstants.h.inl">
-      <Filter>Source Files\Runtime\Math</Filter>
+      <Filter>Source Files\Runtime\Core\Math</Filter>
     </None>
     <None Include="InputComponent.inl">
-      <Filter>Source Files\Entity\Component\ActorComponent\InputComponent</Filter>
+      <Filter>Source Files\Runtime\Engine\Classes\Components\ActorComponent\InputComponent</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Source Files\Entity\Component\ActorComponent\InputComponent">
+    <Filter Include="Source Files\Runtime\Engine\Classes\Components\ActorComponent\InputComponent">
       <UniqueIdentifier>{ec8064fe-4378-4d40-86a4-7c593a6d6326}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\World\Level\LevelStreaming">
+    <Filter Include="Source Files\Runtime\Engine\Classes\Engine\World\Level\LevelStreaming">
       <UniqueIdentifier>{4edd0d5d-c9f3-4e09-a112-5d7db60ca679}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\GameInstance\GameInstanceSubsystem">
+    <Filter Include="Source Files\Runtime\Engine\Subsystems\GameInstanceSubsystem">
       <UniqueIdentifier>{bbfcfb09-6d94-4e56-8f53-c33204298de7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Engine\GameplayStatics">
+    <Filter Include="Source Files\Runtime\Engine\Classes\Kismet\GameplayStatics">
       <UniqueIdentifier>{c96ea62a-39b8-4345-81bd-889d939cdfbc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Engine\GameEngine">
+    <Filter Include="Source Files\Runtime\Engine\Classes\Engine\GameEngine">
       <UniqueIdentifier>{d19bf742-ca18-4939-af99-d162ab830f5b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\World\GameModeBase">
+    <Filter Include="Source Files\Runtime\Engine\Classes\GameFramework\GameModeBase">
       <UniqueIdentifier>{8f0e8872-8456-461b-8159-d71e30f11feb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\World\TickTaskManager">
+    <Filter Include="Source Files\Runtime\Engine\World\TickTaskManager">
       <UniqueIdentifier>{6408643f-1f46-48b9-bf74-92f612d6bb6e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="EngineTypes">
-      <UniqueIdentifier>{76c3123e-0226-4c82-a536-f60885157240}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="EngineTypes\Template">
+
+    <Filter Include="Source Files\Runtime\Core\Templates">
       <UniqueIdentifier>{426237a7-b8ff-4c0c-95ef-68c1592991e5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\System">
+    <Filter Include="Source Files\Runtime\Core\Modules">
+      <UniqueIdentifier>{3f75ca16-28cb-4374-8562-5f8ad2538809}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Runtime\Engine\Systems">
       <UniqueIdentifier>{41b95dea-1de5-4aa0-b71a-5d483b19e197}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Object\Actor\Pawn\MannequinPawn">
+    <Filter Include="Source Files\Runtime\Engine\Classes\GameFramework\Actor\Pawn\MannequinPawn">
       <UniqueIdentifier>{d6930be4-3786-4b1f-b9ac-f3f2ed7870fc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity\Object\Actor\Info">
+    <Filter Include="Source Files\Runtime\Engine\Classes\GameFramework\Actor\Info">
       <UniqueIdentifier>{a69e4d25-abd7-4e47-9e61-e5dc7804f994}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\RHI\Windows\WindowsRHI">
+    <Filter Include="Source Files\Runtime\RHI\Windows\WindowsRHI">
       <UniqueIdentifier>{E6B342B1-8A68-4C14-AE44-2A4C7A4F3D8E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Runtime\Engine\Classes\Materials\MaterialInstance">
+      <UniqueIdentifier>{57ba8820-fab3-44e1-9042-d42eab393ba2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ModuleInterface.h">
+      <Filter>Source Files\Runtime\Core\Modules</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ModuleManager.h">
+      <Filter>Source Files\Runtime\Core\Modules</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ModuleManager.cpp">
+      <Filter>Source Files\Runtime\Core\Modules</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Archive.h">
+      <Filter>Source Files\Runtime\Core\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="StreamableRenderAsset.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture2D.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundBase.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundWave.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Package.h">
+      <Filter>Source Files\Runtime\CoreUObject\UObject</Filter>
+    </ClInclude>
+    <ClInclude Include="PackageStore.h">
+      <Filter>Source Files\Runtime\Engine\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="UObjectGlobals.h">
+      <Filter>Source Files\Runtime\CoreUObject\UObject</Filter>
+    </ClInclude>
+    <ClInclude Include="UObjectGlobals.inl">
+      <Filter>Source Files\Runtime\CoreUObject\UObject</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioComponent.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\AudioComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="BillboardComponent.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\BillboardComponent</Filter>
+    </ClInclude>
+    <ClCompile Include="Archive.cpp">
+      <Filter>Source Files\Runtime\Core\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2D.cpp">
+      <Filter>Source Files\Runtime\Engine\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundWave.cpp">
+      <Filter>Source Files\Runtime\Engine\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="PackageStore.cpp">
+      <Filter>Source Files\Runtime\Engine\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="UObjectGlobals.cpp">
+      <Filter>Source Files\Runtime\CoreUObject\UObject</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioComponent.cpp">
+      <Filter>Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent\AudioComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="BillboardComponent.cpp">
+      <Filter>Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent\PrimitiveComponent\BillboardComponent</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AssetImportData.h">
+      <Filter>Source Files\Runtime\Engine\Classes\EditorFramework</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="WorldPersistence.h">
+      <Filter>Source Files\Runtime\Engine\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerStart.h">
+      <Filter>Source Files\Runtime\Engine\Classes\GameFramework</Filter>
+    </ClInclude>
+    <ClCompile Include="PlayerStart.cpp">
+      <Filter>Source Files\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldPersistence.cpp">
+      <Filter>Source Files\Runtime\Engine\Serialization</Filter>
+    </ClCompile>
+    <ClInclude Include="GameMapsSettings.h">
+      <Filter>Source Files\Runtime\EngineSettings\Classes</Filter>
+    </ClInclude>
+    <ClCompile Include="GameMapsSettings.cpp">
+      <Filter>Source Files\Runtime\EngineSettings</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MaterialInterface.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshComponent.h">
+      <Filter>Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\MeshComponent</Filter>
+    </ClInclude>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files\Runtime\Engine\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshComponent.cpp">
+      <Filter>Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent\PrimitiveComponent\MeshComponent</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EngineTypes.h"><Filter>Source Files\Runtime\Engine\Classes\Engine</Filter></ClInclude>
+    <ClInclude Include="CollisionShape.h"><Filter>Source Files\Runtime\PhysicsCore</Filter></ClInclude>
+    <ClInclude Include="CollisionQueryParams.h"><Filter>Source Files\Runtime\Engine</Filter></ClInclude>
+    <ClInclude Include="PhysicsInterface.h"><Filter>Source Files\Runtime\Engine\Physics</Filter></ClInclude>
+    <ClInclude Include="PhysScene_Chaos.h"><Filter>Source Files\Runtime\Engine\Physics\Experimental</Filter></ClInclude>
+    <ClInclude Include="BodyInstance.h"><Filter>Source Files\Runtime\Engine\Classes\PhysicsEngine</Filter></ClInclude>
+    <ClInclude Include="CollisionProfile.h"><Filter>Source Files\Runtime\Engine\Classes\Engine</Filter></ClInclude>
+    <ClInclude Include="ShapeComponent.h"><Filter>Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\ShapeComponent</Filter></ClInclude>
+    <ClInclude Include="BoxComponent.h"><Filter>Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\ShapeComponent\BoxComponent</Filter></ClInclude>
+    <ClInclude Include="SphereComponent.h"><Filter>Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\ShapeComponent\SphereComponent</Filter></ClInclude>
+    <ClInclude Include="CapsuleComponent.h"><Filter>Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\ShapeComponent\CapsuleComponent</Filter></ClInclude>
+    <ClCompile Include="PhysicsInterface.cpp"><Filter>Source Files\Runtime\Engine\PhysicsEngine</Filter></ClCompile>
+    <ClCompile Include="CollisionProfile.cpp"><Filter>Source Files\Runtime\Engine\Collision</Filter></ClCompile>
+    <ClCompile Include="ShapeComponent.cpp"><Filter>Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent\PrimitiveComponent\ShapeComponent</Filter></ClCompile>
+    <ClInclude Include="Class.h"><Filter>Source Files\Runtime\CoreUObject\UObject</Filter></ClInclude>
+    <ClInclude Include="Class.inl"><Filter>Source Files\Runtime\CoreUObject\UObject</Filter></ClInclude>
+    <ClInclude Include="KismetSystemLibrary.h"><Filter>Source Files\Runtime\Engine\Classes\Kismet</Filter></ClInclude>
+    <ClCompile Include="KismetSystemLibrary.cpp"><Filter>Source Files\Runtime\Engine</Filter></ClCompile>
+    <ClCompile Include="WorldCollision.cpp"><Filter>Source Files\Runtime\Engine\Collision</Filter></ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="NativeClassRegistration.h"><Filter>Source Files\Runtime\Engine\Registration</Filter></ClInclude>
+    <ClInclude Include="NativeClassRegistration.inl"><Filter>Source Files\Runtime\Engine\Registration</Filter></ClInclude>
+  </ItemGroup>
+  <ItemGroup><None Include="..\Build\GenerateNativeClasses.ps1"><Filter>Source Files</Filter></None></ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\Runtime\Engine\Classes" />
+
+    <Filter Include="Source Files\Runtime\PhysicsCore" />
+    <Filter Include="Source Files\Runtime\Engine\Physics" />
+    <Filter Include="Source Files\Runtime\Engine\Physics\Experimental" />
+    <Filter Include="Source Files\Runtime\Engine\Classes\PhysicsEngine" />
+
+    <Filter Include="Source Files\Runtime\Engine\PhysicsEngine" />
+    <Filter Include="Source Files\Runtime\Engine\Collision" />
+    <Filter Include="Source Files\Runtime\Engine\Classes\Kismet" />
+    <Filter Include="Source Files\Runtime\Engine\Registration" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\Runtime\Engine\Subsystems"><UniqueIdentifier>{8ae4397b-836e-4594-aa78-8b2f614b72ec}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Components"><UniqueIdentifier>{13f4c311-1776-4bf0-b0f6-b7792131121b}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Components\ActorComponent"><UniqueIdentifier>{4743f41b-1fef-41eb-b894-b3fe73d6448c}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Renderer"><UniqueIdentifier>{dcb6b4ec-58ef-470b-b236-ec3cc00a4b19}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent"><UniqueIdentifier>{53e658aa-8a38-48db-9946-93a156bff6ff}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\GameFramework"><UniqueIdentifier>{7d91f657-0ce0-4b13-90f4-001aabc2823b}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\GameFramework\Controller"><UniqueIdentifier>{5f9a3f1a-7786-403a-bf46-4b78aeb1c5e9}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\GameFramework\Controller\PlayerController"><UniqueIdentifier>{34efbb26-a367-4397-979b-b066e830a62d}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\GameInstance"><UniqueIdentifier>{04a8be84-b978-4a9d-8bf7-b08bba01c94a}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Engine"><UniqueIdentifier>{1bea7cc3-00dd-4a18-9516-633c7f50f570}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\GameFramework\Actor"><UniqueIdentifier>{9b0654ec-8b53-4d49-8163-fa628a2b209d}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\GameFramework\Actor\Pawn"><UniqueIdentifier>{5340cacb-d092-4284-8c8f-ac2707735dfd}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\GameFramework\Actor\Pawn\Character"><UniqueIdentifier>{23fc0866-b60a-4e31-a180-4383694301f3}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Core\Misc"><UniqueIdentifier>{a674caf6-a5dc-4a07-adc8-68e096c37a7a}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\GameEngine"><UniqueIdentifier>{b0c4114f-6b47-490f-b9a4-b4c98e9fe963}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\GameFramework\Actor\Info"><UniqueIdentifier>{6c945b3c-9c48-47ca-a7b6-fdb18974201d}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\World"><UniqueIdentifier>{bad20190-4e82-4bd6-aeaa-beae6325465b}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Classes\GameFramework\PlayerInput"><UniqueIdentifier>{d788bb4d-4799-47e7-bb7f-5e1d4b641272}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\UserInterface"><UniqueIdentifier>{16ff7396-19c4-4623-a06e-40c127fbf01f}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\UserInterface\PlayerInput"><UniqueIdentifier>{f90f0682-ce04-46a5-a752-8f3f20b46b2c}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Core\UObject"><UniqueIdentifier>{c01edabe-dca1-4a79-a188-6e5ff2b73080}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\World\Level"><UniqueIdentifier>{732d320e-df55-472d-9551-a04bbf571073}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\World\Level\LevelStreaming"><UniqueIdentifier>{1ae3f869-e8c0-4ce6-8696-4c50e05c0661}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Classes\Engine\Viewport"><UniqueIdentifier>{b17923ad-c0f6-494d-ac4b-d629198ff266}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\GameFramework\GameModeBase"><UniqueIdentifier>{775330ea-362c-465a-a348-c2b712f9bc36}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Components\ActorComponent\InputComponent"><UniqueIdentifier>{1fce044e-8a25-465e-89cb-0e05f9fa8b49}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\GameFramework\Actor\Pawn\MannequinPawn"><UniqueIdentifier>{aa7be46e-b776-4164-90db-ab4892bb5e3d}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Core\Internationalization"><UniqueIdentifier>{9969c46b-8ded-4c21-b17d-08d75175d52e}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent\PrimitiveComponent"><UniqueIdentifier>{b2271e46-5b78-45c1-8ed2-8a8155cc62bb}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Core\Containers"><UniqueIdentifier>{419284cb-2d26-4795-9f57-68c1c7fc3bf1}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\EngineSettings"><UniqueIdentifier>{98cb18e2-c980-4ad8-b8ca-6bfc6c222e72}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Materials"><UniqueIdentifier>{107a1005-d8ad-48d1-9977-84d882dfe5bd}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Kismet"><UniqueIdentifier>{331a6f0e-a11a-4384-b5ca-42efff965b3c}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Kismet\GameplayStatics"><UniqueIdentifier>{8873ff7b-bdb9-4374-9167-738fdd03dd66}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Sound"><UniqueIdentifier>{3cc69f59-1d72-4d57-9294-273c40a31542}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Core\HAL"><UniqueIdentifier>{79308756-fc18-415a-a355-0da00ab80af3}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent\PrimitiveComponent\MeshComponent\StaticMeshComponent"><UniqueIdentifier>{cc5d2624-9044-4d63-b1f4-a53b1c008991}</UniqueIdentifier></Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\AudioComponent"><UniqueIdentifier>{a3fefcec-3bcb-47dd-887a-4d7dd747dcd9}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\BillboardComponent"><UniqueIdentifier>{433e92e7-123a-49c3-a4c7-9751337b25c4}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\MeshComponent"><UniqueIdentifier>{de10a4ef-49f4-4d0a-8001-58e3c00c2784}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\ShapeComponent"><UniqueIdentifier>{e04ec045-5b13-4014-93be-c0a2539606e0}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\ShapeComponent\BoxComponent"><UniqueIdentifier>{81d8eb1b-58f2-4d07-bfef-84604ef2797f}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\ShapeComponent\CapsuleComponent"><UniqueIdentifier>{7dae84eb-5ea1-4a40-a3f7-d650ddaa0209}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Classes\Components\ActorComponent\SceneComponent\PrimitiveComponent\ShapeComponent\SphereComponent"><UniqueIdentifier>{4750a229-e49d-4232-a72c-31c66027a436}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent\AudioComponent"><UniqueIdentifier>{585f9d69-4186-44a8-aa77-84ab550e4cff}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent\PrimitiveComponent\BillboardComponent"><UniqueIdentifier>{1c513be3-aa4a-459c-8cb4-298b3b70d105}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent\PrimitiveComponent\MeshComponent"><UniqueIdentifier>{93d45c3a-707b-4e71-ac0e-1443a30c8543}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files\Runtime\Engine\Components\ActorComponent\SceneComponent\PrimitiveComponent\ShapeComponent"><UniqueIdentifier>{23a0d301-24b7-4dec-b746-33ccfd122ebc}</UniqueIdentifier></Filter>
   </ItemGroup>
 </Project>

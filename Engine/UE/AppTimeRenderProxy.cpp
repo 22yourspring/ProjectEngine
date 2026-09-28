@@ -40,7 +40,7 @@ void FAppTimeRenderProxy::Render(FDynamicRHI& _DynamicRHI)
 	sprintf_s(
 		WindowTitle,
 		"%s Game FPS: %.1f  Play Time: %.2fs",
-		Snapshot.ClockName.c_str(),
+		Snapshot.ClockName.ToUtf8().c_str(),
 		Snapshot.FramesPerSecond,
 		Snapshot.CurrentTime);
 

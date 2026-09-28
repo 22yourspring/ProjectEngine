@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include "UE/StringUtility.h"
 
 #include "UE/CoreTypes.h"
@@ -207,7 +209,7 @@ public:
 	 *
 	 * @return A string describing the two-vector.
 	 */
-	[[nodiscard]] std::string ToString() const;
+	[[nodiscard]] FString ToString() const;
 
 public:
 };
@@ -413,9 +415,9 @@ inline FVector::FReal& FTwoVectors::operator[]( int32 i )
 }
 
 
-UE_FORCEINLINE_HINT std::string FTwoVectors::ToString() const
+UE_FORCEINLINE_HINT FString FTwoVectors::ToString() const
 {
-	return StringFormat("V1=(%s) V2=(%s)", v1.ToString().c_str(), v2.ToString().c_str());
+	return StringFormat("V1=(%s) V2=(%s)", v1.ToString().ToUtf8().c_str(), v2.ToString().ToUtf8().c_str());
 }
 
 template <> struct TIsPODType<FTwoVectors> { enum { Value = true }; };

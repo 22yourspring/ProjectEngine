@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include "UE/StringUtility.h"
 
 #include "UE/CoreTypes.h"
@@ -437,16 +439,16 @@ struct FLinearColor
 		return FMath::Min( FMath::Min( FMath::Min( R, G ), B ), A );
 	}
 
-	[[nodiscard]] CORE_API std::string ToString() const;
+	[[nodiscard]] CORE_API FString ToString() const;
 
 	/**
-	 * Initialize this Color based on an std::string. The String is expected to contain R=, G=, B=, A=.
+	 * Initialize this Color based on an FString. The String is expected to contain R=, G=, B=, A=.
 	 * The FLinearColor will be bogus when InitFromString returns false.
 	 *
-	 * @param InSourceString std::string containing the color values.
+	 * @param InSourceString FString containing the color values.
 	 * @return true if the R,G,B values were read successfully; false otherwise.
 	 */
-	CORE_API bool InitFromString( const std::string& InSourceString );
+	CORE_API bool InitFromString( const FString& InSourceString );
 
 	/**
 	 * Helper for pixel format conversions. Clamps to [0,1], mapping NaNs to 0,
@@ -583,7 +585,7 @@ public:
 	 * @return The corresponding color value.
 	 * @see ToHex
 	 */
-	[[nodiscard]] static CORE_API FColor FromHex( const std::string& HexString );
+	[[nodiscard]] static CORE_API FColor FromHex( const FString& HexString );
 
 	/**
 	 * Makes a random but quite nice color.
@@ -707,7 +709,7 @@ public:
 	 * @return Hexadecimal string.
 	 * @see FromHex, ToString
 	 */
-	[[nodiscard]] CORE_API std::string ToHex() const;
+	[[nodiscard]] CORE_API FString ToHex() const;
 
 	/**
 	 * Converts this color value to a string.
@@ -715,16 +717,16 @@ public:
 	 * @return The string representation.
 	 * @see ToHex
 	 */
-	[[nodiscard]] CORE_API std::string ToString() const;
+	[[nodiscard]] CORE_API FString ToString() const;
 
 	/**
-	 * Initialize this Color based on an std::string. The String is expected to contain R=, G=, B=, A=.
+	 * Initialize this Color based on an FString. The String is expected to contain R=, G=, B=, A=.
 	 * The FColor will be bogus when InitFromString returns false.
 	 *
-	 * @param	InSourceString	std::string containing the color values.
+	 * @param	InSourceString	FString containing the color values.
 	 * @return true if the R,G,B values were read successfully; false otherwise.
 	 */
-	CORE_API bool InitFromString( const std::string& InSourceString );
+	CORE_API bool InitFromString( const FString& InSourceString );
 
 	/**
 	 * Gets the color in a packed uint32 format packed in the order ARGB.

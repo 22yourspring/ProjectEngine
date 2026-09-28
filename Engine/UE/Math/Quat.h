@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include "UE/StringUtility.h"
 
 #include "UE/CoreTypes.h"
@@ -563,17 +565,17 @@ public:
 	 *
 	 * @return Text describing the vector.
 	 */
-	[[nodiscard]] std::string ToString() const;
+	[[nodiscard]] FString ToString() const;
 
 	/**
-	 * Initialize this TQuat from a std::string. 
+	 * Initialize this TQuat from a FString. 
 	 * The string is expected to contain X=, Y=, Z=, W=, otherwise 
 	 * this TQuat will have indeterminate (invalid) values.
 	 *
-	 * @param InSourceString std::string containing the quaternion values.
+	 * @param InSourceString FString containing the quaternion values.
 	 * @return true if the TQuat was initialized; false otherwise.
 	 */
-	bool InitFromString(const std::string& InSourceString);
+	bool InitFromString(const FString& InSourceString);
 
 public:
 
@@ -811,13 +813,13 @@ inline TQuat<T>::TQuat(QuatVectorRegister V)
 
 
 template<typename T>
-UE_FORCEINLINE_HINT std::string TQuat<T>::ToString() const
+UE_FORCEINLINE_HINT FString TQuat<T>::ToString() const
 {
 	return StringFormat("X=%.9f Y=%.9f Z=%.9f W=%.9f", X, Y, Z, W);
 }
 
 template<typename T>
-inline bool TQuat<T>::InitFromString(const std::string& InSourceString)
+inline bool TQuat<T>::InitFromString(const FString& InSourceString)
 {
 	X = Y = Z = 0.f;
 	W = 1.f;

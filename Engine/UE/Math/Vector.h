@@ -1,5 +1,7 @@
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include "UE/CoreTypes.h"
 #include "UE/Math/MathFwd.h"
 #include "UE/Math/UnrealMathUtility.h"
@@ -476,8 +478,8 @@ namespace UE
                 const TVector<T>& _NormalB,
                 T _Alpha);
 
-            [[nodiscard]] std::string ToString() const;
-            bool InitFromString(std::string_view _Source);
+            [[nodiscard]] FString ToString() const;
+            bool InitFromString(const FString& _Source);
 
             [[nodiscard]] static T Dist(const TVector<T>& _Left, const TVector<T>& _Right);
             [[nodiscard]] static T Distance(const TVector<T>& _Left, const TVector<T>& _Right)
@@ -976,7 +978,7 @@ namespace UE
         }
 
         template<typename T>
-        inline std::string TVector<T>::ToString() const
+        inline FString TVector<T>::ToString() const
         {
             return StringFormat(
                 "X=%.9g Y=%.9g Z=%.9g",
@@ -986,7 +988,7 @@ namespace UE
         }
 
         template<typename T>
-        inline bool TVector<T>::InitFromString(std::string_view _Source)
+        inline bool TVector<T>::InitFromString(const FString& _Source)
         {
             return ParseValue(_Source, "X=", X)
                 && ParseValue(_Source, "Y=", Y)

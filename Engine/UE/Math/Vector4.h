@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include "UE/StringUtility.h"
 
 #include "UE/CoreTypes.h"
@@ -429,16 +431,16 @@ public:
 	 *
 	 * @return Text describing the vector.
 	 */
-	[[nodiscard]] std::string ToString() const;
+	[[nodiscard]] FString ToString() const;
 
 	/**
-	 * Initialize this Vector based on an std::string. The String is expected to contain X=, Y=, Z=, W=.
+	 * Initialize this Vector based on an FString. The String is expected to contain X=, Y=, Z=, W=.
 	 * The TVector4 will be bogus when InitFromString returns false.
 	 *
-	 * @param InSourceString	std::string containing the vector values.
+	 * @param InSourceString	FString containing the vector values.
 	 * @return true if the X,Y,Z values were read successfully; false otherwise.
 	 */
-	bool InitFromString(const std::string& InSourceString);
+	bool InitFromString(const FString& InSourceString);
 
 	/**
 	 * Returns a normalized copy of the vector if safe to normalize.
@@ -775,14 +777,14 @@ UE_FORCEINLINE_HINT bool TVector4<T>::Equals(const TVector4<T>& V, T Tolerance) 
 
 
 template<typename T>
-UE_FORCEINLINE_HINT std::string TVector4<T>::ToString() const
+UE_FORCEINLINE_HINT FString TVector4<T>::ToString() const
 {
 	return StringFormat("X=%3.3f Y=%3.3f Z=%3.3f W=%3.3f", X, Y, Z, W);
 }
 
 
 template<typename T>
-inline bool TVector4<T>::InitFromString(const std::string& InSourceString)
+inline bool TVector4<T>::InitFromString(const FString& InSourceString)
 {
 	X = Y = Z = 0;
 	W = 1.0f;

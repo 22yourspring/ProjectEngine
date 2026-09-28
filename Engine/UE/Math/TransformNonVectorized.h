@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UE/UnrealString.h"
+
 #include "UE/CoreTypes.h"
 #include "UE/Math/UnrealMathUtility.h"
 #include "UE/Math/VectorRegister.h"
@@ -192,12 +194,12 @@ public:
 	[[nodiscard]] bool DebugEqualMatrix(const TMatrix<T>& Matrix) const;
 
 	/** Convert TTransform<T> contents to a string */
-	[[nodiscard]] CORE_API std::string ToHumanReadableString() const;
+	[[nodiscard]] CORE_API FString ToHumanReadableString() const;
 
-	[[nodiscard]] CORE_API std::string ToString() const;
+	[[nodiscard]] CORE_API FString ToString() const;
 
 	/** Acceptable form: "%f,%f,%f|%f,%f,%f|%f,%f,%f" */
-	CORE_API bool InitFromString(const std::string& InSourceString);
+	CORE_API bool InitFromString(const FString& InSourceString);
 
 	/**
 	* Convert this Transform to a transformation matrix with scaling.
