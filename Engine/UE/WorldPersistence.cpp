@@ -42,21 +42,21 @@ namespace
     {
         static const bool Ready = []
         {
-            FWorldPersistence::RegisterActor(TEXT("/Script/UE.Actor"), typeid(AActor), [](UWorld* _World) { return _World->SpawnActor<AActor>(); });
-            FWorldPersistence::RegisterActor(TEXT("/Script/UE.PlayerStart"), typeid(APlayerStart), [](UWorld* _World) { return _World->SpawnActor<APlayerStart>(); });
-            FWorldPersistence::RegisterActor(TEXT("/Script/UE.Pawn"), typeid(APawn), [](UWorld* _World) { return _World->SpawnActor<APawn>(); });
-            FWorldPersistence::RegisterActor(TEXT("/Script/UE.Character"), typeid(ACharacter), [](UWorld* _World) { return _World->SpawnActor<ACharacter>(); });
-            FWorldPersistence::RegisterActor(TEXT("/Script/UE.MannequinPawn"), typeid(AMannequinPawn), [](UWorld* _World) { return _World->SpawnActor<AMannequinPawn>(); });
-            FWorldPersistence::RegisterComponent(TEXT("/Script/UE.ActorComponent"), typeid(UActorComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UActorComponent>(); });
-            FWorldPersistence::RegisterComponent(TEXT("/Script/UE.BoxComponent"), typeid(UBoxComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UBoxComponent>(); });
-            FWorldPersistence::RegisterComponent(TEXT("/Script/UE.SphereComponent"), typeid(USphereComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<USphereComponent>(); });
-            FWorldPersistence::RegisterComponent(TEXT("/Script/UE.CapsuleComponent"), typeid(UCapsuleComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UCapsuleComponent>(); });
-            FWorldPersistence::RegisterComponent(TEXT("/Script/UE.SceneComponent"), typeid(USceneComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<USceneComponent>(); });
-            FWorldPersistence::RegisterComponent(TEXT("/Script/UE.PrimitiveComponent"), typeid(UPrimitiveComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UPrimitiveComponent>(); });
-            FWorldPersistence::RegisterComponent(TEXT("/Script/UE.StaticMeshComponent"), typeid(UStaticMeshComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UStaticMeshComponent>(); });
-            FWorldPersistence::RegisterComponent(TEXT("/Script/UE.BillboardComponent"), typeid(UBillboardComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UBillboardComponent>(); });
-            FWorldPersistence::RegisterComponent(TEXT("/Script/UE.AudioComponent"), typeid(UAudioComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UAudioComponent>(); });
-            FWorldPersistence::RegisterComponent(TEXT("/Script/UE.InputComponent"), typeid(UInputComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UInputComponent>(); });
+            FWorldPersistence::RegisterActor(TEXT("/Script/Engine.Actor"), typeid(AActor), [](UWorld* _World) { return _World->SpawnActor<AActor>(); });
+            FWorldPersistence::RegisterActor(TEXT("/Script/Engine.PlayerStart"), typeid(APlayerStart), [](UWorld* _World) { return _World->SpawnActor<APlayerStart>(); });
+            FWorldPersistence::RegisterActor(TEXT("/Script/Engine.Pawn"), typeid(APawn), [](UWorld* _World) { return _World->SpawnActor<APawn>(); });
+            FWorldPersistence::RegisterActor(TEXT("/Script/Engine.Character"), typeid(ACharacter), [](UWorld* _World) { return _World->SpawnActor<ACharacter>(); });
+            FWorldPersistence::RegisterActor(TEXT("/Script/Engine.MannequinPawn"), typeid(AMannequinPawn), [](UWorld* _World) { return _World->SpawnActor<AMannequinPawn>(); });
+            FWorldPersistence::RegisterComponent(TEXT("/Script/Engine.ActorComponent"), typeid(UActorComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UActorComponent>(); });
+            FWorldPersistence::RegisterComponent(TEXT("/Script/Engine.BoxComponent"), typeid(UBoxComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UBoxComponent>(); });
+            FWorldPersistence::RegisterComponent(TEXT("/Script/Engine.SphereComponent"), typeid(USphereComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<USphereComponent>(); });
+            FWorldPersistence::RegisterComponent(TEXT("/Script/Engine.CapsuleComponent"), typeid(UCapsuleComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UCapsuleComponent>(); });
+            FWorldPersistence::RegisterComponent(TEXT("/Script/Engine.SceneComponent"), typeid(USceneComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<USceneComponent>(); });
+            FWorldPersistence::RegisterComponent(TEXT("/Script/Engine.PrimitiveComponent"), typeid(UPrimitiveComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UPrimitiveComponent>(); });
+            FWorldPersistence::RegisterComponent(TEXT("/Script/Engine.StaticMeshComponent"), typeid(UStaticMeshComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UStaticMeshComponent>(); });
+            FWorldPersistence::RegisterComponent(TEXT("/Script/Engine.BillboardComponent"), typeid(UBillboardComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UBillboardComponent>(); });
+            FWorldPersistence::RegisterComponent(TEXT("/Script/Engine.AudioComponent"), typeid(UAudioComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UAudioComponent>(); });
+            FWorldPersistence::RegisterComponent(TEXT("/Script/Engine.InputComponent"), typeid(UInputComponent), [](AActor* _Actor) { return _Actor->CreateInstanceComponent<UInputComponent>(); });
             return true;
         }();
     }
@@ -242,6 +242,8 @@ namespace
         for (auto& Record : _Records)
         {
             Archive.String(Record.__Class); Archive.UInt32(Record.__Owner); Archive.UInt32(Record.__Parent);
+            if (Record.__Class.StartsWith(TEXT("/Script/UE."), ESearchCase::CaseSensitive))
+                Record.__Class = FString(TEXT("/Script/Engine.")) + Record.__Class.Mid(11);
             Archive.UInt32(Record.__Root); Archive.UInt32(Record.__Default); Archive.Bytes(Record.__Payload, 1024 * 1024);
             if (Archive.IsError() || Record.__Owner > Count || Record.__Parent > Count || Record.__Root > Count || Record.__Default > 1) return false;
         }
@@ -266,7 +268,9 @@ std::vector<FString> FWorldPersistence::GetActorClasses()
 }
 AActor* FWorldPersistence::SpawnActor(const FString& _Name, UWorld* _World)
 {
-    Builtins(); const auto Found = Types().find(_Name);
+    Builtins();
+    const auto Name = _Name.StartsWith(TEXT("/Script/UE."), ESearchCase::CaseSensitive) ? FString(TEXT("/Script/Engine.")) + _Name.Mid(11) : _Name;
+    const auto Found = Types().find(Name);
     return _World && Found != Types().end() && Found->second.__Actor ? Found->second.__Actor(_World) : nullptr;
 }
 std::unique_ptr<UWorld> FWorldPersistence::CreateWorld(const FString& _Name) { return std::make_unique<UWorld>(FName(*_Name)); }

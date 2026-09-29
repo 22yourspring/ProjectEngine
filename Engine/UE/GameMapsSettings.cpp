@@ -19,8 +19,8 @@ void UGameMapsSettings::Load(const std::filesystem::path& _Project)
     __GameDefaultMap = Read(File, L"GameDefaultMap", L"/Game/Levels/Stage1");
     std::string Legacy;
     std::ifstream(_Project / L"Saved/Config/EditorDefaultPawn.cfg") >> Legacy;
-    const auto Mode = Read(File, L"GlobalDefaultGameMode", Legacy == "EngineGameMode" ? L"/Script/UE.GameModeBase" : L"/Script/Project.ProjectGameMode");
-    __UseEngineGameMode = Mode == TEXT("/Script/UE.GameModeBase");
+    const auto Mode = Read(File, L"GlobalDefaultGameMode", Legacy == "EngineGameMode" ? L"/Script/Engine.GameModeBase" : L"/Script/Project.ProjectGameMode");
+    __UseEngineGameMode = Mode == TEXT("/Script/Engine.GameModeBase") || Mode == TEXT("/Script/UE.GameModeBase");
 }
 bool UGameMapsSettings::Save(const std::filesystem::path& _Project) const
 {
@@ -29,7 +29,7 @@ bool UGameMapsSettings::Save(const std::filesystem::path& _Project) const
     if (Error) return false;
     return WritePrivateProfileStringW(Section, L"EditorStartupMap", *__EditorStartupMap, File.c_str()) &&
         WritePrivateProfileStringW(Section, L"GameDefaultMap", *__GameDefaultMap, File.c_str()) &&
-        WritePrivateProfileStringW(Section, L"GlobalDefaultGameMode", __UseEngineGameMode ? L"/Script/UE.GameModeBase" : L"/Script/Project.ProjectGameMode", File.c_str());
+        WritePrivateProfileStringW(Section, L"GlobalDefaultGameMode", __UseEngineGameMode ? L"/Script/Engine.GameModeBase" : L"/Script/Project.ProjectGameMode", File.c_str());
 }
 std::filesystem::path UGameMapsSettings::ResolveMap(const std::filesystem::path& _Content, const FString& _Map)
 {

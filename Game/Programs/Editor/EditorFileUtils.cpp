@@ -334,12 +334,12 @@ void FEditorImGui::DrawAddActor()
         {
             if (ImGui::BeginMenu("Basic"))
             {
-                for (const auto& Class : Classes) if (Class.StartsWith(TEXT("/Script/UE."), ESearchCase::CaseSensitive)) Entry(Class);
+                for (const auto& Class : Classes) if (Class.StartsWith(TEXT("/Script/Engine."), ESearchCase::CaseSensitive)) Entry(Class);
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Project"))
             {
-                for (const auto& Class : Classes) if (!Class.StartsWith(TEXT("/Script/UE."), ESearchCase::CaseSensitive)) Entry(Class);
+                for (const auto& Class : Classes) if (!Class.StartsWith(TEXT("/Script/Engine."), ESearchCase::CaseSensitive)) Entry(Class);
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("All Classes"))
